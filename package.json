@@ -5,9 +5,12 @@
   "author": "Nicholas Sorokin <nicholas.sorokin@hotmail.com>",
   "license": "MIT",
   "dependencies": {
-    "discord.js": "^11.5.1"
+    "discord.js": "^11.5.1",
+    "haiku-random": "^1.0.0",
+    "node-fetch": "^2.6.0"
   },
   "devDependencies": {
-    "@types/node": "^13.5.0"
+    "@types/node": "^13.5.0",
+    "@types/node-fetch": "^2.5.4"
   }
 }

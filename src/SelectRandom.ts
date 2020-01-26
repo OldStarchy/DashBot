@@ -1,3 +1,10 @@
-export default function selectRandom<T extends any[]>(array: T): T[number] {
-	return array[Math.floor(Math.random() * array.length)];
+export default function selectRandom<T extends any[]>(
+	array: T,
+	limit?: number
+): T[number] {
+	if (limit === undefined || limit < 1) limit = array.length;
+
+	limit = Math.min(limit, array.length);
+	const r = array[Math.floor(Math.random() * limit)];
+	return r;
 }
