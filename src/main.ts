@@ -1,13 +1,12 @@
 //@ts-check
 
-import discord from 'discord.js';
+import DashBot from './DashBot';
 import Config from './dashbot.config';
+import { Client } from 'discord.js';
 
+const client = new Client();
 
-
-const client = new discord.Client();
-
-
+const dashbot = new DashBot(client);
 
 client.on('ready', () => {
 	console.log(`Logged in as ${client.user.tag}!`);
