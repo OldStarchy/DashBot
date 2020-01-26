@@ -19,13 +19,17 @@ export class ImgurSearchAction extends Action {
 				.then((json: ImgurResponse) => {
 					if (json.success) {
 						const img = selectRandom(json.data, 20);
-						message.channel
-							.send(img.title)
-							.then(r => message.channel.send(img.link));
-						this.bot.stats.recordUserTriggeredEvent(
-							message.author.username,
-							'search imgur'
-						);
+						if (img) {
+							message.channel
+								.send(img.title)
+								.then(r => message.channel.send(img.link));
+							this.bot.stats.recordUserTriggeredEvent(
+								message.author.username,
+								'search imgur'
+							);
+						} else {
+							message.channel.send('no results... i guess');
+						}
 					} else {
 						message.channel.send(
 							"Imgur doesn't like me right now sorry"

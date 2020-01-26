@@ -8,6 +8,7 @@ import { StatsAction } from './StatsAction';
 import { DieAction } from './DieAction';
 import { ABResponseAction } from './ABResponseAction';
 import { OneOffReplyAction } from './OneOffReplyAction';
+import { TraceryAction } from './TraceryAction';
 
 export default class DashBot {
 	public stats = new StatTracker();
@@ -169,7 +170,8 @@ export default class DashBot {
 			new StatsAction(this),
 			new ImgurSearchAction(this),
 			new DadJokeAction(this),
-			new HaikuAction(this)
+			new HaikuAction(this),
+			new TraceryAction(this)
 		);
 	}
 
