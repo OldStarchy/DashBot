@@ -1,0 +1,13 @@
+{
+  "name": "dashbot",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Nicholas Sorokin <nicholas.sorokin@hotmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "discord.js": "^11.5.1"
+  },
+  "devDependencies": {
+    "@types/node": "^13.5.0"
+  }
+}
