@@ -1,7 +1,7 @@
 import { Message } from 'discord.js';
-import { sleep } from './sleep';
-import { Action } from './Action';
-import { ActionResult } from './ActionResult';
+import { sleep } from '../sleep';
+import { Action } from '../Action';
+import { ActionResult } from '../ActionResult';
 export class DieAction extends Action {
 	handle(message: Message) {
 		let match = /^roll (d(-?\d+)|dice)$/i.exec(message.content);

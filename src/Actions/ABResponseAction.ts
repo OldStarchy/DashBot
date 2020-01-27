@@ -1,7 +1,7 @@
 import { Message } from 'discord.js';
-import { Action } from './Action';
-import { ActionResult } from './ActionResult';
-import DashBot from './DashBot';
+import { Action } from '../Action';
+import { ActionResult } from '../ActionResult';
+import DashBot from '../DashBot';
 export class ABResponseAction extends Action {
 	constructor(bot: DashBot, protected aBResponses: [string, string][]) {
 		super(bot);

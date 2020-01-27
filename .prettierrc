@@ -10,7 +10,8 @@
 		{
 			"files": [
 				"*.yml",
-				"*.yaml"
+				"*.yaml",
+				"package.json"
 			],
 			"options": {
 				"tabWidth": 2,

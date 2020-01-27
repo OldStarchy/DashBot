@@ -1,13 +1,6 @@
-import { Message } from 'discord.js';
-import { Action } from './Action';
-import { ActionResult } from './ActionResult';
-import { Tracery } from './tracery/Tracery';
-import { Grammar } from './tracery/Grammar';
-import { DefaultModifiersEn } from './tracery/default/modifiers-en';
+import { RawGrammar } from '../tracery/Grammar';
 
-const tracery = new Tracery();
-
-const defaultGrammar = {
+export const AdventurerIntroduction: RawGrammar = {
 	origin: [
 		'You are #name#, #allegiance.a# #race# #class# #action#, #reasonClause#.',
 	],
@@ -202,18 +195,3 @@ const defaultGrammar = {
 		'#hardLetter##secondLetter##vowel#',
 	],
 };
-
-export class TraceryAction extends Action {
-	handle(message: Message) {
-		if (/who am i/i.test(message.content)) {
-			const grammar = tracery.createGrammar(defaultGrammar);
-			grammar.addModifiers(DefaultModifiersEn);
-
-			const generated = grammar.expand('#origin#');
-
-			message.channel.send('> ' + generated.finishedText);
-			return new ActionResult(true);
-		}
-		return new ActionResult(false);
-	}
-}

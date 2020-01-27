@@ -1,14 +1,14 @@
 import { Client, Message } from 'discord.js';
 import { StatTracker } from './StatTracker';
-import { DadJokeAction } from './DadJokeAction';
-import { HaikuAction } from './HaikuAction';
+import { DadJokeAction } from './Actions/DadJokeAction';
+import { HaikuAction } from './Actions/HaikuAction';
 import { Action } from './Action';
-import { ImgurSearchAction } from './ImgurSearchAction';
-import { StatsAction } from './StatsAction';
-import { DieAction } from './DieAction';
-import { ABResponseAction } from './ABResponseAction';
-import { OneOffReplyAction } from './OneOffReplyAction';
-import { TraceryAction } from './TraceryAction';
+import { ImgurSearchAction } from './Actions/ImgurSearchAction';
+import { StatsAction } from './Actions/StatsAction';
+import { DieAction } from './Actions/DieAction';
+import { ABResponseAction } from './Actions/ABResponseAction';
+import { OneOffReplyAction } from './Actions/OneOffReplyAction';
+import { TraceryAction } from './Actions/TraceryAction';
 
 export default class DashBot {
 	public stats = new StatTracker();

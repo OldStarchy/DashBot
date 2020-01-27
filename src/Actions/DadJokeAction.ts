@@ -1,7 +1,7 @@
 import { Message } from 'discord.js';
 import fetch from 'node-fetch';
-import { Action } from './Action';
-import { ActionResult } from './ActionResult';
+import { Action } from '../Action';
+import { ActionResult } from '../ActionResult';
 
 export class DadJokeAction extends Action {
 	handle(message: Message) {

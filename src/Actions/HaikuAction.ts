@@ -1,6 +1,6 @@
 import { Message } from 'discord.js';
-import { ActionResult } from './ActionResult';
-import { Action } from './Action';
+import { ActionResult } from '../ActionResult';
+import { Action } from '../Action';
 import { random as getHaiku } from 'haiku-random';
 
 export class HaikuAction extends Action {
