@@ -1,8 +1,23 @@
+import { writeFileSync, readFileSync, existsSync } from 'fs';
+import { serialize } from 'v8';
+
 export class StatTracker {
+	constructor(private readonly stateFile: string) {
+		if (existsSync(this.stateFile)) {
+			const serializedData = readFileSync(this.stateFile, 'utf8');
+			const data = JSON.parse(serializedData);
+
+			this.events = data.events || {};
+			this.userTriggeredEvents = data.userTriggeredEvents || {};
+		}
+	}
+
 	startTrackingTime = Date.now();
+
 	userTriggeredEvents: {
 		[userName: string]: { [eventType: string]: number };
 	} = {};
+
 	events: {
 		[eventType: string]: number;
 	} = {};
@@ -16,7 +31,16 @@ export class StatTracker {
 
 		this.recordEvent(eventType);
 	}
+
 	recordEvent(eventType: string) {
 		this.events[eventType] = (this.events[eventType] || 0) + 1;
+
+		const data = {
+			events: this.events,
+			userTriggeredEvents: this.userTriggeredEvents,
+		};
+
+		const serializedData = JSON.stringify(data);
+		writeFileSync(this.stateFile, serializedData);
 	}
 }

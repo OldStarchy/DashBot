@@ -1,10 +1,11 @@
 import { Message } from 'discord.js';
 import selectRandom from '../SelectRandom';
 import fetch from 'node-fetch';
-import Config from '../dashbot.config';
 import { ImgurResponse } from '../ImgurResponse';
 import { Action } from '../Action';
 import { ActionResult } from '../ActionResult';
+import Config from '../DashbotConfig';
+
 export class ImgurSearchAction extends Action {
 	handle(message: Message) {
 		const match = /^!imgur (.*)/i.exec(message.content);

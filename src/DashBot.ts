@@ -9,9 +9,10 @@ import { DieAction } from './Actions/DieAction';
 import { ABResponseAction } from './Actions/ABResponseAction';
 import { OneOffReplyAction } from './Actions/OneOffReplyAction';
 import { TraceryAction } from './Actions/TraceryAction';
+import Config from './DashbotConfig';
 
 export default class DashBot {
-	public stats = new StatTracker();
+	public stats = new StatTracker(Config.statsFileLocation);
 	constructor(public readonly client: Client) {
 		client.on('message', this.onMessage.bind(this));
 		// client.on('presenceUpdate', (oldMember, newMember) => {

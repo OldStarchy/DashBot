@@ -1,4 +1,7 @@
-export default interface DashbotConfig {
+import { existsSync, readSync } from 'fs';
+import { join } from 'path';
+
+export interface DashbotConfig {
 	/**
 	 * Client ID taken from the discord developer site
 	 */
@@ -14,4 +17,26 @@ export default interface DashbotConfig {
 	botToken: string;
 	imgurClientId: string;
 	imgurClientSecret: string;
+	statsFileLocation: string;
+
+	logToFile: boolean;
 }
+
+const configFileName = 'dashbot.config';
+const searchPaths = ['config', '.', '..'];
+
+const Config: DashbotConfig = (() => {
+	const paths = searchPaths.map(path => join(path, configFileName));
+
+	for (const path of paths) {
+		try {
+			const config = require('./' + path);
+			console.log(`Loading config from "${path}"`);
+			return config;
+		} catch (ex) {}
+	}
+
+	throw new Error('Could not load config');
+})();
+
+export default Config;

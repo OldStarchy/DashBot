@@ -1,8 +1,19 @@
 //@ts-check
 
 import DashBot from './DashBot';
-import Config from './dashbot.config';
 import { Client } from 'discord.js';
+import Config from './DashbotConfig';
+import { createWriteStream } from 'fs';
+
+// if (Config.logToFile) {
+// 	const dir = 'config';
+// 	const access = createWriteStream(dir + '/node.access.log', { flags: 'a' });
+// 	const error = createWriteStream(dir + '/node.error.log', { flags: 'a' });
+
+// 	// redirect stdout / stderr
+// 	// process.stdout.pipe(access);
+// 	process.stderr.pipe(error);
+// }
 
 const client = new Client();
 
