@@ -2,9 +2,11 @@ import { Message } from 'discord.js';
 import { sleep } from '../sleep';
 import { Action } from '../Action';
 import { ActionResult } from '../ActionResult';
+
 export class DieAction extends Action {
 	handle(message: Message) {
 		let match = /^roll (d(-?\d+)|dice)$/i.exec(message.content);
+
 		if (match) {
 			let size = 0;
 			if (match[1] === 'dice') {
@@ -18,13 +20,13 @@ export class DieAction extends Action {
 					"hey what kind of bot do you take me for, there's no such thing as a " +
 						match![1]
 				);
-				return new ActionResult(true);
+				return ActionResult.HANDLED;
 			}
 			if (size === 1) {
 				message.channel.send(
 					`something tells me the result of rolling a ${match[1]} would be awefully predictable...`
 				);
-				return new ActionResult(true);
+				return ActionResult.HANDLED;
 			}
 			this.bot.stats.recordUserTriggeredEvent(
 				message.author.username,
@@ -46,13 +48,13 @@ export class DieAction extends Action {
 					if (positive) message.channel.send(result.toFixed(0));
 					else message.channel.send('-' + result.toFixed(0));
 				});
-			return new ActionResult(true);
+			return ActionResult.HANDLED;
 		}
 		if (/^roll (d(-?\d+)e\d+)$/i.test(message.content)) {
 			message.channel.send(
 				'get out of here with those silly numbers nerd'
 			);
-			return new ActionResult(true);
+			return ActionResult.HANDLED;
 		}
 		if (/(coin (toss|flip)|(toss|flip) coin)/i.test(message.content)) {
 			const size = 11;
@@ -83,8 +85,8 @@ export class DieAction extends Action {
 						}`
 					);
 				});
-			return new ActionResult(true);
+			return ActionResult.HANDLED;
 		}
-		return new ActionResult(false);
+		return ActionResult.UNHANDLED;
 	}
 }

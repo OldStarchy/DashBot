@@ -32,7 +32,7 @@ export class StatsAction extends Action {
 					});
 					message.channel.send(formatTable(r));
 				});
-			return new ActionResult(true);
+			return ActionResult.HANDLED;
 		}
 		if (message.content.toLowerCase() === 'show my stats') {
 			message.channel
@@ -57,8 +57,8 @@ export class StatsAction extends Action {
 					});
 					message.channel.send(formatTable(r));
 				});
-			return new ActionResult(true);
+			return ActionResult.HANDLED;
 		}
-		return new ActionResult(false);
+		return ActionResult.UNHANDLED;
 	}
 }

@@ -34,8 +34,8 @@ export class OneOffReplyAction extends Action {
 			} else {
 				message.channel.send(compliment);
 			}
-			return new ActionResult(true);
+			return ActionResult.HANDLED;
 		}
-		return new ActionResult(false);
+		return ActionResult.UNHANDLED;
 	}
 }

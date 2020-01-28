@@ -17,8 +17,8 @@ export class TraceryAction extends Action {
 			const generated = grammar.expand('#origin#');
 
 			message.channel.send('> ' + generated.finishedText);
-			return new ActionResult(true);
+			return ActionResult.HANDLED;
 		}
-		return new ActionResult(false);
+		return ActionResult.UNHANDLED;
 	}
 }

@@ -74,6 +74,7 @@ export var DefaultModifiersEn: Collection<Modifier> = {
 				return s + 's';
 		}
 	},
+
 	ed: function(s) {
 		switch (s.charAt(s.length - 1)) {
 			case 's':
@@ -116,5 +117,5 @@ export var DefaultModifiersEn: Collection<Modifier> = {
 
 				return s + "'s";
 		}
-	}
+	},
 };

@@ -10,6 +10,7 @@ import { ABResponseAction } from './Actions/ABResponseAction';
 import { OneOffReplyAction } from './Actions/OneOffReplyAction';
 import { TraceryAction } from './Actions/TraceryAction';
 import Config from './DashbotConfig';
+import { GreetAction } from './Actions/GreetAction';
 
 export default class DashBot {
 	public stats = new StatTracker(Config.statsFileLocation);
@@ -76,33 +77,6 @@ export default class DashBot {
 				msg => /^(만나서 반가워요)/i.test(msg.content),
 				['만나서 반가워요 @n']
 			),
-
-			new OneOffReplyAction(
-				this,
-				msg =>
-					/^(oh )?((hey|hi|hello) )?dash( ?bot)?/i.test(msg.content),
-				[
-					'Oh, hello @n. :|',
-					"Another one... Please, @n, don't touch anything.",
-					"I hope you'll be more interesting than the others, @n.",
-					"I suppose you'll be expecting me to do some tricks @n. I don't do tricks.",
-					"My programming dictates that I welcome you @n, but I won't enjoy it.",
-					'Hello @n.',
-					'Hi @n.',
-					'Hey @n!',
-					"Kon'nichiwa @n-san, kangei.",
-					"Hey @n, glad you're here.",
-					'Welcome to the room @n.',
-					'Enjoy your stay @n.',
-					'Ladies, gentlemen, and non-binaries, I present to you @n.',
-					'Oh, you noticed i was here. You are very observant @n',
-					'Beep boop... does not compute',
-					':eyes:',
-					"I'm sorry, my responses are limited. You must ask the right questions.",
-					"Hey @n, guess what, Rhetticus made me a full member! I'm a real boy!",
-				]
-			),
-
 			new OneOffReplyAction(
 				this,
 				msg => /^link(age)? (pls|please)$/i.test(msg.content),
@@ -167,6 +141,7 @@ export default class DashBot {
 				['rock paper scissors', "um.. I don't have hands"],
 				['pi', '22/7'],
 			]),
+			new GreetAction(this),
 			new DieAction(this),
 			new StatsAction(this),
 			new ImgurSearchAction(this),

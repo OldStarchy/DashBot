@@ -1,5 +1,11 @@
 import { writeFileSync, readFileSync, existsSync } from 'fs';
-import { serialize } from 'v8';
+
+export interface Event {
+	channel: string;
+	source: string;
+	event: string;
+	target?: string;
+}
 
 export class StatTracker {
 	constructor(private readonly stateFile: string) {

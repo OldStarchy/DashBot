@@ -31,8 +31,8 @@ export class DadJokeAction extends Action {
 						);
 					}
 				});
-			return new ActionResult(true);
+			return ActionResult.HANDLED;
 		}
-		return new ActionResult(false);
+		return ActionResult.UNHANDLED;
 	}
 }

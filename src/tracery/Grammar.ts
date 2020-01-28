@@ -82,7 +82,7 @@ export class Grammar {
 		return root;
 	}
 
-	flatten(rule: RawRule, allowEscapeChars: boolean): string {
+	flatten(rule: RawRule, allowEscapeChars: boolean = false): string {
 		var root = this.expand(rule, allowEscapeChars);
 
 		return root.finishedText;

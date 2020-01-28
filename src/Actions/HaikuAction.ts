@@ -10,8 +10,8 @@ export class HaikuAction extends Action {
 			const haiku = getHaiku('shell');
 
 			message.channel.send(haiku);
-			return new ActionResult(true);
+			return ActionResult.HANDLED;
 		}
-		return new ActionResult(false);
+		return ActionResult.UNHANDLED;
 	}
 }
