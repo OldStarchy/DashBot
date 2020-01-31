@@ -20,8 +20,8 @@ jobs:
       - run:
           name: Build images
           command: |
-            if [ "$dir" = "" ]; then dir="." ; fi
             dir=<< parameters.dir >>
+            if [ "$dir" = "" ]; then dir="." ; fi
             docker build -t test:latest $dir
 workflows:
   main:
