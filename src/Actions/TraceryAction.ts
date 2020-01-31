@@ -1,10 +1,9 @@
 import { Message } from 'discord.js';
 import { Action } from '../Action';
 import { ActionResult } from '../ActionResult';
-import { Tracery } from '../tracery/Tracery';
-import { Grammar } from '../tracery/Grammar';
-import { DefaultModifiersEn } from '../tracery/default/modifiers-en';
 import { AdventurerIntroduction } from '../Grammers/AdventurerIntroduction';
+import { DefaultModifiersEn } from '../tracery/default/modifiers-en';
+import { Tracery } from '../tracery/Tracery';
 
 const tracery = new Tracery();
 

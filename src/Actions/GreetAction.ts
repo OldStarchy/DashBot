@@ -1,8 +1,8 @@
-import { Action } from '../Action';
 import { Message } from 'discord.js';
-import { expandTracery } from '../tracery/expandTracery';
-import { GreetingGrammar } from '../Grammers/Greeting';
+import { Action } from '../Action';
 import { ActionResult } from '../ActionResult';
+import { GreetingGrammar } from '../Grammers/Greeting';
+import { expandTracery } from '../tracery/expandTracery';
 
 export class GreetAction extends Action {
 	getExampleTrigger() {

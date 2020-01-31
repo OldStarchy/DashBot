@@ -1,4 +1,4 @@
-import { writeFileSync, readFileSync, existsSync } from 'fs';
+import { existsSync, readFileSync, writeFileSync } from 'fs';
 
 export interface Event {
 	channel: string;

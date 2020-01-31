@@ -1,23 +1,17 @@
-import { TraceryNode } from "./TraceryNode";
-import { Grammar, RawGrammar } from "./Grammar";
-import { Symbol } from "./Symbol";
-import { RuleSet, RawRule } from "./RuleSet";
-import { NodeAction } from "./NodeAction";
-import { Section, SectionType } from "./Section";
-import { Parser } from "./Parser";
-
+import { Grammar, RawGrammar } from './Grammar';
+import { RuleSet } from './RuleSet';
+import { Symbol } from './Symbol';
+import { TraceryNode } from './TraceryNode';
 
 export type Tag = string;
 
 export class Tracery {
 	private rng: () => number;
 
-
 	static TraceryNode = TraceryNode;
 	static Grammar = Grammar;
 	static Symbol = Symbol;
 	static RuleSet = RuleSet;
-
 
 	constructor() {
 		this.rng = Math.random;

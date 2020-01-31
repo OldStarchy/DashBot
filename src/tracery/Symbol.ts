@@ -1,11 +1,10 @@
-
-import { Tracery } from "./Tracery";
-import { Grammar } from "./Grammar";
-import { RuleSet, RawRuleSet, RawRule } from "./RuleSet";
-import { TraceryNode } from "./TraceryNode";
-
+import { Grammar } from './Grammar';
+import { RawRule, RawRuleSet, RuleSet } from './RuleSet';
+import { Tracery } from './Tracery';
+import { TraceryNode } from './TraceryNode';
 
 export type SymbolDefinition = string | Array<string>;
+
 export class Symbol {
 	private baseRules: RuleSet;
 	private stack: Array<RuleSet> = [];
@@ -13,14 +12,17 @@ export class Symbol {
 
 	//TODO: Make better type
 	private uses: Array<{ node?: TraceryNode }> = [];
-	constructor(private tracery: Tracery, private grammar: Grammar, private key: string, private rawRules: RawRuleSet) {
-
+	constructor(
+		private tracery: Tracery,
+		private grammar: Grammar,
+		private key: string,
+		private rawRules: RawRuleSet
+	) {
 		this.baseRules = new RuleSet(tracery, grammar, rawRules);
 		this.clearState();
 	}
 
 	clearState() {
-
 		// Clear the stack and clear all ruleSet usages
 		this.stack = [this.baseRules];
 
@@ -37,14 +39,16 @@ export class Symbol {
 		this.stack.pop();
 	}
 
-	selectRule(node?: TraceryNode, errors: Array<string> = []):RawRule | null {
+	selectRule(node?: TraceryNode, errors: Array<string> = []): RawRule | null {
 		this.uses.push({
-			node: node
+			node: node,
 		});
 
 		if (this.stack.length === 0) {
-			errors.push("The rule stack for '" + this.key + "' is empty, too many pops?");
-			return "((" + this.key + "))";
+			errors.push(
+				"The rule stack for '" + this.key + "' is empty, too many pops?"
+			);
+			return '((' + this.key + '))';
 		}
 
 		return this.stack[this.stack.length - 1].selectRule();
@@ -55,7 +59,7 @@ export class Symbol {
 			return null;
 		}
 		return this.stack[this.stack.length - 1].selectRule();
-	};
+	}
 
 	rulesToJSON() {
 		return JSON.stringify(this.rawRules);

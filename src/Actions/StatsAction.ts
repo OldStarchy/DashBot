@@ -1,8 +1,9 @@
 import { Message } from 'discord.js';
-import { sleep } from '../sleep';
 import { Action } from '../Action';
 import { ActionResult } from '../ActionResult';
 import { formatTable } from '../formatTable';
+import { sleep } from '../sleep';
+
 export class StatsAction extends Action {
 	handle(message: Message) {
 		if (message.content.toLowerCase() === 'show stats') {

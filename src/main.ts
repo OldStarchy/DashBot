@@ -1,10 +1,10 @@
 //@ts-check
 
-import DashBot from './DashBot';
 import { Client } from 'discord.js';
-import { createWriteStream, fstat, existsSync } from 'fs';
+import { existsSync } from 'fs';
+import { join, resolve } from 'path';
+import DashBot from './DashBot';
 import { DashBotConfig } from './DashBotConfig';
-import { resolve, join } from 'path';
 
 const args = process.argv.slice(2);
 

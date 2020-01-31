@@ -1,19 +1,17 @@
-import { Distribution, RawRule } from "./RuleSet";
-import { TraceryNode } from "./TraceryNode";
-import { Symbol, SymbolDefinition } from "./Symbol";
-import { Tracery } from "./Tracery";
-import { NodeAction } from "./NodeAction";
-import { Collection } from "./Util";
-import { Modifier } from "./Modifier";
+import { Modifier } from './Modifier';
+import { NodeAction } from './NodeAction';
+import { Distribution, RawRule } from './RuleSet';
+import { Symbol, SymbolDefinition } from './Symbol';
+import { Tracery } from './Tracery';
+import { TraceryNode } from './TraceryNode';
+import { Collection } from './Util';
+
 /**
  * The raw JSON text that is loaded by Tracery to define the grammar
  */
 export interface RawGrammar {
 	[propName: string]: SymbolDefinition;
 }
-
-
-
 
 export class Grammar {
 	private raw: RawGrammar;
@@ -44,11 +42,10 @@ export class Grammar {
 	addModifiers(mods: Collection<Modifier>) {
 		for (var key in mods) {
 			this.modifiers[key] = mods[key];
-		};
+		}
 	}
 
 	loadFromRawObj(raw: RawGrammar) {
-
 		this.raw = raw;
 		this.symbols = {};
 		this.subGrammars = [];
@@ -57,7 +54,12 @@ export class Grammar {
 			// Add all rules to the grammar
 			for (var key in this.raw) {
 				if (this.raw.hasOwnProperty(key)) {
-					this.symbols[key] = new Symbol(this.tracery, this, key, this.raw[key]);
+					this.symbols[key] = new Symbol(
+						this.tracery,
+						this,
+						key,
+						this.raw[key]
+					);
 				}
 			}
 		}
@@ -76,8 +78,7 @@ export class Grammar {
 	expand(rule: RawRule, allowEscapeChars: boolean = false) {
 		var root = this.createRoot(rule);
 		root.expand();
-		if (!allowEscapeChars)
-			root.clearEscapeChars();
+		if (!allowEscapeChars) root.clearEscapeChars();
 
 		return root;
 	}
@@ -93,18 +94,22 @@ export class Grammar {
 		var symbolJSON = [];
 		for (var i = 0; i < keys.length; i++) {
 			var key = keys[i];
-			symbolJSON.push(' "' + key + '" : ' + this.symbols[key].rulesToJSON());
+			symbolJSON.push(
+				' "' + key + '" : ' + this.symbols[key].rulesToJSON()
+			);
 		}
-		return "{\n" + symbolJSON.join(",\n") + "\n}";
+		return '{\n' + symbolJSON.join(',\n') + '\n}';
 	}
 
 	// Create or push rules
-	pushRules(key: string, rawRules: SymbolDefinition, sourceAction: NodeAction) {
-
+	pushRules(
+		key: string,
+		rawRules: SymbolDefinition,
+		sourceAction: NodeAction
+	) {
 		if (this.symbols[key] === undefined) {
 			this.symbols[key] = new Symbol(this.tracery, this, key, rawRules);
-			if (sourceAction)
-				this.symbols[key].isDynamic = true;
+			if (sourceAction) this.symbols[key].isDynamic = true;
 		} else {
 			this.symbols[key].pushRules(rawRules);
 		}
@@ -116,7 +121,11 @@ export class Grammar {
 		this.symbols[key].popRules();
 	}
 
-	selectRule(key: string, node: TraceryNode, errors: ErrorLog): RawRule | null {
+	selectRule(
+		key: string,
+		node: TraceryNode,
+		errors: ErrorLog
+	): RawRule | null {
 		if (this.symbols[key]) {
 			var rule = this.symbols[key].selectRule(node, errors);
 
@@ -125,13 +134,12 @@ export class Grammar {
 
 		// Fail-over to alternative subGrammars
 		for (var i = 0; i < this.subGrammars.length; i++) {
-
 			if (this.subGrammars[i].symbols[key])
 				return this.subGrammars[i].symbols[key].selectRule();
 		}
 
 		// No symbol?
 		errors.push("No symbol for '" + key + "'");
-		return "((" + key + "))";
+		return '((' + key + '))';
 	}
 }

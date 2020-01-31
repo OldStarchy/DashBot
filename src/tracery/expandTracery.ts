@@ -1,6 +1,6 @@
-import { Tracery } from './Tracery';
 import { DefaultModifiersEn } from './default/modifiers-en';
 import { RawGrammar } from './Grammar';
+import { Tracery } from './Tracery';
 
 export function expandTracery(entry: string, rawGrammar: RawGrammar) {
 	const tracery = new Tracery();

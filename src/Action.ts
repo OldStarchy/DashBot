@@ -1,6 +1,7 @@
 import { Client, Message } from 'discord.js';
-import DashBot from './DashBot';
 import { ActionResult } from './ActionResult';
+import DashBot from './DashBot';
+
 export abstract class Action {
 	protected readonly client: Client;
 	constructor(protected readonly bot: DashBot) {

@@ -1,8 +1,9 @@
 import { Message, TextChannel } from 'discord.js';
-import selectRandom from '../SelectRandom';
 import { Action } from '../Action';
 import { ActionResult } from '../ActionResult';
 import DashBot from '../DashBot';
+import selectRandom from '../SelectRandom';
+
 export class OneOffReplyAction extends Action {
 	private readonly trigger: (message: Message) => boolean;
 	constructor(

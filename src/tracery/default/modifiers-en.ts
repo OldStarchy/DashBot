@@ -1,5 +1,5 @@
-import { Collection, escapeRegExp, isAlphaNum, isVowel } from '../Util';
 import { Modifier } from '../Modifier';
+import { Collection, escapeRegExp, isAlphaNum, isVowel } from '../Util';
 
 export var DefaultModifiersEn: Collection<Modifier> = {
 	replace: function(s, params) {
