@@ -10,7 +10,9 @@
 			"name": "Launch Program",
 			"skipFiles": ["<node_internals>/**"],
 			"program": "${workspaceFolder}\\dist\\main.js",
-			"outFiles": ["${workspaceFolder}/**/*.js"]
+			"outFiles": ["${workspaceFolder}/**/*.js"],
+			"args": ["--storage", ".."],
+			"cwd": "${workspaceFolder}\\dist"
 		}
 	]
 }

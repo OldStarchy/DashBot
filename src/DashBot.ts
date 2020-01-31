@@ -1,20 +1,27 @@
 import { Client, Message } from 'discord.js';
-import { StatTracker } from './StatTracker';
-import { DadJokeAction } from './Actions/DadJokeAction';
-import { HaikuAction } from './Actions/HaikuAction';
 import { Action } from './Action';
-import { ImgurSearchAction } from './Actions/ImgurSearchAction';
-import { StatsAction } from './Actions/StatsAction';
-import { DieAction } from './Actions/DieAction';
 import { ABResponseAction } from './Actions/ABResponseAction';
-import { OneOffReplyAction } from './Actions/OneOffReplyAction';
-import { TraceryAction } from './Actions/TraceryAction';
-import Config from './DashbotConfig';
+import { DadJokeAction } from './Actions/DadJokeAction';
+import { DieAction } from './Actions/DieAction';
 import { GreetAction } from './Actions/GreetAction';
+import { HaikuAction } from './Actions/HaikuAction';
+import { ImgurSearchAction } from './Actions/ImgurSearchAction';
+import { OneOffReplyAction } from './Actions/OneOffReplyAction';
+import { StatsAction } from './Actions/StatsAction';
+import { TraceryAction } from './Actions/TraceryAction';
+import { DashBotConfig } from './DashBotConfig';
+import { StatTracker } from './StatTracker';
 
 export default class DashBot {
-	public stats = new StatTracker(Config.statsFileLocation);
-	constructor(public readonly client: Client) {
+	public readonly stats: StatTracker;
+	public readonly client: Client;
+	public readonly config: DashBotConfig;
+
+	constructor({ client, config }: { client: Client; config: DashBotConfig }) {
+		this.client = client;
+		this.config = config;
+
+		this.stats = new StatTracker(config.statsFileLocation);
 		client.on('message', this.onMessage.bind(this));
 		// client.on('presenceUpdate', (oldMember, newMember) => {
 		// 	if (newMember.presence) {

@@ -2,22 +2,52 @@
 
 import DashBot from './DashBot';
 import { Client } from 'discord.js';
-import Config from './DashbotConfig';
-import { createWriteStream } from 'fs';
+import { createWriteStream, fstat, existsSync } from 'fs';
+import { DashBotConfig } from './DashBotConfig';
+import { resolve, join } from 'path';
 
-// if (Config.logToFile) {
-// 	const dir = 'config';
-// 	const access = createWriteStream(dir + '/node.access.log', { flags: 'a' });
-// 	const error = createWriteStream(dir + '/node.error.log', { flags: 'a' });
+const args = process.argv.slice(2);
 
-// 	// redirect stdout / stderr
-// 	// process.stdout.pipe(access);
-// 	process.stderr.pipe(error);
-// }
+const storageDir = resolve(
+	(() => {
+		if (args.length === 0) {
+			return 'storage';
+		}
+
+		if (args.length === 2 && args[0] === '--storage') {
+			return args[1];
+		}
+
+		throw new Error(
+			'Invalid arguments supplied. Either 0 or 2 arguments expected. Should be node main.js --storage path/to/storage/dir'
+		);
+	})()
+);
+
+console.log(`Storage location set to ${storageDir}`);
+
+if (!existsSync(storageDir)) {
+	throw new Error(
+		`Can\'t find storage directory at "${storageDir}", make sure it exists`
+	);
+}
+
+const config: DashBotConfig = (() => {
+	const configFileName = 'dashbot.config';
+	const path = join(storageDir + '/' + configFileName);
+
+	const config = require(path);
+	console.log(`Loading config from "${path}"`);
+
+	return config;
+})();
 
 const client = new Client();
 
-const dashbot = new DashBot(client);
+const dashbot = new DashBot({
+	client,
+	config,
+});
 
 client.on('ready', () => {
 	console.log(`Logged in as ${client.user.tag}!`);
@@ -29,4 +59,4 @@ client.on('message', msg => {
 	}
 });
 
-client.login(Config.botToken);
+client.login(config.botToken);

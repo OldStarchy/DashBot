@@ -1,10 +1,9 @@
 import { Message } from 'discord.js';
-import selectRandom from '../SelectRandom';
 import fetch from 'node-fetch';
-import { ImgurResponse } from '../ImgurResponse';
 import { Action } from '../Action';
 import { ActionResult } from '../ActionResult';
-import Config from '../DashbotConfig';
+import { ImgurResponse } from '../ImgurResponse';
+import selectRandom from '../SelectRandom';
 
 export class ImgurSearchAction extends Action {
 	handle(message: Message) {
@@ -13,7 +12,10 @@ export class ImgurSearchAction extends Action {
 			const q = match[1];
 			fetch('https://api.imgur.com/3/gallery/search?q=' + encodeURI(q), {
 				headers: [
-					['Authorization', 'Client-ID ' + Config.imgurClientId],
+					[
+						'Authorization',
+						'Client-ID ' + this.bot.config.imgurClientId,
+					],
 				],
 			})
 				.then(r => r.json())
