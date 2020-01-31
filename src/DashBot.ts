@@ -151,11 +151,14 @@ export default class DashBot {
 			new GreetAction(this),
 			new DieAction(this),
 			new StatsAction(this),
-			new ImgurSearchAction(this),
 			new DadJokeAction(this),
 			new HaikuAction(this),
 			new TraceryAction(this)
 		);
+
+		if (this.config.imgurClientId) {
+			this.actions.push(new ImgurSearchAction(this));
+		}
 	}
 
 	actions: Action[] = [];
