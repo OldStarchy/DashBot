@@ -60,6 +60,11 @@ tweetnacl@^1.0.0:
   resolved "https://registry.yarnpkg.com/tweetnacl/-/tweetnacl-1.0.2.tgz#39fba8d1f7a34706a3fc1fd8c04afcad7bb9e689"
   integrity sha512-+8aPRjmXgf1VqvyxSlBUzKzeYqVS9Ai8vZ28g+mL7dNQl1jlUTCMDZnvNQdAS1xTywMkIXwJsfipsR/6s2+syw==
 
+typescript@^3.7.5:
+  version "3.7.5"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.7.5.tgz#0692e21f65fd4108b9330238aac11dd2e177a1ae"
+  integrity sha512-/P5lkRXkWHNAbcJIiHPfRoKqyd7bsyCma1hZNUGfn20qm64T6ZBlrzprymeu918H+mB/0rIg2gGK/BXkhhYgBw==
+
 ws@^6.0.0:
   version "6.2.1"
   resolved "https://registry.yarnpkg.com/ws/-/ws-6.2.1.tgz#442fdf0a47ed64f59b6a5d8ff130f4748ed524fb"
