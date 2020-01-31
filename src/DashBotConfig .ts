@@ -7,14 +7,11 @@ export interface DashBotConfig {
 	 * Client Secret taken from the discord developer site
 	 */
 	clientSecret?: string;
-
 	/**
 	 * The Bot token taken from the discord developer site
 	 */
-	botToken: string;
+	discordBotToken: string;
 	imgurClientId: string;
 	imgurClientSecret: string;
 	statsFileLocation: string;
-
-	logToFile: boolean;
 }
