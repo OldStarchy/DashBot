@@ -1,0 +1,29 @@
+version: 2.1
+jobs:
+  build:
+    parameters:
+      dir:
+        type: string
+        default: ""
+    description: "build << parameters.container-image >>"
+    docker:
+      - image: docker:stable
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Lint Dockerfile
+          command: |
+            dir=<< parameters.dir >>
+            if [ "$dir" = "" ]; then dir="." ; fi
+            docker run --rm -i hadolint/hadolint /bin/hadolint - < $dir/Dockerfile
+      - run:
+          name: Build images
+          command: |
+            if [ "$dir" = "" ]; then dir="." ; fi
+            dir=<< parameters.dir >>
+            docker build -t test:latest $dir
+workflows:
+  main:
+    jobs:
+      - build
