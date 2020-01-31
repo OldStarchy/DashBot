@@ -1,11 +1,11 @@
 # DashBot
 
-A chat bot that does whatever I feel like implementing at the time.
+A chatbot that does whatever I feel like implementing at the time.
 
 ## How to use
 
 1. Clone and build.
-2. Create a config file `dashbot.config.js`. The options should be self explanatory.
+2. Create a config file `dashbot.config.js`. The options should be self-explanatory.
 3. Put the config file in the storage location (of your choice)
 
     ```javascript
@@ -21,8 +21,8 @@ A chat bot that does whatever I feel like implementing at the time.
     module.exports = Config;
     ```
 
-    You can find details on how to get a bot token for discord online (thats how i figured it out).  
-    Same goes for the imgur stuff if you want it.
+    You can find details on how to get a bot token for discord online (that's how I figured it out).  
+    The same goes for the Imgur stuff if you want it.
 
 4.  1. Run in node
 
@@ -31,7 +31,7 @@ A chat bot that does whatever I feel like implementing at the time.
     node main.js --storage ".."
     ```
 
-5.  2. Run in docker
+5.  1. Run in docker
 
     ```bash
     docker build -t dashbot .
