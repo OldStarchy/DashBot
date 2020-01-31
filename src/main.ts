@@ -60,3 +60,7 @@ client.on('message', msg => {
 });
 
 client.login(config.discordBotToken);
+
+process.on('SIGINT', () => {
+	client.destroy().then(() => process.exit());
+});
