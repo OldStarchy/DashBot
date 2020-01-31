@@ -1,17 +1,17 @@
 export interface DashBotConfig {
 	/**
-	 * Client ID taken from the discord developer site
+	 * Not used
 	 */
-	clientId?: string;
+	discordClientId?: string;
 	/**
-	 * Client Secret taken from the discord developer site
+	 * Not used
 	 */
-	clientSecret?: string;
-	/**
-	 * The Bot token taken from the discord developer site
-	 */
+	discordClientSecret?: string;
 	discordBotToken: string;
-	imgurClientId: string;
-	imgurClientSecret: string;
+	imgurClientId?: string;
+	/**
+	 * Not used
+	 */
+	imgurClientSecret?: string;
 	statsFileLocation: string;
 }

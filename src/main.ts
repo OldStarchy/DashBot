@@ -59,4 +59,4 @@ client.on('message', msg => {
 	}
 });
 
-client.login(config.botToken);
+client.login(config.discordBotToken);
