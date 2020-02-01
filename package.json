@@ -9,7 +9,7 @@
     "watch": "tsc -w",
     "run": "node dist/main.js",
     "deploy": "yarn build && docker build -t localhost:5000/dashbot . && docker push localhost:5000/dashbot",
-    "lint": "eslint **/*.ts **/*.js"
+    "lint": "eslint src/**/*.ts"
   },
   "dependencies": {
     "discord.js": "^11.5.1",
