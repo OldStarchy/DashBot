@@ -5,10 +5,10 @@ import { TraceryNode } from './TraceryNode';
 
 export type SymbolDefinition = string | Array<string>;
 
-export class Symbol {
+export class TracerySymbol {
 	private baseRules: RuleSet;
 	private stack: Array<RuleSet> = [];
-	public isDynamic: boolean = false;
+	public isDynamic = false;
 
 	//TODO: Make better type
 	private uses: Array<{ node?: TraceryNode }> = [];
@@ -31,7 +31,7 @@ export class Symbol {
 	}
 
 	pushRules(rawRules: RawRuleSet) {
-		var rules = new RuleSet(this.tracery, this.grammar, rawRules);
+		const rules = new RuleSet(this.tracery, this.grammar, rawRules);
 		this.stack.push(rules);
 	}
 

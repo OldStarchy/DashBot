@@ -1,7 +1,7 @@
 import { Modifier } from './Modifier';
 import { NodeAction } from './NodeAction';
 import { Distribution, RawRule } from './RuleSet';
-import { Symbol, SymbolDefinition } from './Symbol';
+import { SymbolDefinition, TracerySymbol } from './Symbol';
 import { Tracery } from './Tracery';
 import { TraceryNode } from './TraceryNode';
 import { Collection } from './Util';
@@ -15,7 +15,7 @@ export interface RawGrammar {
 
 export class Grammar {
 	private raw: RawGrammar;
-	private symbols: Collection<Symbol>;
+	private symbols: Collection<TracerySymbol>;
 	private errors: ErrorLog;
 
 	private subGrammars: Array<Grammar> = [];
@@ -40,7 +40,7 @@ export class Grammar {
 	}
 
 	addModifiers(mods: Collection<Modifier>) {
-		for (var key in mods) {
+		for (const key in mods) {
 			this.modifiers[key] = mods[key];
 		}
 	}
@@ -52,9 +52,9 @@ export class Grammar {
 
 		if (this.raw) {
 			// Add all rules to the grammar
-			for (var key in this.raw) {
+			for (const key in this.raw) {
 				if (this.raw.hasOwnProperty(key)) {
-					this.symbols[key] = new Symbol(
+					this.symbols[key] = new TracerySymbol(
 						this.tracery,
 						this,
 						key,
@@ -67,7 +67,7 @@ export class Grammar {
 
 	createRoot(rule: RawRule) {
 		// Create a node and subNodes
-		var root = new TraceryNode(this.tracery, this, 0, {
+		const root = new TraceryNode(this.tracery, this, 0, {
 			type: -1,
 			raw: rule,
 		});
@@ -75,25 +75,25 @@ export class Grammar {
 		return root;
 	}
 
-	expand(rule: RawRule, allowEscapeChars: boolean = false) {
-		var root = this.createRoot(rule);
+	expand(rule: RawRule, allowEscapeChars = false) {
+		const root = this.createRoot(rule);
 		root.expand();
 		if (!allowEscapeChars) root.clearEscapeChars();
 
 		return root;
 	}
 
-	flatten(rule: RawRule, allowEscapeChars: boolean = false): string {
-		var root = this.expand(rule, allowEscapeChars);
+	flatten(rule: RawRule, allowEscapeChars = false): string {
+		const root = this.expand(rule, allowEscapeChars);
 
 		return root.finishedText;
 	}
 
 	toJSON() {
-		var keys = Object.keys(this.symbols);
-		var symbolJSON = [];
-		for (var i = 0; i < keys.length; i++) {
-			var key = keys[i];
+		const keys = Object.keys(this.symbols);
+		const symbolJSON = [];
+		for (let i = 0; i < keys.length; i++) {
+			const key = keys[i];
 			symbolJSON.push(
 				' "' + key + '" : ' + this.symbols[key].rulesToJSON()
 			);
@@ -108,7 +108,12 @@ export class Grammar {
 		sourceAction: NodeAction
 	) {
 		if (this.symbols[key] === undefined) {
-			this.symbols[key] = new Symbol(this.tracery, this, key, rawRules);
+			this.symbols[key] = new TracerySymbol(
+				this.tracery,
+				this,
+				key,
+				rawRules
+			);
 			if (sourceAction) this.symbols[key].isDynamic = true;
 		} else {
 			this.symbols[key].pushRules(rawRules);
@@ -127,13 +132,13 @@ export class Grammar {
 		errors: ErrorLog
 	): RawRule | null {
 		if (this.symbols[key]) {
-			var rule = this.symbols[key].selectRule(node, errors);
+			const rule = this.symbols[key].selectRule(node, errors);
 
 			return rule;
 		}
 
 		// Fail-over to alternative subGrammars
-		for (var i = 0; i < this.subGrammars.length; i++) {
+		for (let i = 0; i < this.subGrammars.length; i++) {
 			if (this.subGrammars[i].symbols[key])
 				return this.subGrammars[i].symbols[key].selectRule();
 		}

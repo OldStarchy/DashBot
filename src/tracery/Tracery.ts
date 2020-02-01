@@ -1,6 +1,6 @@
 import { Grammar, RawGrammar } from './Grammar';
 import { RuleSet } from './RuleSet';
-import { Symbol } from './Symbol';
+import { TracerySymbol } from './Symbol';
 import { TraceryNode } from './TraceryNode';
 
 export type Tag = string;
@@ -10,7 +10,7 @@ export class Tracery {
 
 	static TraceryNode = TraceryNode;
 	static Grammar = Grammar;
-	static Symbol = Symbol;
+	static Symbol = TracerySymbol;
 	static RuleSet = RuleSet;
 
 	constructor() {

@@ -5,7 +5,7 @@ import { sleep } from '../sleep';
 
 export class DieAction extends Action {
 	handle(message: Message) {
-		let match = /^roll (d(-?\d+)|dice)$/i.exec(message.content);
+		const match = /^roll (d(-?\d+)|dice)$/i.exec(message.content);
 
 		if (match) {
 			let size = 0;

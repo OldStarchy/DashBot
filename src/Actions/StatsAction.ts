@@ -17,7 +17,7 @@ export class StatsAction extends Action {
 					);
 					const stats = this.bot.stats.events;
 					const keys = Object.keys(stats).sort();
-					let r: string[][] = [['Stat', 'Count']];
+					const r: string[][] = [['Stat', 'Count']];
 					r.push([
 						'time since last nap',
 						(
@@ -49,7 +49,7 @@ export class StatsAction extends Action {
 							message.author.username
 						] || {};
 					const keys = Object.keys(stats).sort();
-					let r: string[][] = [['Stat', 'Count']];
+					const r: string[][] = [['Stat', 'Count']];
 					keys.forEach(key => {
 						r.push([
 							`${key}`,

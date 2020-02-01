@@ -10,7 +10,7 @@ import { DashBotConfig } from './DashBotConfig';
 const args = process.argv.slice(2);
 
 const storageDir = resolve(
-	(() => {
+	((): string => {
 		if (args.length === 0) {
 			return 'storage';
 		}

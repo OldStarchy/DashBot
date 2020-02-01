@@ -9,7 +9,8 @@ A chatbot that does whatever I feel like implementing at the time.
 3. Put the config file in the storage location (of your choice)
 
     ```javascript
-    /// <reference path="src/DashbotConfig.ts" />
+    /* eslint-disable @typescript-eslint/triple-slash-reference */
+    /// <reference path="src/DashBotConfig.d.ts" />
 
     /** @type DashbotConfig */
     const Config = {
@@ -40,4 +41,4 @@ A chatbot that does whatever I feel like implementing at the time.
 
 ## What can it do
 
-The magic is in the mystery but if you really want to know you can check the code.
+The magic is in the mystery but if you want to know you can check the code.

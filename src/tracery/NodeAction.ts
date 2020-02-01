@@ -41,7 +41,7 @@ export class NodeAction {
 		 console.warn("No raw commands for NodeAction");
 		 */
 
-		var sections = raw.split(':');
+		const sections = raw.split(':');
 		this.target = sections[0];
 
 		// No colon? A function!
@@ -73,15 +73,15 @@ export class NodeAction {
 	}
 
 	activate() {
-		var grammar = this.node.grammar;
+		const grammar = this.node.grammar;
 		switch (this.type) {
 			case NodeActionType.Push:
 				// split into sections (the way to denote an array of rules)
 				this.ruleSections = (<string>this.rule).split(',');
 				this.finishedRules = [];
 				// this.ruleNodes = [];
-				for (var i = 0; i < this.ruleSections.length; i++) {
-					var n = new TraceryNode(this.tracery, grammar, 0, {
+				for (let i = 0; i < this.ruleSections.length; i++) {
+					const n = new TraceryNode(this.tracery, grammar, 0, {
 						type: -1,
 						raw: this.ruleSections[i],
 					});

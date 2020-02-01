@@ -14,7 +14,7 @@ export function range(length: number): Array<number> {
 }
 
 export function isVowel(c: string): boolean {
-	var c2 = c.toLowerCase();
+	const c2 = c.toLowerCase();
 	return c2 === 'a' || c2 === 'e' || c2 === 'i' || c2 === 'o' || c2 === 'u';
 }
 
@@ -37,10 +37,10 @@ export function fyShuffle(
 	array: Array<any>,
 	rng: () => number = Math.random
 ): Array<any> {
-	var remaining = array.length;
+	let remaining = array.length;
 
 	while (remaining > 0) {
-		var pos = Math.floor(rng() * remaining),
+		const pos = Math.floor(rng() * remaining),
 			tmp = array[pos],
 			end = remaining - 1;
 

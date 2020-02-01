@@ -33,7 +33,7 @@ class NodeIterator {
 						log: this.itSpacer + 'start children: no children',
 					};
 				} else {
-					var childCount = this.node.children.length;
+					const childCount = this.node.children.length;
 					this.node = this.node.children[0];
 					this.mode = 0;
 					return {
@@ -50,7 +50,7 @@ class NodeIterator {
 				// Find a sibling
 				if (this.node.parent) {
 					// Attempt sibling
-					var nextSib = this.node.childIndex + 1;
+					const nextSib = this.node.childIndex + 1;
 					if (this.node.parent.children[nextSib] !== undefined) {
 						this.node = this.node.parent.children[nextSib];
 						this.mode = 0;

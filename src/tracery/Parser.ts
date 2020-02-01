@@ -26,7 +26,7 @@ export class Parser {
 		const sections = parseResult.sections;
 		let symbolSection: string | null = null;
 
-		for (var i = 0; i < sections.length; i++) {
+		for (let i = 0; i < sections.length; i++) {
 			if (sections[i].type === SectionType.Plaintext) {
 				if (symbolSection === null) {
 					symbolSection = sections[i].raw;
@@ -61,7 +61,7 @@ export class Parser {
 		let sections: Array<Section> = [];
 		let escaped = false;
 
-		let errors: ErrorLog = [];
+		const errors: ErrorLog = [];
 		let start = 0;
 
 		let escapedSubstring = '';
@@ -93,7 +93,7 @@ export class Parser {
 
 		for (let i = 0; i < rule.length; i++) {
 			if (!escaped) {
-				var c = rule.charAt(i);
+				const c = rule.charAt(i);
 
 				switch (c) {
 					// Enter a deeper bracketed section

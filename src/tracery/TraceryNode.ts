@@ -18,7 +18,7 @@ export class TraceryNode {
 	public action: NodeAction | undefined;
 	public errors: ErrorLog = [];
 	public symbol: string | undefined;
-	public finishedText: string = '';
+	public finishedText = '';
 	public grammar: Grammar;
 	public parent: TraceryNode | null;
 	public children: Array<TraceryNode> = [];
@@ -74,16 +74,16 @@ export class TraceryNode {
 		// Set the rule for making children,
 		// and expand it into section
 		this.childRule = childRule;
-		let parseResult = Parser.parse(childRule);
+		const parseResult = Parser.parse(childRule);
 
 		// Add errors to this
 		if (parseResult.errors.length > 0) {
 			this.errors = this.errors.concat(parseResult.errors);
 		}
 
-		let sections = parseResult.sections;
+		const sections = parseResult.sections;
 
-		for (var i = 0; i < sections.length; i++) {
+		for (let i = 0; i < sections.length; i++) {
 			this.children[i] = new TraceryNode(
 				this.tracery,
 				this,
@@ -98,7 +98,7 @@ export class TraceryNode {
 	}
 
 	// Expand this rule (possibly creating children)
-	expand(preventRecursion: boolean = false) {
+	expand(preventRecursion = false) {
 		if (!this.isExpanded) {
 			this.isExpanded = true;
 
@@ -127,7 +127,7 @@ export class TraceryNode {
 					this.preActions = [];
 					this.postActions = [];
 
-					let parsed = Parser.parseTag(this.raw);
+					const parsed = Parser.parseTag(this.raw);
 					if (parsed == null) return;
 
 					// Break into symbol actions and modifiers
@@ -149,7 +149,7 @@ export class TraceryNode {
 					// Make undo actions for all preActions (pops for each push)
 					for (let i = 0; i < this.preActions.length; i++) {
 						if (this.preActions[i].type === 0) {
-							let undoAction = this.preActions[i].createUndo();
+							const undoAction = this.preActions[i].createUndo();
 							if (undoAction !== null)
 								this.postActions.push(undoAction);
 						}
@@ -164,7 +164,7 @@ export class TraceryNode {
 
 					// Expand (passing the node, this allows tracking of recursion depth)
 
-					let selectedRule = this.grammar.selectRule(
+					const selectedRule = this.grammar.selectRule(
 						this.symbol,
 						this,
 						this.errors
@@ -181,10 +181,10 @@ export class TraceryNode {
 						let modName = this.modifiers[i];
 						let modParams: Array<string> = [];
 						if (modName.indexOf('(') > 0) {
-							let regExp = /\(([^)]+)\)/;
+							const regExp = /\(([^)]+)\)/;
 
 							// Todo: ignore any escaped commas.  For now, commas always split
-							var results = regExp.exec(this.modifiers[i]);
+							const results = regExp.exec(this.modifiers[i]);
 							if (!results || results.length < 2) {
 							} else {
 								modParams = results[1].split(',');
@@ -195,7 +195,7 @@ export class TraceryNode {
 							}
 						}
 
-						var mod = this.grammar.modifiers[modName];
+						const mod = this.grammar.modifiers[modName];
 
 						// Missing modifier?
 						if (!mod) {
@@ -210,7 +210,7 @@ export class TraceryNode {
 					}
 
 					// Perform post-actions
-					for (var i = 0; i < this.postActions.length; i++) {
+					for (let i = 0; i < this.postActions.length; i++) {
 						this.postActions[i].activate();
 					}
 					break;

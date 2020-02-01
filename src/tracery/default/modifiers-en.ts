@@ -1,7 +1,7 @@
 import { Modifier } from '../Modifier';
 import { Collection, escapeRegExp, isAlphaNum, isVowel } from '../Util';
 
-export var DefaultModifiersEn: Collection<Modifier> = {
+export const DefaultModifiersEn: Collection<Modifier> = {
 	replace: function(s, params) {
 		//http://stackoverflow.com/questions/1144783/replacing-all-occurrences-of-a-string-in-javascript
 		if (!params || params.length < 2) throw 'Missing regex in modifier';
@@ -10,9 +10,9 @@ export var DefaultModifiersEn: Collection<Modifier> = {
 	},
 
 	capitalizeAll: function(s) {
-		var s2 = '';
-		var capNext = true;
-		for (var i = 0; i < s.length; i++) {
+		let s2 = '';
+		let capNext = true;
+		for (let i = 0; i < s.length; i++) {
 			if (!isAlphaNum(s.charAt(i))) {
 				capNext = true;
 				s2 += s.charAt(i);
@@ -50,9 +50,9 @@ export var DefaultModifiersEn: Collection<Modifier> = {
 
 	firstS: function(s) {
 		console.log(s);
-		var s2 = s.split(' ');
+		const s2 = s.split(' ');
 
-		var finished =
+		const finished =
 			DefaultModifiersEn.s(s2[0]) + ' ' + s2.slice(1).join(' ');
 		console.log(finished);
 		return finished;
@@ -109,7 +109,7 @@ export var DefaultModifiersEn: Collection<Modifier> = {
 			case 'who':
 				return 'whose';
 			default:
-				var last = s.charAt(s.length - 1);
+				const last = s.charAt(s.length - 1);
 
 				if (last === 's') {
 					return s + "'";
