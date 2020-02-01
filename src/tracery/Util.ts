@@ -33,10 +33,10 @@ export function escapeRegExp(str: string): string {
 /**
  * Shuffles an array using the Fisher-Yates algorithm
  */
-export function fyShuffle(
-	array: unknown[],
+export function fyShuffle<T extends unknown[]>(
+	array: T,
 	rng: () => number = Math.random
-): unknown[] {
+): T {
 	let remaining = array.length;
 
 	while (remaining > 0) {
