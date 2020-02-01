@@ -4,8 +4,8 @@ jobs:
     parameters:
       dir:
         type: string
-        default: ""
-    description: "build << parameters.container-image >>"
+        default: ''
+    description: 'build << parameters.container-image >>'
     docker:
       - image: docker:stable
     steps:
@@ -16,12 +16,12 @@ jobs:
           command: |
             dir=<< parameters.dir >>
             if [ "$dir" = "" ]; then dir="." ; fi
-						docker run --rm -i hadolint/hadolint /bin/hadolint - < $dir/Dockerfile
-			- run:
-					name: Lint TS / JS
-					command: |
-						yarn install
-						yarn lint
+            docker run --rm -i hadolint/hadolint /bin/hadolint - < $dir/Dockerfile
+      - run:
+          name: Lint TS / JS
+          command: |
+            yarn install
+            yarn lint
       - run:
           name: Build images
           command: |
