@@ -1,14 +1,11 @@
 import { Message } from 'discord.js';
 import { Action } from '../Action';
 import { ActionResult } from '../ActionResult';
-import { GreetingGrammar } from '../Grammers/Greeting';
+import { GreetingGrammar } from '../Grammars/Greeting';
 import { expandTracery } from '../tracery/expandTracery';
 
 export class GreetAction extends Action {
-	getExampleTrigger() {
-		return 'Hello, DashBot!';
-	}
-	handle(message: Message) {
+	handle(message: Message): ActionResult {
 		if (
 			/^(oh )?((hey|hi|hello),? )?(there )?dash( ?bot)?!?/i.test(
 				message.content

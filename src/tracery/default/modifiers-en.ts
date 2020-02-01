@@ -49,12 +49,10 @@ export const DefaultModifiersEn: Collection<Modifier> = {
 	},
 
 	firstS: function(s) {
-		console.log(s);
 		const s2 = s.split(' ');
 
 		const finished =
 			DefaultModifiersEn.s(s2[0]) + ' ' + s2.slice(1).join(' ');
-		console.log(finished);
 		return finished;
 	},
 

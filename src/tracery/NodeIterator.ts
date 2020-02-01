@@ -4,6 +4,8 @@ import { TraceryNode } from './TraceryNode';
  * @author Kate
  */
 
+// TODO: Decide to remove or use
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 class NodeIterator {
 	private itSpacer = '';
 	private childIndex = -1;
@@ -12,7 +14,7 @@ class NodeIterator {
 	constructor(private node: TraceryNode) {}
 
 	// Go to the next
-	next() {
+	next(): { log: string } | null {
 		// Actions for this node
 		// 0: Just entered
 		// 1: Start children
@@ -66,9 +68,8 @@ class NodeIterator {
 								' no remaining siblings, exit to parent',
 						};
 					}
-				} else {
-					return null;
 				}
 		}
+		return null;
 	}
 }

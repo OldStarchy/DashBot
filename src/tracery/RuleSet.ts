@@ -32,13 +32,16 @@ export enum Distribution {
  * A collection of possible expansions for a symbol
  */
 export class RuleSet {
-	//TODO: Better type
+	//TODO: Better type (currently conditionalRule has no effect)
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	private conditionalRule: any = false;
 	private conditionalValues: { [propName: string]: RuleSet } = {};
 	private defaultRules: Array<RawRule> = [];
 	private falloff = 1;
 	private shuffledDeck: Array<number> = [];
 
+	//TODO: Better type (currently ranking has no effect)
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	private ranking: any;
 	private distribution: Distribution | null = null;
 	private defaultUses: Array<number> | null = null;
@@ -105,7 +108,7 @@ export class RuleSet {
 						);
 					}
 
-					index = <number>this.shuffledDeck.pop();
+					index = this.shuffledDeck.pop() as number;
 
 					break;
 
@@ -137,7 +140,7 @@ export class RuleSet {
 		return null;
 	}
 
-	clearState() {
+	clearState(): void {
 		if (this.defaultUses) {
 			this.defaultUses = [];
 		}

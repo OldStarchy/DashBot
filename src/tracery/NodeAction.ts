@@ -60,7 +60,7 @@ export class NodeAction {
 		}
 	}
 
-	createUndo() {
+	createUndo(): NodeAction | null {
 		if (this.type === 0) {
 			return new NodeAction(
 				this.tracery,
@@ -72,12 +72,12 @@ export class NodeAction {
 		return null;
 	}
 
-	activate() {
+	activate(): void {
 		const grammar = this.node.grammar;
 		switch (this.type) {
 			case NodeActionType.Push:
 				// split into sections (the way to denote an array of rules)
-				this.ruleSections = (<string>this.rule).split(',');
+				this.ruleSections = (this.rule as string).split(',');
 				this.finishedRules = [];
 				// this.ruleNodes = [];
 				for (let i = 0; i < this.ruleSections.length; i++) {
@@ -103,7 +103,7 @@ export class NodeAction {
 		}
 	}
 
-	toText() {
+	toText(): string {
 		switch (this.type) {
 			case 0:
 				return this.target + ':' + this.rule;

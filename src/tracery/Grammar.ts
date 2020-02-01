@@ -33,19 +33,19 @@ export class Grammar {
 		this.loadFromRawObj(raw);
 	}
 
-	clearState() {
+	clearState(): void {
 		for (const name in this.symbols) {
 			this.symbols[name].clearState();
 		}
 	}
 
-	addModifiers(mods: Collection<Modifier>) {
+	addModifiers(mods: Collection<Modifier>): void {
 		for (const key in mods) {
 			this.modifiers[key] = mods[key];
 		}
 	}
 
-	loadFromRawObj(raw: RawGrammar) {
+	loadFromRawObj(raw: RawGrammar): void {
 		this.raw = raw;
 		this.symbols = {};
 		this.subGrammars = [];
@@ -65,7 +65,7 @@ export class Grammar {
 		}
 	}
 
-	createRoot(rule: RawRule) {
+	createRoot(rule: RawRule): TraceryNode {
 		// Create a node and subNodes
 		const root = new TraceryNode(this.tracery, this, 0, {
 			type: -1,
@@ -75,7 +75,7 @@ export class Grammar {
 		return root;
 	}
 
-	expand(rule: RawRule, allowEscapeChars = false) {
+	expand(rule: RawRule, allowEscapeChars = false): TraceryNode {
 		const root = this.createRoot(rule);
 		root.expand();
 		if (!allowEscapeChars) root.clearEscapeChars();
@@ -89,7 +89,7 @@ export class Grammar {
 		return root.finishedText;
 	}
 
-	toJSON() {
+	toJSON(): string {
 		const keys = Object.keys(this.symbols);
 		const symbolJSON = [];
 		for (let i = 0; i < keys.length; i++) {
@@ -106,7 +106,7 @@ export class Grammar {
 		key: string,
 		rawRules: SymbolDefinition,
 		sourceAction: NodeAction
-	) {
+	): void {
 		if (this.symbols[key] === undefined) {
 			this.symbols[key] = new TracerySymbol(
 				this.tracery,
@@ -120,7 +120,7 @@ export class Grammar {
 		}
 	}
 
-	popRules(key: string) {
+	popRules(key: string): void {
 		if (!this.symbols[key])
 			this.errors.push("Can't pop: no symbol for key " + key);
 		this.symbols[key].popRules();

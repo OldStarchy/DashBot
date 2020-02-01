@@ -20,7 +20,6 @@ export class Parser {
 		const preActions: Array<Section> = [];
 		//TODO: postActions is always empty
 		const postActions: Array<Section> = [];
-		const modifiers: Array<string> = [];
 
 		const parseResult = Parser.parse(tagContents);
 		const sections = parseResult.sections;
@@ -39,8 +38,7 @@ export class Parser {
 		}
 
 		if (symbolSection === null) {
-			console.log('no main section in ' + tagContents);
-			return null;
+			throw new Error('no main section in ' + tagContents);
 		} else {
 			const components = symbolSection.split('.');
 			return {
@@ -67,7 +65,11 @@ export class Parser {
 		let escapedSubstring = '';
 		let lastEscapedChar: number | null = null;
 
-		function createSection(start: number, end: number, type: SectionType) {
+		function createSection(
+			start: number,
+			end: number,
+			type: SectionType
+		): void {
 			if (end - start < 1) {
 				if (type === SectionType.Tag)
 					errors.push(start + ': empty tag');

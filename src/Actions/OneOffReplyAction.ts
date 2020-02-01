@@ -16,12 +16,13 @@ export class OneOffReplyAction extends Action {
 	) {
 		super(bot);
 		if (triggerOrKeywords instanceof Array) {
-			this.trigger = msg => triggerOrKeywords.includes(msg.content);
+			this.trigger = (msg): boolean =>
+				triggerOrKeywords.includes(msg.content);
 		} else {
 			this.trigger = triggerOrKeywords.bind(null);
 		}
 	}
-	handle(message: Message) {
+	handle(message: Message): ActionResult {
 		if (this.trigger(message)) {
 			let compliment = selectRandom(this.replies);
 			const replacements = [['@n', message.author.username]];

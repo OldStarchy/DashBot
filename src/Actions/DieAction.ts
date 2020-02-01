@@ -4,7 +4,7 @@ import { ActionResult } from '../ActionResult';
 import { sleep } from '../sleep';
 
 export class DieAction extends Action {
-	handle(message: Message) {
+	handle(message: Message): ActionResult {
 		const match = /^roll (d(-?\d+)|dice)$/i.exec(message.content);
 
 		if (match) {
@@ -24,7 +24,7 @@ export class DieAction extends Action {
 			}
 			if (size === 1) {
 				message.channel.send(
-					`something tells me the result of rolling a ${match[1]} would be awefully predictable...`
+					`something tells me the result of rolling a ${match[1]} would be awfully predictable...`
 				);
 				return ActionResult.HANDLED;
 			}
@@ -43,8 +43,8 @@ export class DieAction extends Action {
 						size * (positive ? 1 : -1)
 					).toFixed(0)}...`
 				)
-				.then(r => sleep(1000))
-				.then(r => {
+				.then(() => sleep(1000))
+				.then(() => {
 					if (positive) message.channel.send(result.toFixed(0));
 					else message.channel.send('-' + result.toFixed(0));
 				});
@@ -65,8 +65,8 @@ export class DieAction extends Action {
 			);
 			message.channel
 				.send('@' + message.author.username + ', flipping...')
-				.then(r => sleep(1000))
-				.then(r => {
+				.then(() => sleep(1000))
+				.then(() => {
 					if (result === 11) {
 						message.channel.send('Oh no i dropped it :(');
 						this.bot.stats.recordUserTriggeredEvent(

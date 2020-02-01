@@ -28,7 +28,7 @@ export class StatTracker {
 		[eventType: string]: number;
 	} = {};
 
-	recordUserTriggeredEvent(username: string, eventType: string) {
+	recordUserTriggeredEvent(username: string, eventType: string): void {
 		this.userTriggeredEvents[username] =
 			this.userTriggeredEvents[username] || {};
 
@@ -38,7 +38,7 @@ export class StatTracker {
 		this.recordEvent(eventType);
 	}
 
-	recordEvent(eventType: string) {
+	recordEvent(eventType: string): void {
 		this.events[eventType] = (this.events[eventType] || 0) + 1;
 
 		const data = {

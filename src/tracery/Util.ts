@@ -1,5 +1,5 @@
 /**
- * Represents an object whos keys are all strings and whos values are all of type T
+ * Represents an object whose keys are all strings and whose values are all of type T
  */
 export interface Collection<T> {
 	[propName: string]: T;
@@ -34,9 +34,9 @@ export function escapeRegExp(str: string): string {
  * Shuffles an array using the Fisher-Yates algorithm
  */
 export function fyShuffle(
-	array: Array<any>,
+	array: unknown[],
 	rng: () => number = Math.random
-): Array<any> {
+): unknown[] {
 	let remaining = array.length;
 
 	while (remaining > 0) {

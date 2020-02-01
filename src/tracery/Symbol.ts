@@ -22,7 +22,7 @@ export class TracerySymbol {
 		this.clearState();
 	}
 
-	clearState() {
+	clearState(): void {
 		// Clear the stack and clear all ruleSet usages
 		this.stack = [this.baseRules];
 
@@ -30,12 +30,12 @@ export class TracerySymbol {
 		this.baseRules.clearState();
 	}
 
-	pushRules(rawRules: RawRuleSet) {
+	pushRules(rawRules: RawRuleSet): void {
 		const rules = new RuleSet(this.tracery, this.grammar, rawRules);
 		this.stack.push(rules);
 	}
 
-	popRules() {
+	popRules(): void {
 		this.stack.pop();
 	}
 
@@ -54,14 +54,14 @@ export class TracerySymbol {
 		return this.stack[this.stack.length - 1].selectRule();
 	}
 
-	getActiveRules() {
+	getActiveRules(): RawRule | null {
 		if (this.stack.length === 0) {
 			return null;
 		}
 		return this.stack[this.stack.length - 1].selectRule();
 	}
 
-	rulesToJSON() {
+	rulesToJSON(): string {
 		return JSON.stringify(this.rawRules);
 	}
 }

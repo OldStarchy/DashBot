@@ -1,4 +1,4 @@
-export default function selectRandom<T extends any[]>(
+export default function selectRandom<T extends unknown[]>(
 	array: T,
 	limit?: number
 ): T[number] {

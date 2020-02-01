@@ -22,7 +22,7 @@ export class TraceryNode {
 	public grammar: Grammar;
 	public parent: TraceryNode | null;
 	public children: Array<TraceryNode> = [];
-	public type: any;
+	public type: SectionType;
 
 	constructor(
 		private tracery: Tracery,
@@ -55,11 +55,11 @@ export class TraceryNode {
 		this.isExpanded = false;
 
 		if (this.grammar === null) {
-			console.warn('No grammar specified for this node', this);
+			throw new Error('No grammar specified for this node');
 		}
 	}
 
-	toString() {
+	toString(): string {
 		return (
 			"Node('" + this.raw + "' " + this.type + ' d:' + this.depth + ')'
 		);
@@ -67,7 +67,7 @@ export class TraceryNode {
 
 	// Expand the node (with the given child rule)
 	//  Make children if the node has any
-	expandChildren(childRule: RawRule, preventRecursion: boolean) {
+	expandChildren(childRule: RawRule, preventRecursion: boolean): void {
 		this.children = [];
 		this.finishedText = '';
 
@@ -98,7 +98,7 @@ export class TraceryNode {
 	}
 
 	// Expand this rule (possibly creating children)
-	expand(preventRecursion = false) {
+	expand(preventRecursion = false): void {
 		if (!this.isExpanded) {
 			this.isExpanded = true;
 
@@ -229,7 +229,7 @@ export class TraceryNode {
 		}
 	}
 
-	clearEscapeChars() {
+	clearEscapeChars(): void {
 		this.finishedText = this.finishedText
 			.replace(/\\\\/g, 'DOUBLEBACKSLASH')
 			.replace(/\\/g, '')

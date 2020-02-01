@@ -6,7 +6,7 @@ import { ImgurResponse } from '../ImgurResponse';
 import selectRandom from '../SelectRandom';
 
 export class ImgurSearchAction extends Action {
-	handle(message: Message) {
+	handle(message: Message): ActionResult {
 		const match = /^!imgur (.*)/i.exec(message.content);
 		if (match) {
 			const q = match[1];
@@ -25,7 +25,7 @@ export class ImgurSearchAction extends Action {
 						if (img) {
 							message.channel
 								.send(img.title)
-								.then(r => message.channel.send(img.link));
+								.then(() => message.channel.send(img.link));
 							this.bot.stats.recordUserTriggeredEvent(
 								message.author.username,
 								'search imgur'

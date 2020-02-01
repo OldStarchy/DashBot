@@ -10,6 +10,7 @@ import { OneOffReplyAction } from './Actions/OneOffReplyAction';
 import { StatsAction } from './Actions/StatsAction';
 import { TraceryAction } from './Actions/TraceryAction';
 import { DashBotConfig } from './DashBotConfig';
+import { logger } from './main';
 import { StatTracker } from './StatTracker';
 
 export default class DashBot {
@@ -30,15 +31,15 @@ export default class DashBot {
 		this.initActions();
 	}
 
-	private onMessage(message: Message) {
+	private onMessage(message: Message): void {
 		if (message.author.bot) return;
 		const handled = this.actions.some(
 			action => action.handle(message).handled
 		);
-		console.log(`Message ${handled ? 'handled' : 'ignored'}`);
+		logger.info(`Message ${handled ? 'handled' : 'ignored'}`);
 	}
 
-	private initActions() {
+	private initActions(): void {
 		this.actions.push(
 			new OneOffReplyAction(
 				this,
@@ -49,7 +50,7 @@ export default class DashBot {
 					"Music is better when I listen to it with @n! Oh wait, this isn't plug.dj! :open_mouth:",
 					"I don't care about trying to be more human-like, but if I could be more like @n I would be happy.",
 					"If I had eyes, they'd be looking at you @n!",
-					'You have an exquizite aura',
+					'You have an exquisite aura',
 					"My friends won't believe me when I go home tonight and tell them I met @n today!",
 				]
 			),

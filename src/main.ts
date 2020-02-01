@@ -25,6 +25,7 @@ const storageDir = resolve(
 	})()
 );
 
+// eslint-disable-next-line no-console
 console.log(`Storage location set to ${storageDir}`);
 
 if (!existsSync(storageDir)) {
@@ -33,7 +34,7 @@ if (!existsSync(storageDir)) {
 	);
 }
 
-function formatTime(date: Date) {
+function formatTime(date: Date): string {
 	const hours = date.getHours();
 	const minutes = date.getMinutes();
 	const seconds = date.getSeconds();
@@ -60,10 +61,11 @@ export const logger = winston.createLogger({
 	],
 });
 
-const config: DashBotConfig = (() => {
+const config = ((): DashBotConfig => {
 	const configFileName = 'dashbot.config';
 	const path = join(storageDir + '/' + configFileName);
 
+	// eslint-disable-next-line @typescript-eslint/no-var-requires
 	const config = require(path);
 	logger.info(`Loading config from "${path}"`);
 
@@ -72,23 +74,18 @@ const config: DashBotConfig = (() => {
 
 const client = new Client();
 
-const dashbot = new DashBot({
-	client,
-	config,
-});
-
+//TODO: Move into dashbot
 client.on('ready', () => {
 	logger.info(`Logged in as ${client.user.tag}!`);
-});
-
-client.on('message', msg => {
-	if (msg.content === 'ping') {
-		msg.reply('Pong!');
-	}
 });
 
 client.login(config.discordBotToken);
 
 process.on('SIGINT', () => {
 	client.destroy().then(() => process.exit());
+});
+
+new DashBot({
+	client,
+	config,
 });

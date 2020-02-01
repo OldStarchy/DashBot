@@ -20,14 +20,14 @@ export class Tracery {
 	/**
 	 * Sets the internal random number generator
 	 */
-	setRng(rng: () => number) {
+	setRng(rng: () => number): void {
 		this.rng = rng;
 	}
 
-	random() {
+	random(): number {
 		return this.rng();
 	}
-	createGrammar(raw: RawGrammar) {
+	createGrammar(raw: RawGrammar): Grammar {
 		return new Grammar(this, raw);
 	}
 }

@@ -5,12 +5,12 @@ import { formatTable } from '../formatTable';
 import { sleep } from '../sleep';
 
 export class StatsAction extends Action {
-	handle(message: Message) {
+	handle(message: Message): ActionResult {
 		if (message.content.toLowerCase() === 'show stats') {
 			message.channel
 				.send('Gathering stats...')
-				.then(f => sleep(1000))
-				.then(f => {
+				.then(() => sleep(1000))
+				.then(() => {
 					this.bot.stats.recordUserTriggeredEvent(
 						message.author.username,
 						'request stats'
@@ -38,8 +38,8 @@ export class StatsAction extends Action {
 		if (message.content.toLowerCase() === 'show my stats') {
 			message.channel
 				.send(`Gathering stats for ${message.author.username}...`)
-				.then(f => sleep(1000))
-				.then(f => {
+				.then(() => sleep(1000))
+				.then(() => {
 					this.bot.stats.recordUserTriggeredEvent(
 						message.author.username,
 						'request stats'

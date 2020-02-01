@@ -1,4 +1,4 @@
-export function formatTable(rows: string[][]) {
+export function formatTable(rows: string[][]): string {
 	const widths: number[] = [];
 	rows.forEach(row =>
 		row.forEach((col, index) => {
@@ -8,7 +8,7 @@ export function formatTable(rows: string[][]) {
 	return (
 		'```\n' +
 		rows
-			.map((row, rowIndex) =>
+			.map(row =>
 				row
 					.map((col, index) => col.padEnd(widths[index] + 1))
 					.join('| ')

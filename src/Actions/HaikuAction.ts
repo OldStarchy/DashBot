@@ -4,7 +4,7 @@ import { Action } from '../Action';
 import { ActionResult } from '../ActionResult';
 
 export class HaikuAction extends Action {
-	handle(message: Message) {
+	handle(message: Message): ActionResult {
 		const match = /^!haiku/i.exec(message.content);
 		if (match) {
 			const haiku = getHaiku('shell');

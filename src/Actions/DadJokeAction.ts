@@ -4,7 +4,7 @@ import { Action } from '../Action';
 import { ActionResult } from '../ActionResult';
 
 export class DadJokeAction extends Action {
-	handle(message: Message) {
+	handle(message: Message): ActionResult {
 		const match = /^joke( pls)?$/i.exec(message.content);
 
 		if (match) {
