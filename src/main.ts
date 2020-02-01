@@ -3,6 +3,7 @@
 import { Client } from 'discord.js';
 import { existsSync } from 'fs';
 import { join, resolve } from 'path';
+import winston from 'winston';
 import DashBot from './DashBot';
 import { DashBotConfig } from './DashBotConfig';
 
@@ -32,12 +33,39 @@ if (!existsSync(storageDir)) {
 	);
 }
 
+function formatTime(date: Date) {
+	const hours = date.getHours();
+	const minutes = date.getMinutes();
+	const seconds = date.getSeconds();
+
+	return `${hours}:${minutes}:${seconds}`;
+}
+
+export const logger = winston.createLogger({
+	level: 'info',
+	format: winston.format.printf(
+		({ service, level, message }) =>
+			`${formatTime(new Date())} [${service}] ${level}: ${message}`
+	),
+	defaultMeta: { service: 'dashbot' },
+	transports: [
+		new winston.transports.Console({ format: winston.format.simple() }),
+		new winston.transports.File({
+			filename: join(storageDir, 'combined.log'),
+		}),
+		new winston.transports.File({
+			filename: join(storageDir, 'error.log'),
+			level: 'error',
+		}),
+	],
+});
+
 const config: DashBotConfig = (() => {
 	const configFileName = 'dashbot.config';
 	const path = join(storageDir + '/' + configFileName);
 
 	const config = require(path);
-	console.log(`Loading config from "${path}"`);
+	logger.info(`Loading config from "${path}"`);
 
 	return config;
 })();
@@ -50,7 +78,7 @@ const dashbot = new DashBot({
 });
 
 client.on('ready', () => {
-	console.log(`Logged in as ${client.user.tag}!`);
+	logger.info(`Logged in as ${client.user.tag}!`);
 });
 
 client.on('message', msg => {
