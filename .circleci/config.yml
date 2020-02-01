@@ -16,7 +16,12 @@ jobs:
           command: |
             dir=<< parameters.dir >>
             if [ "$dir" = "" ]; then dir="." ; fi
-            docker run --rm -i hadolint/hadolint /bin/hadolint - < $dir/Dockerfile
+						docker run --rm -i hadolint/hadolint /bin/hadolint - < $dir/Dockerfile
+			- run:
+					name: Lint TS / JS
+					command: |
+						yarn install
+						yarn lint
       - run:
           name: Build images
           command: |
