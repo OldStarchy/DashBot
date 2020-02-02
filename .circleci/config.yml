@@ -12,6 +12,7 @@ jobs:
           command: |
             yarn install
             yarn lint
+            yarn build
             yarn test
   test-docker:
     parameters:
