@@ -11,8 +11,8 @@ jobs:
           name: Lint TS / JS
           command: |
             yarn install
-						yarn lint
-						yarn test
+            yarn lint
+            yarn test
   test-docker:
     parameters:
       dir:
