@@ -1,11 +1,14 @@
 import { Client, Message } from 'discord.js';
 import { Action } from './Action';
+import { ActionResult } from './ActionResult';
 import { ABResponseAction } from './Actions/ABResponseAction';
 import { DadJokeAction } from './Actions/DadJokeAction';
 import { DieAction } from './Actions/DieAction';
 import { GreetAction } from './Actions/GreetAction';
 import { HaikuAction } from './Actions/HaikuAction';
+import { HelpAction } from './Actions/HelpAction';
 import { ImgurSearchAction } from './Actions/ImgurSearchAction';
+import { NumberGameAction } from './Actions/NumberGameAction';
 import { OneOffReplyAction } from './Actions/OneOffReplyAction';
 import { StatsAction } from './Actions/StatsAction';
 import { TraceryAction } from './Actions/TraceryAction';
@@ -53,8 +56,8 @@ export default class DashBot {
 
 	private onMessage(message: Message): void {
 		if (message.author.bot) return;
-		const handled = this.actions.some(
-			action => action.handle(message).handled
+		const handled = this.actions.some(action =>
+			ActionResult.isHandled(action.handle(message))
 		);
 		logger.info(`Message ${handled ? 'handled' : 'ignored'}`);
 	}
@@ -174,7 +177,9 @@ export default class DashBot {
 			new StatsAction(this),
 			new DadJokeAction(this),
 			new HaikuAction(this),
-			new TraceryAction(this)
+			new TraceryAction(this),
+			new NumberGameAction(this),
+			new HelpAction(this)
 		);
 
 		if (this.config.imgurClientId) {

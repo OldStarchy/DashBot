@@ -3,7 +3,8 @@ import { RawRule, RawRuleSet, RuleSet } from './RuleSet';
 import { Tracery } from './Tracery';
 import { TraceryNode } from './TraceryNode';
 
-export type SymbolDefinition = string | Array<string>;
+type SingleOrArray<T> = T | Array<T>;
+export type SymbolDefinition = SingleOrArray<string>;
 
 export class TracerySymbol {
 	private baseRules: RuleSet;

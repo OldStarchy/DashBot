@@ -72,6 +72,12 @@ const bot = new DashBot({
 	stats: new StatTracker(config.statsFileLocation),
 });
 
+bot.login();
+
 process.on('SIGINT', () => {
 	bot.destroy().then(() => process.exit());
+});
+
+process.on('uncaughtException', e => {
+	logger.error(e);
 });
