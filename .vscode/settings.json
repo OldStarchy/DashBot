@@ -1,5 +1,11 @@
 {
 	"cSpell.words": ["DashBot"],
 	"prettier.configPath": ".prettierrc",
-	"eslint.validate": ["javascript", "typescript"]
+	"eslint.validate": ["javascript", "typescript"],
+	"search.exclude": {
+		"**/node_modules": true,
+		"**/bower_components": true,
+		"**/*.code-search": true,
+		"dist/**": true
+	}
 }
