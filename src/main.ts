@@ -6,6 +6,8 @@ import { join, resolve } from 'path';
 import winston from 'winston';
 import DashBot from './DashBot';
 import { DashBotConfig } from './DashBotConfig';
+import { StatTracker } from './StatTracker';
+import { formatTime } from './util/formatTime';
 
 const args = process.argv.slice(2);
 
@@ -32,14 +34,6 @@ if (!existsSync(storageDir)) {
 	throw new Error(
 		`Can\'t find storage directory at "${storageDir}", make sure it exists`
 	);
-}
-
-function formatTime(date: Date): string {
-	const hours = date.getHours();
-	const minutes = date.getMinutes();
-	const seconds = date.getSeconds();
-
-	return `${hours}:${minutes}:${seconds}`;
 }
 
 export const logger = winston.createLogger({
@@ -72,20 +66,12 @@ const config = ((): DashBotConfig => {
 	return config;
 })();
 
-const client = new Client();
-
-//TODO: Move into dashbot
-client.on('ready', () => {
-	logger.info(`Logged in as ${client.user.tag}!`);
+const bot = new DashBot({
+	config,
+	client: new Client(),
+	stats: new StatTracker(config.statsFileLocation),
 });
-
-client.login(config.discordBotToken);
 
 process.on('SIGINT', () => {
-	client.destroy().then(() => process.exit());
-});
-
-new DashBot({
-	client,
-	config,
+	bot.destroy().then(() => process.exit());
 });

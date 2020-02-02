@@ -3,7 +3,7 @@ import fetch from 'node-fetch';
 import { Action } from '../Action';
 import { ActionResult } from '../ActionResult';
 import { ImgurResponse } from '../ImgurResponse';
-import selectRandom from '../SelectRandom';
+import selectRandom from '../util/selectRandom';
 
 export class ImgurSearchAction extends Action {
 	handle(message: Message): ActionResult {

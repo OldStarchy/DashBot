@@ -1,7 +1,7 @@
 import { Message } from 'discord.js';
 import { Action } from '../Action';
 import { ActionResult } from '../ActionResult';
-import { sleep } from '../sleep';
+import { sleep } from '../util/sleep';
 
 export class DieAction extends Action {
 	handle(message: Message): ActionResult {

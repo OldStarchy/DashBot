@@ -18,17 +18,37 @@ export default class DashBot {
 	public readonly client: Client;
 	public readonly config: DashBotConfig;
 
-	constructor({ client, config }: { client: Client; config: DashBotConfig }) {
+	constructor({
+		client,
+		config,
+		stats,
+	}: {
+		client: Client;
+		config: DashBotConfig;
+		stats: StatTracker;
+	}) {
 		this.client = client;
 		this.config = config;
+		this.stats = stats;
 
-		this.stats = new StatTracker(config.statsFileLocation);
-		client.on('message', this.onMessage.bind(this));
-		// client.on('presenceUpdate', (oldMember, newMember) => {
-		// 	if (newMember.presence) {
-		// 	}
-		// });
+		this.bindEvents();
 		this.initActions();
+	}
+
+	public login(): Promise<string> {
+		return this.client.login(this.config.discordBotToken);
+	}
+
+	public destroy(): Promise<void> {
+		return this.client.destroy();
+	}
+
+	private bindEvents(): void {
+		this.client.on('ready', () => {
+			logger.info(`Logged in as ${this.client.user.tag}!`);
+		});
+
+		this.client.on('message', this.onMessage.bind(this));
 	}
 
 	private onMessage(message: Message): void {

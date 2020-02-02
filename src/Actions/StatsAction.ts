@@ -1,8 +1,8 @@
 import { Message } from 'discord.js';
 import { Action } from '../Action';
 import { ActionResult } from '../ActionResult';
-import { formatTable } from '../formatTable';
-import { sleep } from '../sleep';
+import { formatTable } from '../util/formatTable';
+import { sleep } from '../util/sleep';
 
 export class StatsAction extends Action {
 	handle(message: Message): ActionResult {
