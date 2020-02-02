@@ -9,7 +9,9 @@
     "watch": "tsc -w",
     "run": "node dist/main.js",
     "publish": "docker build -t oldstarchy/dashbot . && docker push oldstarchy/dashbot",
-    "lint": "eslint src/**/*.ts"
+    "lint": "eslint src/**/*.ts",
+    "test": "mocha dist/**/*.test.js",
+    "test:watch": "mocha -w dist/**/*.test.js"
   },
   "dependencies": {
     "discord.js": "^11.5.1",
@@ -19,13 +21,17 @@
     "winston": "^3.2.1"
   },
   "devDependencies": {
+    "@types/chai": "^4.2.8",
+    "@types/mocha": "^7.0.1",
     "@types/node": "^13.5.0",
     "@types/node-fetch": "^2.5.4",
     "@typescript-eslint/eslint-plugin": "^2.18.0",
     "@typescript-eslint/parser": "^2.18.0",
+    "chai": "^4.2.0",
     "eslint": "^6.8.0",
     "eslint-config-prettier": "^6.10.0",
     "eslint-plugin-prettier": "^3.1.2",
+    "mocha": "^7.0.1",
     "prettier": "^1.19.1"
   }
 }
