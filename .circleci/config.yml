@@ -12,7 +12,7 @@ jobs:
           command: |
             yarn install
             yarn lint
-      - test:
+      - run:
           name: Test TS
           command: |
             yarn build
