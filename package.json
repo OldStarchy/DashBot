@@ -6,6 +6,7 @@
   "license": "MIT",
   "scripts": {
     "build": "tsc",
+    "build:prod": "tsc -p tsconfig.prod.json",
     "watch": "tsc -w",
     "run": "node dist/main.js",
     "publish": "docker build -t oldstarchy/dashbot . && docker push oldstarchy/dashbot",
@@ -14,6 +15,7 @@
     "test:watch": "mocha -w dist/**/*.test.js"
   },
   "dependencies": {
+    "@types/node": "^13.5.0",
     "discord.js": "^11.5.1",
     "haiku-random": "^1.0.0",
     "node-fetch": "^2.6.0",
@@ -23,7 +25,6 @@
   "devDependencies": {
     "@types/chai": "^4.2.8",
     "@types/mocha": "^7.0.1",
-    "@types/node": "^13.5.0",
     "@types/node-fetch": "^2.5.4",
     "@typescript-eslint/eslint-plugin": "^2.18.0",
     "@typescript-eslint/parser": "^2.18.0",

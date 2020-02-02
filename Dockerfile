@@ -3,14 +3,14 @@ WORKDIR /app
 
 COPY package.json .
 COPY yarn.lock .
-COPY tsconfig.json .
+COPY tsconfig.prod.json .
 
 COPY src ./src
 
 RUN ls
 
-RUN yarn install && \
-	yarn build
+RUN yarn install --production && \
+	yarn build:prod
 
 
 FROM arm32v7/node:10-alpine
