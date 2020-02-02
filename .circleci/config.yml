@@ -12,6 +12,9 @@ jobs:
           command: |
             yarn install
             yarn lint
+      - test:
+          name: Test TS
+          command: |
             yarn build
             yarn test
   test-docker:
