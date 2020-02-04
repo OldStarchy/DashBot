@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "author": "Nicholas Sorokin <nicholas.sorokin@hotmail.com>",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "scripts": {
     "build": "tsc",
     "build:prod": "tsc -p tsconfig.prod.json",
