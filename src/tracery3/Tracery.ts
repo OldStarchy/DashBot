@@ -16,7 +16,9 @@ export class Tracery<T extends Grammar> {
 		[modifierName: string]: Modifier;
 	};
 
-	constructor(grammar: Grammar) {
+	public randomiser: () => number = Math.random;
+
+	constructor(grammar: T) {
 		this.rules = {};
 		this.varStack = [];
 		this.modifiers = {};
@@ -223,11 +225,15 @@ export class Rule {
 
 		let result = '';
 		if (this.type === 'string') {
-			result = selectRandom(this.parts)
+			result = selectRandom(this.parts, null, this.tracery.randomiser)
 				.map(part => part())
 				.join('');
 		} else if (this.type === 'object') {
-			let item: unknown = selectRandom(this.definitions);
+			let item: unknown = selectRandom(
+				this.definitions,
+				null,
+				this.tracery.randomiser
+			);
 
 			while (
 				item !== null &&

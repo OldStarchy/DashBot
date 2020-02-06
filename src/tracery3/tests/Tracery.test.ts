@@ -1,4 +1,4 @@
-import { throws } from 'assert';
+import { fail, throws } from 'assert';
 import { expect } from 'chai';
 import 'mocha';
 import { Tracery } from '../Tracery';
@@ -56,6 +56,85 @@ describe('Tracery3', () => {
 		);
 
 		expect(result).to.match(/^(\d+) \1$/);
+	});
+
+	it('Should select things randomly (enough)', () => {
+		const tracery = new Tracery({
+			origin: [
+				'1',
+				'2',
+				'3',
+				'4',
+				'5',
+				'6',
+				'7',
+				'8',
+				'9',
+				'10',
+				'11',
+				'12',
+				'13',
+				'14',
+				'15',
+				'16',
+			],
+		});
+
+		let last = tracery.generate('origin');
+		for (let i = 0; i < 100; i++) {
+			const next = tracery.generate('origin');
+			if (last !== next) {
+				return;
+			}
+			last = next;
+		}
+
+		fail('Generated 100 results exactly the same way');
+	});
+
+	it('Should select the same thing given a seeded randomiser', () => {
+		const tracery = new Tracery({
+			origin: '#number# #number# #number# #number# #number# #number#',
+			number: [
+				'1',
+				'2',
+				'3',
+				'4',
+				'5',
+				'6',
+				'7',
+				'8',
+				'9',
+				'10',
+				'11',
+				'12',
+				'13',
+				'14',
+				'15',
+				'16',
+			],
+		});
+
+		const randomiserMaker = (seed: number) => {
+			return (): number => {
+				seed = Math.pow(seed * Math.PI, 2) % 1;
+				return seed;
+			};
+		};
+
+		const seed = 34;
+
+		tracery.randomiser = randomiserMaker(seed);
+		let last = tracery.generate('origin');
+
+		for (let i = 0; i < 100; i++) {
+			tracery.randomiser = randomiserMaker(seed);
+			const next = tracery.generate('origin');
+			if (last !== next) {
+				fail('Same seed generation resulted in different results');
+			}
+			last = next;
+		}
 	});
 
 	it('Should work with objects', () => {
