@@ -258,9 +258,11 @@ export class Rule {
 					case 'number':
 						item = item!.toString();
 						break;
+
 					case 'function':
-						item = item();
+						item = item(this.tracery);
 						break;
+
 					default:
 						throw new Error(
 							`Unknown type for tracery object reduction "${typeof item}"`
