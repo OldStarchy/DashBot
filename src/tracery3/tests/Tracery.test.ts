@@ -72,7 +72,25 @@ describe('Tracery3', () => {
 		expect(result).to.equal('freddy');
 	});
 
-	it('Should do many things', () => {
+	it('Should reduce objects by following properties and function return values', () => {
+		const result = Tracery.generate(
+			{
+				origin: '#user.get.name#',
+				user: [
+					{
+						get: (): unknown => ({
+							name: 'teddy',
+						}),
+					},
+				],
+			},
+			'origin'
+		);
+
+		expect(result).to.equal('teddy');
+	});
+
+	it('Should do many things at once', () => {
 		const result = Tracery.generate(
 			{
 				origin:
@@ -111,6 +129,44 @@ describe('Tracery3', () => {
 			},
 			(e: Error) => {
 				return /^Don't nest variable assignments/.test(e.message);
+			}
+		);
+	});
+
+	it('Should fail if modifiers attempt to access missing properties on an object', () => {
+		throws(
+			() => {
+				Tracery.generate(
+					{
+						origin: '#user.name#',
+						user: {
+							nothing: 'to see here',
+						},
+					},
+					'origin'
+				);
+			},
+			(e: Error) => {
+				return /^Missing property "name"/.test(e.message);
+			}
+		);
+	});
+
+	it("Should fail if objects aren't reduced to a string or number", () => {
+		throws(
+			() => {
+				Tracery.generate(
+					{
+						origin: 'My #object#',
+						object: { subProperty: 'things' },
+					},
+					'origin'
+				);
+			},
+			(e: Error) => {
+				return /^Object could not be reduced to string or number/.test(
+					e.message
+				);
 			}
 		);
 	});

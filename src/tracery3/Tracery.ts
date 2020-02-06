@@ -121,9 +121,11 @@ export class Rule {
 				? definition
 				: ([definition] as RuleDefinitionArray);
 
-		this.parts = (this.definitions as string[]).map((def: string) => {
-			return this.parse(def);
-		});
+		if (this.type === 'string') {
+			this.parts = (this.definitions as string[]).map((def: string) => {
+				return this.parse(def);
+			});
+		}
 	}
 
 	private parse(string: string): (() => string)[] {
@@ -216,11 +218,66 @@ export class Rule {
 	}
 
 	public evaluate(modifiers: string[]): string {
+		const originalModifiers = modifiers.slice(0);
 		this.tracery.pushVars();
 
-		const result = selectRandom(this.parts)
-			.map(part => part())
-			.join('');
+		let result = '';
+		if (this.type === 'string') {
+			result = selectRandom(this.parts)
+				.map(part => part())
+				.join('');
+		} else if (this.type === 'object') {
+			let item: unknown = selectRandom(this.definitions);
+
+			while (
+				item !== null &&
+				typeof item !== 'string' &&
+				modifiers.length > 0
+			) {
+				switch (typeof item) {
+					case 'object':
+						if (item instanceof Array) {
+							throw new Error(
+								'Arrays are not supported in tracery object reductions'
+							);
+						}
+						if (item instanceof Object) {
+							if (item.hasOwnProperty(modifiers[0])) {
+								item = (item as StringKeyedObject)[
+									modifiers[0]
+								];
+								modifiers.shift();
+							} else {
+								throw new Error(
+									`Missing property "${modifiers[0]}" on object for reduction in rule "${this.name}"`
+								);
+							}
+							break;
+						}
+
+					case 'number':
+						item = item.toString();
+						break;
+					case 'function':
+						item = item();
+						break;
+					default:
+						throw new Error(
+							`Unknown type for tracery object reduction "${typeof item}"`
+						);
+				}
+			}
+
+			if (typeof item === 'string') {
+				result = item;
+			} else {
+				throw new Error(
+					`Object could not be reduced to string or number with modifiers in "${
+						this.name
+					}" rule, modifiers: "${originalModifiers.join('.')}`
+				);
+			}
+		}
 
 		this.tracery.popVars();
 
