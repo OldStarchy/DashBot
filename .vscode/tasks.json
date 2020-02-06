@@ -6,24 +6,36 @@
 		{
 			"type": "npm",
 			"script": "lint",
-			"problemMatcher": ["$eslint-stylish"]
+			"problemMatcher": [
+				"$eslint-stylish"
+			]
 		},
 		{
 			"type": "npm",
 			"script": "build",
-			"problemMatcher": ["$tsc"],
+			"problemMatcher": [
+				"$tsc"
+			],
 			"group": "build"
 		},
 		{
 			"type": "npm",
 			"script": "watch",
-			"problemMatcher": ["$tsc-watch"],
+			"problemMatcher": [
+				"$tsc-watch"
+			],
 			"group": "build",
 			"isBackground": true
 		},
 		{
 			"type": "npm",
 			"script": "publish",
+			"problemMatcher": []
+		},
+		{
+			"type": "npm",
+			"script": "test:watch",
+			"group": "build",
 			"problemMatcher": []
 		}
 	]

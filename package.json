@@ -12,6 +12,7 @@
     "publish": "docker build -t oldstarchy/dashbot . && docker push oldstarchy/dashbot",
     "lint": "eslint src/**/*.ts",
     "test": "mocha dist/**/*.test.js",
+    "test:debug": "mocha --inspect-brk dist/**/*.test.js",
     "test:watch": "mocha -w dist/**/*.test.js"
   },
   "dependencies": {
