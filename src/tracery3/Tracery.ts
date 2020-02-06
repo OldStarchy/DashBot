@@ -97,9 +97,8 @@ export class Tracery<T extends Grammar> {
 	}
 }
 
-export type StringKeyedObject = { [prop: string]: unknown };
-
-export class Rule {
+type StringKeyedObject = { [prop: string]: unknown };
+class Rule {
 	private readonly type: 'string' | 'object';
 	private readonly definitions: RuleDefinitionArray;
 
@@ -243,9 +242,12 @@ export class Rule {
 				switch (typeof item) {
 					case 'object':
 						if (item instanceof Array) {
-							throw new Error(
-								'Arrays are not supported in tracery object reductions'
+							item = selectRandom(
+								item,
+								null,
+								this.tracery.randomiser
 							);
+							break;
 						}
 						if (item instanceof Object) {
 							if (item.hasOwnProperty(modifiers[0])) {
