@@ -104,6 +104,20 @@ describe('Tracery3', () => {
 		expect(result).to.match(/^The (\w+) (\w+) is an? \1 \2$/);
 	});
 
+	it('Should modify reduced objects', () => {
+		const result = Tracery.generate(
+			{
+				origin: 'This is #user.name#, and this is #user.name.s# cat',
+				user: {
+					name: 'Ned',
+				},
+			},
+			'origin'
+		);
+
+		expect(result).to.equal('This is Ned, and this is Neds cat');
+	});
+
 	it('Should not work with unclosed #', () => {
 		throws(
 			() => {
