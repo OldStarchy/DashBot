@@ -256,7 +256,7 @@ export class Rule {
 						}
 
 					case 'number':
-						item = item.toString();
+						item = item!.toString();
 						break;
 					case 'function':
 						item = item();
