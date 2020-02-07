@@ -1,4 +1,4 @@
-import { Modifier } from '../Modifier';
+import { Modifier } from '../Tracery';
 import { Collection, escapeRegExp, isAlphaNum, isVowel } from '../Util';
 
 export const DefaultModifiersEn: Collection<Modifier> = {

@@ -5,17 +5,15 @@ import { AdventurerIntroduction } from '../Grammars/AdventurerIntroduction';
 import { DefaultModifiersEn } from '../tracery/default/modifiers-en';
 import { Tracery } from '../tracery/Tracery';
 
-const tracery = new Tracery();
+const tracery = new Tracery(AdventurerIntroduction);
 
+tracery.addModifiers(DefaultModifiersEn);
 export class TraceryAction extends Action {
 	handle(message: Message): ActionResult {
 		if (/who am i/i.test(message.content)) {
-			const grammar = tracery.createGrammar(AdventurerIntroduction);
-			grammar.addModifiers(DefaultModifiersEn);
+			const generated = tracery.generate('origin');
 
-			const generated = grammar.expand('#origin#');
-
-			message.channel.send('> ' + generated.finishedText);
+			message.channel.send('> ' + generated);
 			return ActionResult.HANDLED;
 		}
 		return ActionResult.UNHANDLED;

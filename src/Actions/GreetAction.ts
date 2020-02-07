@@ -1,7 +1,7 @@
 import { Message } from 'discord.js';
 import { Action } from '../Action';
 import { ActionResult } from '../ActionResult';
-import { expandTracery } from '../tracery/expandTracery';
+import { Tracery } from '../tracery/Tracery';
 
 const GreetingGrammar = {
 	greeting: [
@@ -32,10 +32,13 @@ export class GreetAction extends Action {
 				message.content
 			)
 		) {
-			const greeting = expandTracery('greeting', {
-				...GreetingGrammar,
-				'target.username': message.author.username,
-			});
+			const greeting = Tracery.generate(
+				{
+					...GreetingGrammar,
+					target: message.author,
+				},
+				'greeting'
+			);
 
 			message.channel.send(greeting);
 			return ActionResult.HANDLED;

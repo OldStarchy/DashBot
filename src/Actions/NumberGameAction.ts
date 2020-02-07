@@ -1,5 +1,5 @@
 import { Message } from 'discord.js';
-import { expandTracery } from '../tracery/expandTracery';
+import { Tracery } from '../tracery/Tracery';
 import { OngoingAction } from './OngoingAction';
 
 interface NumberGameState {
@@ -12,7 +12,7 @@ const NumberGuessGrammar = {
 	higher: [
 		'Nope, higher',
 		"Wrong you're too low",
-		"Sorry #username#, that number is no the number I'm thinking of. You need to guess a higher number",
+		"Sorry #target.username#, that number is no the number I'm thinking of. You need to guess a higher number",
 	],
 	lower: ['Nope, lower'],
 };
@@ -38,29 +38,38 @@ export class NumberGameAction extends OngoingAction<NumberGameState> {
 			}
 			return false;
 		} else {
+			const tracery = new Tracery({
+				...NumberGuessGrammar,
+				target: message.author,
+			});
+
 			if (/^\d+$/.test(message.content)) {
 				const guess = Number.parseInt(message.content);
+
 				if (guess < session.number) {
-					const response = expandTracery('higher', {
-						...NumberGuessGrammar,
-						username: message.author.username,
-					});
+					const response = tracery.generate('higher');
 					message.channel.send(response);
 					session.guesses++;
-				} else if (guess > session.number) {
-					const response = expandTracery('lower', {
-						...NumberGuessGrammar,
-						username: message.author.username,
-					});
+
+					return true;
+				}
+
+				if (guess > session.number) {
+					const response = tracery.generate('lower');
 					message.channel.send(response);
 					session.guesses++;
-				} else if (guess === session.number) {
+
+					return true;
+				}
+
+				if (guess === session.number) {
 					message.channel.send(
 						`You win, you made ${session.guesses} guesses. Well done, you're parents must be proud.`
 					);
 					session.playing = false;
+
+					return true;
 				}
-				return true;
 			}
 		}
 		return false;

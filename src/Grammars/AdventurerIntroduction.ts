@@ -1,6 +1,4 @@
-import { RawGrammar } from '../tracery/Grammar';
-
-export const AdventurerIntroduction: RawGrammar = {
+export const AdventurerIntroduction = {
 	origin: [
 		'You are #name#, #allegiance.a# #race# #class# #action#, #reasonClause#.',
 	],
