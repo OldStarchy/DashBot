@@ -46,11 +46,7 @@ export const logger = winston.createLogger({
 	transports: [
 		new winston.transports.Console({ format: winston.format.simple() }),
 		new winston.transports.File({
-			filename: join(storageDir, 'combined.log'),
-		}),
-		new winston.transports.File({
-			filename: join(storageDir, 'error.log'),
-			level: 'error',
+			filename: join(storageDir, 'dashbot.log'),
 		}),
 	],
 });
@@ -80,4 +76,5 @@ process.on('SIGINT', () => {
 
 process.on('uncaughtException', e => {
 	logger.error(e);
+	process.exit(1);
 });
