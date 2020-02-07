@@ -56,10 +56,16 @@ export default class DashBot {
 
 	private onMessage(message: Message): void {
 		if (message.author.bot) return;
-		const handled = this.actions.some(action =>
-			ActionResult.isHandled(action.handle(message))
-		);
-		logger.info(`Message ${handled ? 'handled' : 'ignored'}`);
+
+		try {
+			this.actions.some(action =>
+				ActionResult.isHandled(action.handle(message))
+			);
+		} catch (e) {
+			logger.error(`Message "${message.content}" caused error`);
+			logger.error(e);
+			message.reply('Something broke :poop:');
+		}
 	}
 
 	private initActions(): void {
