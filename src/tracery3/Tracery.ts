@@ -3,7 +3,7 @@ import selectRandom from '../util/selectRandom';
 
 export type Modifier = (string: string, ...args: string[]) => string;
 
-export class Tracery<T extends Grammar> {
+export class Tracery<T extends Grammar = Grammar> {
 	private readonly rules: {
 		[ruleName: string]: Rule;
 	};
@@ -97,10 +97,9 @@ export class Tracery<T extends Grammar> {
 	}
 }
 
-type StringKeyedObject = { [prop: string]: unknown };
 class Rule {
 	private readonly type: 'string' | 'object';
-	private readonly definitions: RuleDefinitionArray;
+	private readonly definitions: RuleDefinition[];
 
 	private parts: (() => string)[][] = [];
 
@@ -118,9 +117,7 @@ class Rule {
 
 		this.type = typeof proto as 'string' | 'object';
 		this.definitions =
-			definition instanceof Array
-				? definition
-				: ([definition] as RuleDefinitionArray);
+			definition instanceof Array ? definition : [definition];
 
 		if (this.type === 'string') {
 			this.parts = (this.definitions as string[]).map((def: string) => {
@@ -228,16 +225,17 @@ class Rule {
 				.map(part => part())
 				.join('');
 		} else if (this.type === 'object') {
-			let item: unknown = selectRandom(
+			let item: RuleDefinition = selectRandom(
 				this.definitions,
 				null,
 				this.tracery.randomiser
 			);
 
 			while (
-				item !== null &&
-				typeof item !== 'string' &&
-				modifiers.length > 0
+				item !== null && //Fail on null
+				typeof item !== 'string' && //Found a string
+				(modifiers.length > 0 || //No more modifiers left, but...
+					item instanceof Array) //Don't need modifiers to randomly select from an array
 			) {
 				switch (typeof item) {
 					case 'object':
@@ -251,9 +249,8 @@ class Rule {
 						}
 						if (item instanceof Object) {
 							if (item.hasOwnProperty(modifiers[0])) {
-								item = (item as StringKeyedObject)[
-									modifiers[0]
-								];
+								// Cast is required to make typescript happy, but is not technically correct as I want to allow any object to be used as part of a definition, including ones that have properties that aren't compatible, and we trust the author to not reference those properties in the grammar
+								item = (item as Grammar)[modifiers[0]];
 								modifiers.shift();
 							} else {
 								throw new Error(
@@ -264,7 +261,7 @@ class Rule {
 						}
 
 					case 'number':
-						item = item!.toString();
+						item = item.toString();
 						break;
 
 					case 'function':
@@ -328,13 +325,16 @@ const varPart = <T extends Grammar>(
 	};
 };
 
-export type OneOrList<T> = T | T[];
+// We can't be real specific about the allowed grammar as it would be too restricting (thoughts?)
+// So this way (with "object" as an option) it really allows anything, but the type hinting does work for
+// functions declared at the top level
 export type RuleDefinition =
 	| string
-	| StringKeyedObject
-	| string[]
-	| StringKeyedObject[];
-export type RuleDefinitionArray = string[] | StringKeyedObject[];
+	| number
+	| RuleDefinition[]
+	| object
+	| ((tracery: Tracery<Grammar>, ...args: unknown[]) => RuleDefinition);
+
 export type Grammar = {
 	[ruleName: string]: RuleDefinition;
 };

@@ -151,13 +151,24 @@ describe('Tracery3', () => {
 		expect(result).to.equal('freddy');
 	});
 
+	it('Should work with nested arrays', () => {
+		const result = Tracery.generate(
+			{
+				origin: [['nested']],
+			},
+			'origin'
+		);
+
+		expect(result).to.equal('nested');
+	});
+
 	it('Should reduce objects by following properties and function return values', () => {
 		const result = Tracery.generate(
 			{
 				origin: '#user.get.name#',
 				user: [
 					{
-						get: (): unknown => ({
+						get: (): { name: string } => ({
 							name: 'teddy',
 						}),
 					},
