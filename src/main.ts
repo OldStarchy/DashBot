@@ -65,7 +65,7 @@ const config = ((): DashBotConfig => {
 const bot = new DashBot({
 	config,
 	client: new Client(),
-	stats: new StatTracker(config.statsFileLocation),
+	stats: new StatTracker(join(storageDir, config.statsFileLocation)),
 });
 
 bot.login();
