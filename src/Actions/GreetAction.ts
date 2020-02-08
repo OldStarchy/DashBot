@@ -2,6 +2,7 @@ import { Message } from 'discord.js';
 import { Action } from '../Action';
 import { ActionResult } from '../ActionResult';
 import { Tracery } from '../tracery/Tracery';
+import { escapeSpecialCharacters } from '../util/escapeSpecialCharacters';
 
 const GreetingGrammar = {
 	greeting: [
@@ -27,11 +28,10 @@ const GreetingGrammar = {
 
 export class GreetAction extends Action {
 	handle(message: Message): ActionResult {
-		if (
-			/^(oh )?((hey|hi|hello),? )?(there )?dash( ?bot)?!?/i.test(
-				message.content
-			)
-		) {
+		const name = escapeSpecialCharacters(this.client.user.username);
+		const regexString = `^(oh )?((hey|hi|hello),? )?(there )?(dash|${name})( ?bot)?!?`;
+		const regexObj = new RegExp(regexString, 'i');
+		if (regexObj.test(message.content)) {
 			const greeting = Tracery.generate(
 				{
 					...GreetingGrammar,
