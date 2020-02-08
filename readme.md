@@ -14,7 +14,7 @@ A chatbot that does whatever I feel like implementing at the time.
 
     /** @type DashbotConfig */
     const Config = {
-    	botToken: '',
+    	discordBotToken: '',
     	imgurClientId: '',
     	statsFileLocation: 'stats.json',
     };
