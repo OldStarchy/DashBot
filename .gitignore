@@ -2,3 +2,4 @@ node_modules
 dist
 dashbot.config.js
 *.log
+storage
