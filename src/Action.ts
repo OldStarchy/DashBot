@@ -7,5 +7,5 @@ export abstract class Action {
 	constructor(protected readonly bot: DashBot) {
 		this.client = bot.client;
 	}
-	abstract handle(message: Message): ActionResult | boolean;
+	abstract async handle(message: Message): Promise<ActionResult | boolean>;
 }

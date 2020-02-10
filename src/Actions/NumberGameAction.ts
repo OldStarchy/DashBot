@@ -23,8 +23,9 @@ export class NumberGameAction extends OngoingAction<NumberGameState> {
 		number: 0,
 		guesses: 0,
 	};
-	handle(message: Message): boolean {
+	async handle(message: Message) {
 		const session = this.getSession(message, NumberGameAction.defaultState);
+
 		if (session.playing === false) {
 			if (/^i want to guess a number$/i.test(message.content)) {
 				const number = Math.floor(Math.random() * 99) + 1;

@@ -22,7 +22,8 @@ export class OneOffReplyAction extends Action {
 			this.trigger = triggerOrKeywords.bind(null);
 		}
 	}
-	handle(message: Message): ActionResult {
+
+	async handle(message: Message) {
 		if (this.trigger(message)) {
 			let compliment = selectRandom(this.replies);
 			const replacements = [['@n', message.author.username]];

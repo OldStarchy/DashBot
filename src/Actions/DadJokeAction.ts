@@ -3,12 +3,17 @@ import fetch from 'node-fetch';
 import { Action } from '../Action';
 import { ActionResult } from '../ActionResult';
 
+interface Joke {
+	id: string;
+	joke: string;
+	status: number;
+}
 export class DadJokeAction extends Action {
-	handle(message: Message): ActionResult {
+	async handle(message: Message) {
 		const match = /^joke( pls)?$/i.exec(message.content);
 
 		if (match) {
-			fetch('https://icanhazdadjoke.com/', {
+			const response = await fetch('https://icanhazdadjoke.com/', {
 				headers: [
 					['Accept', ' application/json'],
 					[
@@ -16,23 +21,25 @@ export class DadJokeAction extends Action {
 						'DashBot Discord Bot (not public atm sorry)',
 					],
 				],
-			})
-				.then(r => r.json())
-				.then((json: { id: string; joke: string; status: number }) => {
-					if (json.status === 200) {
-						message.channel.send(json.joke);
-						this.bot.stats.recordUserTriggeredEvent(
-							message.author.username,
-							'get joke'
-						);
-					} else {
-						message.channel.send(
-							"icanhazdadjoke.com doesn't like me right now sorry"
-						);
-					}
-				});
+			});
+
+			const joke = await response.json();
+
+			if (joke.status === 200) {
+				message.channel.send(joke.joke);
+
+				this.bot.stats.recordUserTriggeredEvent(
+					message.author.username,
+					'get joke'
+				);
+			} else {
+				message.channel.send(
+					"icanhazdadjoke.com doesn't like me right now sorry"
+				);
+			}
 			return ActionResult.HANDLED;
 		}
+
 		return ActionResult.UNHANDLED;
 	}
 }

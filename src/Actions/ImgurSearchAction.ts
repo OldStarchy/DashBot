@@ -6,39 +6,43 @@ import { ImgurResponse } from '../ImgurResponse';
 import selectRandom from '../util/selectRandom';
 
 export class ImgurSearchAction extends Action {
-	handle(message: Message): ActionResult {
+	async handle(message: Message) {
 		const match = /^!imgur (.*)/i.exec(message.content);
 		if (match) {
 			const q = match[1];
-			fetch('https://api.imgur.com/3/gallery/search?q=' + encodeURI(q), {
-				headers: [
-					[
-						'Authorization',
-						'Client-ID ' + this.bot.config.imgurClientId,
+
+			const response = await fetch(
+				'https://api.imgur.com/3/gallery/search?q=' + encodeURI(q),
+				{
+					headers: [
+						[
+							'Authorization',
+							'Client-ID ' + this.bot.config.imgurClientId,
+						],
 					],
-				],
-			})
-				.then(r => r.json())
-				.then((json: ImgurResponse) => {
-					if (json.success) {
-						const img = selectRandom(json.data, 20);
-						if (img) {
-							message.channel
-								.send(img.title)
-								.then(() => message.channel.send(img.link));
-							this.bot.stats.recordUserTriggeredEvent(
-								message.author.username,
-								'search imgur'
-							);
-						} else {
-							message.channel.send('no results... i guess');
-						}
-					} else {
-						message.channel.send(
-							"Imgur doesn't like me right now sorry"
-						);
-					}
-				});
+				}
+			);
+
+			const json: ImgurResponse = await response.json();
+
+			if (json.success) {
+				const img = selectRandom(json.data, 20);
+
+				if (img) {
+					await message.channel.send(img.title);
+					await message.channel.send(img.link);
+
+					this.bot.stats.recordUserTriggeredEvent(
+						message.author.username,
+						'search imgur'
+					);
+				} else {
+					message.channel.send('no results... i guess');
+				}
+			} else {
+				message.channel.send("Imgur doesn't like me right now sorry");
+			}
+
 			return ActionResult.HANDLED;
 		}
 		return ActionResult.UNHANDLED;

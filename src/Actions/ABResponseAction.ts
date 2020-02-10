@@ -7,7 +7,7 @@ export class ABResponseAction extends Action {
 	constructor(bot: DashBot, protected aBResponses: [string, string][]) {
 		super(bot);
 	}
-	handle(message: Message): ActionResult {
+	async handle(message: Message) {
 		return new ActionResult(
 			this.aBResponses.some(ab => {
 				if (ab[0].toLowerCase() === message.content) {

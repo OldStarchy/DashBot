@@ -9,7 +9,7 @@ const tracery = new Tracery(AdventurerIntroduction);
 
 tracery.addModifiers(DefaultModifiersEn);
 export class TraceryAction extends Action {
-	handle(message: Message): ActionResult {
+	async handle(message: Message) {
 		if (/who am i/i.test(message.content)) {
 			const generated = tracery.generate('origin');
 

@@ -31,7 +31,7 @@ export class HelpAction extends OngoingAction<HelpActionSession> {
 		sentMessageTime: 0,
 	};
 
-	handle(message: Message): boolean {
+	async handle(message: Message) {
 		const { content, channel, author } = message;
 		const helpRegex = /^(\!?help)$/;
 		const session = this.getSession(message, HelpAction.defaultSession);
@@ -59,11 +59,11 @@ export class HelpAction extends OngoingAction<HelpActionSession> {
 			Date.now() - session.sentMessageTime < thirtyMinutes
 		) {
 			if (regex.yes.test(content)) {
-				author
-					.createDM()
-					.then(dmChannel =>
-						dmChannel.send(tracery().generate('moreInfo'))
-					);
+				(async () => {
+					const dmChannel = await author.createDM();
+					dmChannel.send(tracery().generate('moreInfo'));
+				})();
+
 				channel.send(tracery().generate('ok-yes'));
 				session.pendingAnswer = false;
 				return true;

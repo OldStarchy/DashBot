@@ -27,7 +27,7 @@ const GreetingGrammar = {
 };
 
 export class GreetAction extends Action {
-	handle(message: Message): ActionResult {
+	async handle(message: Message) {
 		const name = escapeSpecialCharacters(this.client.user.username);
 		const regexString = `^(oh )?((hey|hi|hello),? )?(there )?(dash|${name})( ?bot)?!?`;
 		const regexObj = new RegExp(regexString, 'i');

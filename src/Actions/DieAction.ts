@@ -4,7 +4,7 @@ import { ActionResult } from '../ActionResult';
 import { sleep } from '../util/sleep';
 
 export class DieAction extends Action {
-	handle(message: Message): ActionResult {
+	async handle(message: Message) {
 		const match = /^roll (d(-?\d+)|dice)$/i.exec(message.content);
 
 		if (match) {
@@ -37,17 +37,20 @@ export class DieAction extends Action {
 				positive = false;
 			}
 			const result = Math.floor(Math.random() * size) + 1;
-			message.channel
-				.send(
+
+			(async () => {
+				await message.channel.send(
 					`@${message.author.username}, rolling a D${(
 						size * (positive ? 1 : -1)
 					).toFixed(0)}...`
-				)
-				.then(() => sleep(1000))
-				.then(() => {
-					if (positive) message.channel.send(result.toFixed(0));
-					else message.channel.send('-' + result.toFixed(0));
-				});
+				);
+
+				await sleep(1000);
+
+				if (positive) message.channel.send(result.toFixed(0));
+				else message.channel.send('-' + result.toFixed(0));
+			})();
+
 			return ActionResult.HANDLED;
 		}
 		if (/^roll (d(-?\d+)e\d+)$/i.test(message.content)) {

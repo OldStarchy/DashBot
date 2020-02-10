@@ -1,4 +1,5 @@
 import { Client, Message } from 'discord.js';
+import { Logger } from 'winston';
 import { Action } from './Action';
 import { ActionResult } from './ActionResult';
 import { ABResponseAction } from './Actions/ABResponseAction';
@@ -13,58 +14,62 @@ import { OneOffReplyAction } from './Actions/OneOffReplyAction';
 import { StatsAction } from './Actions/StatsAction';
 import { TraceryAction } from './Actions/TraceryAction';
 import { DashBotConfig } from './DashBotConfig';
-import { logger } from './main';
 import { StatTracker } from './StatTracker';
+
+export interface DashBotOptions {
+	client: Client;
+	config: DashBotConfig;
+	stats: StatTracker;
+	logger: Logger;
+}
 
 export default class DashBot {
 	public readonly stats: StatTracker;
 	public readonly client: Client;
 	public readonly config: DashBotConfig;
+	public readonly logger: Logger;
 
-	constructor({
-		client,
-		config,
-		stats,
-	}: {
-		client: Client;
-		config: DashBotConfig;
-		stats: StatTracker;
-	}) {
+	private actions: Action[] = [];
+
+	constructor({ client, config, stats, logger }: DashBotOptions) {
 		this.client = client;
 		this.config = config;
 		this.stats = stats;
+		this.logger = logger;
 
 		this.bindEvents();
 		this.initActions();
 	}
 
-	public login(): Promise<string> {
-		return this.client.login(this.config.discordBotToken);
+	public async login(): Promise<string> {
+		return await this.client.login(this.config.discordBotToken);
 	}
 
-	public destroy(): Promise<void> {
-		return this.client.destroy();
+	public async destroy(): Promise<void> {
+		return await this.client.destroy();
 	}
 
 	private bindEvents(): void {
 		this.client.on('ready', () => {
-			logger.info(`Logged in as ${this.client.user.tag}!`);
+			this.logger.info(`Logged in as ${this.client.user.tag}!`);
 		});
 
 		this.client.on('message', this.onMessage.bind(this));
 	}
 
-	private onMessage(message: Message): void {
+	private async onMessage(message: Message): Promise<void> {
 		if (message.author.bot) return;
 
 		try {
-			this.actions.some(action =>
-				ActionResult.isHandled(action.handle(message))
-			);
+			for (const action of this.actions) {
+				const result = await action.handle(message);
+
+				if (ActionResult.isHandled(result)) return;
+			}
 		} catch (e) {
-			logger.error(`Message "${message.content}" caused error`);
-			logger.error(e);
-			message.reply('Something broke :poop:');
+			this.logger.error(`Message "${message.content}" caused error`);
+			this.logger.error(e);
+			await message.reply('Something broke :poop:');
 		}
 	}
 
@@ -192,6 +197,4 @@ export default class DashBot {
 			this.actions.push(new ImgurSearchAction(this));
 		}
 	}
-
-	actions: Action[] = [];
 }

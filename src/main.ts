@@ -36,7 +36,7 @@ if (!existsSync(storageDir)) {
 	);
 }
 
-export const logger = winston.createLogger({
+const logger = winston.createLogger({
 	level: 'info',
 	format: winston.format.printf(
 		({ service, level, message }) =>
@@ -49,6 +49,11 @@ export const logger = winston.createLogger({
 			filename: join(storageDir, 'dashbot.log'),
 		}),
 	],
+});
+
+process.on('uncaughtException', e => {
+	logger.error(e);
+	process.exit(1);
 });
 
 const config = ((): DashBotConfig => {
@@ -66,15 +71,12 @@ const bot = new DashBot({
 	config,
 	client: new Client(),
 	stats: new StatTracker(join(storageDir, config.statsFileLocation)),
+	logger,
 });
 
 bot.login();
 
-process.on('SIGINT', () => {
+process.on('SIGINT', e => {
+	logger.warn(e);
 	bot.destroy().then(() => process.exit());
-});
-
-process.on('uncaughtException', e => {
-	logger.error(e);
-	process.exit(1);
 });
