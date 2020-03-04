@@ -3,3 +3,5 @@ dist
 dashbot.config.js
 *.log
 storage
+coverage
+.nyc_output

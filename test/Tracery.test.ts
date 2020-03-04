@@ -1,7 +1,7 @@
 import { fail, throws } from 'assert';
 import { expect } from 'chai';
 import 'mocha';
-import { Tracery } from '../../tracery/Tracery';
+import { Tracery } from '../src/tracery/Tracery';
 
 describe('Tracery3', () => {
 	it('Should interpolate', () => {
