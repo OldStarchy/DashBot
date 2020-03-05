@@ -1,9 +1,10 @@
-FROM node:10 AS builder
+FROM node:13 AS builder
 WORKDIR /app
 
 COPY package.json .
 COPY yarn.lock .
 COPY tsconfig.prod.json .
+COPY tsconfig.json .
 
 COPY src ./src
 
@@ -13,7 +14,7 @@ RUN yarn install --production && \
 	yarn build:prod
 
 
-FROM arm32v7/node:10-alpine
+FROM arm32v7/node:13-alpine
 WORKDIR /app
 
 COPY --from=builder /app/dist .
