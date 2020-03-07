@@ -5,16 +5,18 @@
 	"version": "0.2.0",
 	"configurations": [
 		{
-			"name": "Attach",
+			"name": "Debug Tests",
 			"port": 9229,
-			"request": "attach",
+			"request": "launch",
+			"runtimeArgs": ["test"],
+			"runtimeExecutable": "yarn",
 			"skipFiles": ["<node_internals>/**"],
 			"type": "pwa-node"
 		},
 		{
 			"type": "node",
 			"request": "launch",
-			"name": "Launch Program",
+			"name": "Debug DashBot",
 			"skipFiles": ["<node_internals>/**"],
 			"program": "${workspaceFolder}\\dist\\main.js",
 			"outFiles": ["${workspaceFolder}/**/*.js"],
