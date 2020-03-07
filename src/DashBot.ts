@@ -11,6 +11,7 @@ import { HelpAction } from './Actions/HelpAction';
 import { ImgurSearchAction } from './Actions/ImgurSearchAction';
 import { NumberGameAction } from './Actions/NumberGameAction';
 import { OneOffReplyAction } from './Actions/OneOffReplyAction';
+import { PollAction } from './Actions/PollAction';
 import { StatsAction } from './Actions/StatsAction';
 import { TraceryAction } from './Actions/TraceryAction';
 import { DashBotConfig } from './DashBotConfig';
@@ -203,7 +204,8 @@ export default class DashBot {
 					}
 					return false;
 				}
-			})(this)
+			})(this),
+			new PollAction(this)
 		);
 
 		if (this.config.imgurClientId) {
