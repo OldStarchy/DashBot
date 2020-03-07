@@ -97,32 +97,66 @@ export class Tracery<T extends Grammar = Grammar> {
 	}
 }
 
+type CompiledDefinition = (() => string) | object;
 class Rule {
-	private readonly type: 'string' | 'object';
-	private readonly definitions: RuleDefinition[];
+	private readonly compiledDefinition: CompiledDefinition;
 
-	private parts: (() => string)[][] = [];
+	// private parts: (() => string)[][] = [];
 
 	public constructor(
 		private readonly tracery: Tracery<Grammar>,
 		public readonly name: string | null,
-		definition: RuleDefinition
+		private readonly definition: RuleDefinition
 	) {
-		const proto =
-			definition instanceof Array
-				? definition.length > 0
-					? definition[0]
-					: ''
-				: definition;
+		this.compiledDefinition = this.compileDefinition(definition);
+	}
 
-		this.type = typeof proto as 'string' | 'object';
-		this.definitions =
-			definition instanceof Array ? definition : [definition];
+	private compileDefinition(
+		definition: RuleDefinition
+	): (() => string) | object {
+		switch (typeof definition) {
+			case 'string':
+				const compiledString = this.parse(definition);
+				return () => compiledString.map(part => part()).join('');
+			case 'number':
+				const compiledNumber = definition.toString();
+				return () => compiledNumber;
+			case 'function':
+				return () => {
+					const functionResult = this.compileDefinition(
+						definition(this.tracery)
+					);
 
-		if (this.type === 'string') {
-			this.parts = (this.definitions as string[]).map((def: string) => {
-				return this.parse(def);
-			});
+					if (functionResult instanceof Function) {
+						return functionResult();
+					} else {
+						return functionResult;
+					}
+				};
+			case 'object':
+				if (definition instanceof Array) {
+					const compiledArrayDefinitions = definition.map(
+						subDefinition => this.compileDefinition(subDefinition)
+					);
+
+					return () => {
+						const randomSubDefinition = selectRandom(
+							compiledArrayDefinitions,
+							null,
+							this.tracery.randomiser
+						);
+
+						if (randomSubDefinition instanceof Function) {
+							return randomSubDefinition();
+						} else {
+							return randomSubDefinition;
+						}
+					};
+				} else {
+					return definition;
+				}
+			default:
+				throw new Error('unrecognized rule definition');
 		}
 	}
 
@@ -216,79 +250,100 @@ class Rule {
 	}
 
 	public evaluate(modifiers: string[]): string {
-		const originalModifiers = modifiers.slice(0);
 		this.tracery.pushVars();
 
-		let result = '';
-		if (this.type === 'string') {
-			result = selectRandom(this.parts, null, this.tracery.randomiser)
-				.map(part => part())
-				.join('');
-		} else if (this.type === 'object') {
-			let item: RuleDefinition = selectRandom(
-				this.definitions,
-				null,
-				this.tracery.randomiser
-			);
-
-			while (
-				item !== null && //Fail on null
-				typeof item !== 'string' && //Found a string
-				(modifiers.length > 0 || //No more modifiers left, but...
-					item instanceof Array) //Don't need modifiers to randomly select from an array
-			) {
-				switch (typeof item) {
-					case 'object':
-						if (item instanceof Array) {
-							item = selectRandom(
-								item,
-								null,
-								this.tracery.randomiser
-							);
-							break;
-						}
-						if (item instanceof Object) {
-							if (item.hasOwnProperty(modifiers[0])) {
-								// Cast is required to make typescript happy, but is not technically correct as I want to allow any object to be used as part of a definition, including ones that have properties that aren't compatible, and we trust the author to not reference those properties in the grammar
-								item = (item as Grammar)[modifiers[0]];
-								modifiers.shift();
-							} else {
-								throw new Error(
-									`Missing property "${modifiers[0]}" on object for reduction in rule "${this.name}"`
-								);
-							}
-							break;
-						}
-
-					case 'number':
-						item = item.toString();
-						break;
-
-					case 'function':
-						item = item(this.tracery);
-						break;
-
-					default:
-						throw new Error(
-							`Unknown type for tracery object reduction "${typeof item}"`
-						);
-				}
-			}
-
-			if (typeof item === 'string') {
-				result = item;
-			} else {
-				throw new Error(
-					`Object could not be reduced to string or number with modifiers in "${
-						this.name
-					}" rule, modifiers: "${originalModifiers.join('.')}`
-				);
-			}
-		}
+		const result = this.reduce(this.compiledDefinition, modifiers);
 
 		this.tracery.popVars();
+		return result;
+	}
 
-		return this.tracery.modify(result, modifiers);
+	private safeGetProperty(
+		obj: Record<string, unknown>,
+		property: string
+	): unknown {
+		const val = obj[property];
+		return val;
+	}
+
+	private reduceObject(
+		obj: Record<string, unknown>,
+		modifiers: string[]
+	): [string | number | Function, string[]] {
+		if (modifiers.length === 0) {
+			throw new Error('Object could not be reduced to string or number');
+		}
+
+		if (obj.hasOwnProperty(modifiers[0])) {
+			const objectLookupResult = this.safeGetProperty(
+				obj as Record<string, unknown>,
+				modifiers[0]
+			);
+
+			const remainingModifiers = modifiers.slice(1);
+
+			if (
+				objectLookupResult === null ||
+				objectLookupResult === undefined
+			) {
+				throw new Error(
+					'Property lookup on object returned null or undefined'
+				);
+			}
+
+			switch (typeof objectLookupResult) {
+				case 'string':
+				case 'number':
+					return [objectLookupResult, remainingModifiers];
+
+				case 'function':
+					if (objectLookupResult instanceof Function) {
+						return [objectLookupResult, remainingModifiers];
+					}
+
+				case 'object':
+					return this.reduceObject(
+						objectLookupResult as Record<string, unknown>,
+						remainingModifiers
+					);
+				default:
+					throw new Error(
+						`Invalid type ${typeof objectLookupResult} after reduction`
+					);
+			}
+		} else {
+			throw new Error(
+				`Missing property "${modifiers[0]}" on object for reduction in rule "${this.name}"`
+			);
+		}
+	}
+
+	private reduce(
+		definition: string | number | Function | object,
+		modifiers: string[]
+	): string {
+		switch (typeof definition) {
+			case 'string':
+				return this.tracery.modify(definition, modifiers);
+
+			case 'number':
+				return this.tracery.modify(definition.toString(), modifiers);
+
+			case 'function':
+				return this.reduce(definition(), modifiers);
+
+			case 'object':
+				const [reductionResult, remainingModifiers] = this.reduceObject(
+					definition as Record<string, unknown>,
+					modifiers
+				);
+
+				return this.reduce(reductionResult, remainingModifiers);
+			default:
+				throw new Error(
+					`Unexpected type to reduce "${typeof definition}"`
+				);
+		}
 	}
 }
 

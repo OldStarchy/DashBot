@@ -137,6 +137,18 @@ describe('Tracery3', () => {
 		}
 	});
 
+	it('Should stringify numbers', () => {
+		const tracery = new Tracery({
+			test1: 'Number #number#.',
+			number: 34,
+			test2: 'Number #numberFunc#.',
+			numberFunc: () => 23,
+		});
+
+		expect(tracery.generate('test1')).to.equal('Number 34.');
+		expect(tracery.generate('test2')).to.equal('Number 23.');
+	});
+
 	it('Should work with objects', () => {
 		const result = Tracery.generate(
 			{
