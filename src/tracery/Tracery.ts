@@ -140,11 +140,11 @@ class Rule {
 			},
 			{
 				tokenName: 'assignment',
-				regexp: /^\[(?<variable>.*?)(:(?<!\\))(?<expression>.*?)(\](?<!\\)|$)/, // Any text between [ and a :, and between the : and an unescaped ], or between the : and end of string
+				regexp: /^\[(?<variable>.*?)(:(?<!\\))(?<expression>[^]*?)(\](?<!\\)|$)/, // Any text between [ and a :, and between the : and an unescaped ], or between the : and end of string
 			},
 			{
 				tokenName: 'plainText',
-				regexp: /^(.*?)((\#|\[)(?<!\\)|$)/, // Any text up to an unescaped # or [
+				regexp: /^([^]*?)((\#|\[)(?<!\\)|$)/, // Any text up to an unescaped # or [
 			},
 		];
 
@@ -169,7 +169,7 @@ class Rule {
 
 			if (tokenStuff === null) {
 				throw new Error(
-					"can't find token in string, this should never happen"
+					"can't find token in string, this may happen if a variable name contains a newline"
 				);
 			}
 

@@ -274,4 +274,15 @@ describe('Tracery3', () => {
 			}
 		);
 	});
+
+	it('Should handle newlines', () => {
+		const result = Tracery.generate(
+			{
+				origin: 'First line\nSecond line',
+			},
+			'origin'
+		);
+
+		expect(result).to.equal('First line\nSecond line');
+	});
 });
