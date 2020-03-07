@@ -14,4 +14,9 @@ export interface DashBotConfig {
 	 */
 	imgurClientSecret?: string;
 	statsFileLocation: string;
+
+	/**
+	 * Log extra debug messages
+	 */
+	debug?: boolean;
 }

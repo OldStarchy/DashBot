@@ -50,6 +50,9 @@ export default class DashBot {
 	}
 
 	private bindEvents(): void {
+		if (this.config.debug) {
+			this.client.on('debug', info => this.logger.debug(info));
+		}
 		this.client.on('ready', () => {
 			this.logger.info(`Logged in as ${this.client.user.tag}!`);
 		});
@@ -190,7 +193,17 @@ export default class DashBot {
 			new HaikuAction(this),
 			new TraceryAction(this),
 			new NumberGameAction(this),
-			new HelpAction(this)
+			new HelpAction(this),
+			new (class extends Action {
+				async handle(message: Message) {
+					//TODO: Maybe check to see who's triggered a disconnect so not anyone can do it
+					if (message.content === '__disconnect') {
+						this.bot.destroy();
+						return true;
+					}
+					return false;
+				}
+			})(this)
 		);
 
 		if (this.config.imgurClientId) {
