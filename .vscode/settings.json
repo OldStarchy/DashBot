@@ -1,5 +1,5 @@
 {
-	"cSpell.words": ["DashBot"],
+	"cSpell.words": ["DashBot", "Emoji"],
 	"prettier.configPath": ".prettierrc",
 	"eslint.validate": ["javascript", "typescript"],
 	"search.exclude": {
@@ -11,5 +11,8 @@
 	"[yaml]": {
 		"editor.tabSize": 2,
 		"editor.insertSpaces": true
-	}
+	},
+	"npm.packageManager": "yarn",
+	"eslint.packageManager": "yarn",
+	"prettier.packageManager": "yarn"
 }
