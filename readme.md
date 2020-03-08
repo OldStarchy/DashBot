@@ -1,5 +1,8 @@
 # DashBot
 
+[![CircleCI](https://circleci.com/gh/aNickzz/DashBot.svg?style=svg)](https://circleci.com/gh/aNickzz/DashBot)
+[![codecov.io](https://codecov.io/github/aNickzz/DashBot/coverage.svg?branch=master)](https://codecov.io/github/aNickzz/DashBot?branch=master)
+
 A chatbot that does whatever I feel like implementing at the time.
 
 ## What can it do

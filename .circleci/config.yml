@@ -16,7 +16,7 @@ jobs:
           name: Test TS
           command: |
             yarn build
-            yarn test
+            yarn coverage
   test-docker:
     parameters:
       dir:
