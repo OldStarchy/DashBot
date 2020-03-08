@@ -4,6 +4,9 @@ import { ActionResult } from '../ActionResult';
 import { formatTable } from '../util/formatTable';
 import { sleep } from '../util/sleep';
 
+/**
+ * Shows some stats. Not many things record stats at the moment. Currently its just a couple things like how many dice rolls and how many imgur searches there have been.
+ */
 export class StatsAction extends Action {
 	async handle(message: Message) {
 		if (message.content.toLowerCase() === 'show stats') {

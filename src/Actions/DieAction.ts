@@ -3,6 +3,17 @@ import { Action } from '../Action';
 import { ActionResult } from '../ActionResult';
 import { sleep } from '../util/sleep';
 
+/**
+ * Rolls dice and flips coins.
+ *
+ * `roll dice`
+ *
+ * `roll d20`
+ *
+ * `roll d100000`
+ *
+ * `flip coin`
+ */
 export class DieAction extends Action {
 	async handle(message: Message) {
 		const match = /^roll (d(-?\d+)|dice)$/i.exec(message.content);

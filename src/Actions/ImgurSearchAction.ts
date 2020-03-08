@@ -5,6 +5,9 @@ import { ActionResult } from '../ActionResult';
 import { ImgurResponse } from '../ImgurResponse';
 import selectRandom from '../util/selectRandom';
 
+/**
+ * Performs an Imgur search and posts a random result
+ */
 export class ImgurSearchAction extends Action {
 	async handle(message: Message) {
 		const match = /^!imgur (.*)/i.exec(message.content);

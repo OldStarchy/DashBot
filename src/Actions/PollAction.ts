@@ -22,6 +22,11 @@ const grammar = {
 	],
 };
 
+/**
+ * Allows you to create polls (much like other existing poll bots).
+ *
+ * `!poll "this is my question" yes no maybe "i don't know".`
+ */
 export class PollAction extends Action {
 	static readonly answersEmoji = [
 		Emoji.ZERO,

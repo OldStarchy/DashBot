@@ -26,6 +26,9 @@ const GreetingGrammar = {
 	],
 };
 
+/**
+ * Could probably be replaced with a OneOffReplyAction.
+ */
 export class GreetAction extends Action {
 	async handle(message: Message) {
 		const name = escapeSpecialCharacters(this.client.user.username);

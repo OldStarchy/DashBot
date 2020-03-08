@@ -8,6 +8,10 @@ interface Joke {
 	joke: string;
 	status: number;
 }
+
+/**
+ * Responds with a random dad joke from the free API https://icanhazdadjoke.com/.
+ */
 export class DadJokeAction extends Action {
 	async handle(message: Message) {
 		const match = /^joke( pls)?$/i.exec(message.content);
@@ -18,7 +22,7 @@ export class DadJokeAction extends Action {
 					['Accept', ' application/json'],
 					[
 						'User-Agent',
-						'DashBot Discord Bot (not public atm sorry)',
+						'DashBot Discord Bot (https://github.com/aNickzz/DashBot)',
 					],
 				],
 			});

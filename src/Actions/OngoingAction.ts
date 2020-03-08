@@ -1,6 +1,9 @@
 import { Message } from 'discord.js';
 import { Action } from '../Action';
 
+/**
+ * Keeps a state object based on the message channel ID and the message author ID.
+ */
 export abstract class OngoingAction<TState> extends Action {
 	private session: {
 		[channelUserId: string]: TState;

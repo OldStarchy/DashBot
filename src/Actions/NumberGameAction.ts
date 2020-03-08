@@ -17,12 +17,16 @@ const NumberGuessGrammar = {
 	lower: ['Nope, lower'],
 };
 
+/**
+ * Plays the "I'm thinking of a number" game, currently it only thinks of a number, but does not guess your number.
+ */
 export class NumberGameAction extends OngoingAction<NumberGameState> {
 	private static readonly defaultState: Readonly<NumberGameState> = {
 		playing: false,
 		number: 0,
 		guesses: 0,
 	};
+
 	async handle(message: Message) {
 		const session = this.getSession(message, NumberGameAction.defaultState);
 

@@ -3,6 +3,9 @@ import { random as getHaiku } from 'haiku-random';
 import { Action } from '../Action';
 import { ActionResult } from '../ActionResult';
 
+/**
+ * Responds with a random haiku from the [haiku-random](https://www.npmjs.com/package/haiku-random) package
+ */
 export class HaikuAction extends Action {
 	async handle(message: Message) {
 		const match = /^!haiku/i.exec(message.content);

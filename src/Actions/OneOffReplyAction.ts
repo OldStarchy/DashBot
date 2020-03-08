@@ -4,8 +4,28 @@ import { ActionResult } from '../ActionResult';
 import DashBot from '../DashBot';
 import selectRandom from '../util/selectRandom';
 
+/**
+ * A convenience class for all the simple responses that DashBot can do.
+ */
 export class OneOffReplyAction extends Action {
 	private readonly trigger: (message: Message) => boolean;
+
+	/**
+	 * Triggers a random reply if the predicate "trigger" returns true
+	 */
+	constructor(
+		bot: DashBot,
+		trigger: (message: Message) => boolean,
+		replies: (Parameters<TextChannel['sendMessage']>[0] | string)[]
+	);
+	/**
+	 * Triggers a random reply if the received message matches one of the keywords
+	 */
+	constructor(
+		bot: DashBot,
+		keywords: string[],
+		replies: (Parameters<TextChannel['sendMessage']>[0] | string)[]
+	);
 	constructor(
 		bot: DashBot,
 		triggerOrKeywords: ((message: Message) => boolean) | string[],

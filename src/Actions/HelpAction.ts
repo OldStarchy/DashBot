@@ -9,7 +9,9 @@ const HelpActionGrammar = {
 	description: [
 		'I\'m you\'re friendly neighbourhood chatbot. I can do a couple things like give you a "compliment" or "roll D20". If you want, I can DM you some more info.',
 	],
-	moreInfo: ['This is a placeholder lol sorry. Complain to Old Starchy.'],
+	moreInfo: [
+		"You're best of reading my readme file over on github.\nhttps://github.com/aNickzz/DashBot#dashbot",
+	],
 	'ok-no': ['ok :)', 'No problem'],
 	'ok-yes': ['Will do', 'ok, 1 sec'],
 	//TODO: add grammar for using objects and dot notation instead of just strings.
@@ -25,6 +27,9 @@ interface HelpActionSession {
 	sentMessageTime: number;
 }
 
+/**
+ * Placeholder help action supposed to give people hints as to what DashBot can do, however due to the "conversational"-like invocation phrases I feel like it doesn't really make sense to just list all the "commands" so not much work has been put in this.
+ */
 export class HelpAction extends OngoingAction<HelpActionSession> {
 	private static defaultSession: Readonly<HelpActionSession> = {
 		pendingAnswer: false,
