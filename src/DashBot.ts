@@ -1,4 +1,4 @@
-import { Client, Message } from 'discord.js';
+import { Client, Message, TextChannel } from 'discord.js';
 import { Logger } from 'winston';
 import { Action } from './Action';
 import { ActionResult } from './ActionResult';
@@ -15,6 +15,8 @@ import { PollAction } from './Actions/PollAction';
 import { StatsAction } from './Actions/StatsAction';
 import { TraceryAction } from './Actions/TraceryAction';
 import { DashBotConfig } from './DashBotConfig';
+import { ChatMessage } from './MInecraftLogClient/ChatMessage';
+import { MinecraftLogClient } from './MInecraftLogClient/MinecraftLogClient';
 import { StatTracker } from './StatTracker';
 
 export interface DashBotOptions {
@@ -22,6 +24,7 @@ export interface DashBotOptions {
 	config: DashBotConfig;
 	stats: StatTracker;
 	logger: Logger;
+	minecraftClient?: MinecraftLogClient;
 }
 
 export default class DashBot {
@@ -29,20 +32,32 @@ export default class DashBot {
 	public readonly client: Client;
 	public readonly config: DashBotConfig;
 	public readonly logger: Logger;
+	public readonly minecraftClient?: MinecraftLogClient;
 
 	private actions: Action[] = [];
 
-	constructor({ client, config, stats, logger }: DashBotOptions) {
+	private minecraftRelayChannel: TextChannel | null;
+
+	constructor({
+		client,
+		config,
+		stats,
+		logger,
+		minecraftClient,
+	}: DashBotOptions) {
 		this.client = client;
 		this.config = config;
 		this.stats = stats;
 		this.logger = logger;
+		this.minecraftClient = minecraftClient;
+		this.minecraftRelayChannel = null;
 
 		this.bindEvents();
 		this.initActions();
 	}
 
 	public async login(): Promise<string> {
+		this.minecraftClient?.start();
 		return await this.client.login(this.config.discordBotToken);
 	}
 
@@ -54,10 +69,17 @@ export default class DashBot {
 		if (this.config.debug) {
 			this.client.on('debug', info => this.logger.debug(info));
 		}
+
 		this.client.on('ready', () => {
 			this.logger.info(`Logged in as ${this.client.user.tag}!`);
 		});
 
+		if (this.minecraftClient) {
+			this.minecraftClient.on(
+				'chatMessage',
+				this.onMinecraftMessage.bind(this)
+			);
+		}
 		this.client.on('message', this.onMessage.bind(this));
 	}
 
@@ -77,7 +99,47 @@ export default class DashBot {
 		}
 	}
 
+	private async onMinecraftMessage(message: ChatMessage) {
+		if (this.minecraftRelayChannel) {
+			await this.minecraftRelayChannel.send(
+				`<${message.author}> ${message.message}`
+			);
+		}
+	}
+
 	private initActions(): void {
+		if (this.minecraftClient)
+			this.actions.push(
+				new (class extends Action {
+					async handle(message: Message) {
+						if (message.content == '!minecraft') {
+							if (this.bot.minecraftRelayChannel === null) {
+								this.bot.minecraftRelayChannel = message.channel as TextChannel;
+								message.reply(
+									"OK, I'll relay messages from Minecraft to this channel"
+								);
+							} else {
+								if (
+									this.bot.minecraftRelayChannel.id ===
+									message.channel.id
+								) {
+									this.bot.minecraftRelayChannel = null;
+									message.reply(
+										"I'll stop sending messages from Minecraft to this channel"
+									);
+								} else {
+									message.reply(
+										`I\'m already sending Minecraft messages to the ${this.bot.minecraftRelayChannel.name} channel. Send \`!minecraft\` to that channel again to stop it there first.`
+									);
+								}
+							}
+							return true;
+						}
+						return false;
+					}
+				})(this)
+			);
+
 		this.actions.push(
 			new OneOffReplyAction(
 				this,

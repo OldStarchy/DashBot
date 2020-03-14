@@ -1,11 +1,13 @@
 //@ts-check
 
-import { Client } from 'discord.js';
+import { Client as DiscordClient } from 'discord.js';
+import express from 'express';
 import { existsSync } from 'fs';
 import { join, resolve } from 'path';
 import winston from 'winston';
-import DashBot from './DashBot';
+import DashBot, { DashBotOptions } from './DashBot';
 import { DashBotConfig } from './DashBotConfig';
+import { MinecraftPumpLogClient } from './MInecraftLogClient/MinecraftPumpLogClient';
 import { StatTracker } from './StatTracker';
 import { formatTime } from './util/formatTime';
 
@@ -67,12 +69,34 @@ const config = ((): DashBotConfig => {
 	return config;
 })();
 
-const bot = new DashBot({
+const options: DashBotOptions = {
 	config,
-	client: new Client(),
+	client: new DiscordClient(),
 	stats: new StatTracker(join(storageDir, config.statsFileLocation)),
 	logger,
-});
+};
+
+switch (config.minecraftClient?.type) {
+	case undefined:
+	case 'none':
+		break;
+	case 'webhook': {
+		const minecraftClient = new MinecraftPumpLogClient({
+			express,
+			port: config.minecraftClient.port ?? 25580,
+		});
+
+		minecraftClient.on('chatMessage', message => {
+			// eslint-disable-next-line no-console
+			console.log('Received message from ' + message.author);
+		});
+
+		options.minecraftClient = minecraftClient;
+		break;
+	}
+}
+
+const bot = new DashBot(options);
 
 bot.login();
 

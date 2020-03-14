@@ -19,4 +19,14 @@ export interface DashBotConfig {
 	 * Log extra debug messages
 	 */
 	debug?: boolean;
+
+	minecraftClient?:
+		| { type: 'none' }
+		| {
+				type: 'webhook';
+				/**
+				 * Default 25580
+				 */
+				port?: number;
+		  };
 }
