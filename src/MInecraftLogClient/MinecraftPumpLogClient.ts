@@ -1,5 +1,6 @@
 import bodyParser from 'body-parser';
 import * as ExpressCore from 'express-serve-static-core';
+import { Server } from 'http';
 import { ChatMessage } from './ChatMessage';
 import { LogMessage } from './LogMessage';
 import { MinecraftLogClient } from './MinecraftLogClient';
@@ -12,11 +13,13 @@ export interface MinecraftPumpLogClientOptions {
 export class MinecraftPumpLogClient extends MinecraftLogClient {
 	private readonly app: ExpressCore.Express;
 	private readonly port: number;
+	private server: Server | null;
 
 	constructor({ express, port }: MinecraftPumpLogClientOptions) {
 		super();
 		this.app = express();
 		this.port = port;
+		this.server = null;
 
 		this.app.use(bodyParser.text());
 		this.app.post<ExpressCore.ParamsDictionary, never, string>(
@@ -44,6 +47,13 @@ export class MinecraftPumpLogClient extends MinecraftLogClient {
 	}
 
 	start() {
-		this.app.listen(this.port);
+		if (this.server === null) {
+			this.server = this.app.listen(this.port);
+		}
+	}
+
+	stop() {
+		this.server?.close();
+		this.server = null;
 	}
 }

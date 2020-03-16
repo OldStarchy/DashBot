@@ -1,4 +1,4 @@
-export interface DashBotConfig {
+interface DashBotConfig {
 	/**
 	 * Not used
 	 */
@@ -28,5 +28,9 @@ export interface DashBotConfig {
 				 * Default 25580
 				 */
 				port?: number;
+		  }
+		| {
+				type: 'tail';
+				logFilePath: string;
 		  };
 }

@@ -19,7 +19,7 @@ export class LogMessage {
 		}
 		const { time, thread, logLevel, content } = match.groups!;
 
-		if (this.CHAT_MESSAGE_REGEX.test(content)) {
+		if (LogMessage.CHAT_MESSAGE_REGEX.test(content)) {
 			return new ChatMessage(time, thread, logLevel, content);
 		}
 

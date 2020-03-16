@@ -6,8 +6,8 @@ import { existsSync } from 'fs';
 import { join, resolve } from 'path';
 import winston from 'winston';
 import DashBot, { DashBotOptions } from './DashBot';
-import { DashBotConfig } from './DashBotConfig';
-import { MinecraftPumpLogClient } from './MInecraftLogClient/MinecraftPumpLogClient';
+import { MinecraftPumpLogClient } from './MinecraftLogClient/MinecraftPumpLogClient';
+import { MinecraftTailLogClient } from './MinecraftLogClient/MinecraftTailLogClient';
 import { StatTracker } from './StatTracker';
 import { formatTime } from './util/formatTime';
 
@@ -80,21 +80,25 @@ switch (config.minecraftClient?.type) {
 	case undefined:
 	case 'none':
 		break;
-	case 'webhook': {
-		const minecraftClient = new MinecraftPumpLogClient({
+
+	case 'webhook':
+		options.minecraftClient = new MinecraftPumpLogClient({
 			express,
 			port: config.minecraftClient.port ?? 25580,
 		});
-
-		minecraftClient.on('chatMessage', message => {
-			// eslint-disable-next-line no-console
-			console.log('Received message from ' + message.author);
-		});
-
-		options.minecraftClient = minecraftClient;
 		break;
-	}
+
+	case 'tail':
+		options.minecraftClient = new MinecraftTailLogClient({
+			logFilePath: config.minecraftClient.logFilePath,
+		});
+		break;
 }
+
+options.minecraftClient?.on('chatMessage', message => {
+	// eslint-disable-next-line no-console
+	console.log('Received message from ' + message.author);
+});
 
 const bot = new DashBot(options);
 

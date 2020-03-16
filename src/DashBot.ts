@@ -14,9 +14,8 @@ import { OneOffReplyAction } from './Actions/OneOffReplyAction';
 import { PollAction } from './Actions/PollAction';
 import { StatsAction } from './Actions/StatsAction';
 import { TraceryAction } from './Actions/TraceryAction';
-import { DashBotConfig } from './DashBotConfig';
-import { ChatMessage } from './MInecraftLogClient/ChatMessage';
-import { MinecraftLogClient } from './MInecraftLogClient/MinecraftLogClient';
+import { ChatMessage } from './MinecraftLogClient/ChatMessage';
+import { MinecraftLogClient } from './MinecraftLogClient/MinecraftLogClient';
 import { StatTracker } from './StatTracker';
 
 export interface DashBotOptions {

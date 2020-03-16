@@ -9,4 +9,5 @@ export interface MinecraftLogClient {
 
 export abstract class MinecraftLogClient extends EventEmitter {
 	public abstract start(): void;
+	public abstract stop(): void;
 }
