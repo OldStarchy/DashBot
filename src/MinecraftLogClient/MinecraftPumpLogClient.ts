@@ -1,17 +1,17 @@
 import bodyParser from 'body-parser';
-import * as ExpressCore from 'express-serve-static-core';
+import { Express } from 'express';
 import { Server } from 'http';
 import { ChatMessage } from './ChatMessage';
 import { LogMessage } from './LogMessage';
 import { MinecraftLogClient } from './MinecraftLogClient';
 
 export interface MinecraftPumpLogClientOptions {
-	express: () => ExpressCore.Express;
+	express: () => Express;
 	port: number;
 }
 
 export class MinecraftPumpLogClient extends MinecraftLogClient {
-	private readonly app: ExpressCore.Express;
+	private readonly app: Express;
 	private readonly port: number;
 	private server: Server | null;
 
@@ -22,7 +22,7 @@ export class MinecraftPumpLogClient extends MinecraftLogClient {
 		this.server = null;
 
 		this.app.use(bodyParser.text());
-		this.app.post<ExpressCore.ParamsDictionary, never, string>(
+		this.app.post<Record<string, string>, never, string>(
 			'/v1/onLogChanged',
 			(req, res) => {
 				const body = req.body;
