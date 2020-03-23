@@ -2,7 +2,7 @@ import { EventEmitter } from 'events';
 import { Logger } from 'winston';
 import { ChatMessage } from './ChatMessage';
 import { LogInOutMessage } from './LogInOutMessage';
-import { LogMessage } from './LogMessage';
+import { LogMessageParser } from './LogMessageParser';
 
 export interface MinecraftLogClient {
 	on(event: 'chatMessage', listener: (message: ChatMessage) => void): this;
@@ -31,7 +31,7 @@ export abstract class MinecraftLogClient extends EventEmitter {
 	public onLineReceived(line: string) {
 		this.logger.info(`Minecraft Log: ${line}`);
 
-		const message = LogMessage.parse(line);
+		const message = LogMessageParser.parse(line);
 
 		if (message !== null) {
 			if (message instanceof ChatMessage) {
