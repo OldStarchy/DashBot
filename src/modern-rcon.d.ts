@@ -14,11 +14,13 @@ declare module 'modern-rcon' {
 	}
 
 	class ExtendableError extends Error {
-		constructor(message: string);
+		public message: string;
+		public name: string;
+		constructor(message?: string);
 	}
 
 	export class RconError extends ExtendableError {
-		constructor(message: string);
+		constructor(message?: string);
 	}
 
 	export default Rcon;

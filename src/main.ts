@@ -3,6 +3,7 @@
 import { Client as DiscordClient } from 'discord.js';
 import express from 'express';
 import { copyFileSync, existsSync } from 'fs';
+import Rcon from 'modern-rcon';
 import { dirname, join, resolve } from 'path';
 import winston from 'winston';
 import DashBot, { DashBotOptions } from './DashBot';
@@ -11,6 +12,7 @@ import loadConfig from './loadConfig';
 import { MinecraftPumpLogClient } from './MinecraftLogClient/MinecraftPumpLogClient';
 import { MinecraftTailLogClient } from './MinecraftLogClient/MinecraftTailLogClient';
 import { StatTracker } from './StatTracker';
+import Storage from './Storage';
 import { formatTime } from './util/formatTime';
 
 const args = process.argv.slice(2);
@@ -67,6 +69,8 @@ process.on('uncaughtException', e => {
 });
 
 const config = loadConfig(storageDir);
+
+Storage.rootDir = storageDir;
 
 if (
 	existsSync(join(storageDir, 'stats.json')) &&
@@ -130,7 +134,13 @@ if (config.minecraft) {
 		}
 	}
 
-	options.rcon = config.minecraft.rcon;
+	if (config.minecraft.rcon) {
+		options.rcon = new Rcon(
+			config.minecraft.rcon.host,
+			config.minecraft.rcon.port,
+			config.minecraft.rcon.password
+		);
+	}
 }
 
 options.minecraftClient?.on('chatMessage', message => {
