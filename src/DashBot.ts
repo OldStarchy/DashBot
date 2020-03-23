@@ -209,9 +209,10 @@ export default class DashBot {
 								const chat = new RconChat(
 									this.bot.rcon!,
 									message.author.username.replace(
-										/^[a-zA-Z0-9 _-]+/g,
+										/[^a-zA-Z0-9 _-]+/g,
 										''
-									)
+									),
+									'discord'
 								);
 
 								await chat.broadcast(message.cleanContent);

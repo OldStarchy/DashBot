@@ -2,17 +2,28 @@ import Rcon from 'modern-rcon';
 import { RichText } from './RichText';
 
 export class RconChat {
-	constructor(private client: Rcon, private from: string) {}
+	constructor(
+		private client: Rcon,
+		private from: string,
+		private via: string | null = null
+	) {}
 
 	async broadcast(message: string) {
 		const cmdJson: RichText = [
 			{ text: '<' },
 			{ text: this.from, color: 'dark_green' },
-			{ text: ' (' },
-			{ text: 'web', color: 'aqua' },
-			{ text: ')>: ' },
-			{ text: message },
+			{ text: ' ' },
 		];
+
+		if (this.via) {
+			cmdJson.push(
+				{ text: '(' },
+				{ text: this.via, color: 'aqua' },
+				{ text: ')' }
+			);
+		}
+
+		cmdJson.push({ text: '>: ' }, { text: message });
 
 		await this.client.send(`tellraw @a ${JSON.stringify(cmdJson)}`);
 	}
@@ -28,21 +39,34 @@ export class RconChat {
 				color: 'gray',
 			},
 			{
-				text: ' (',
+				text: ' ',
 			},
+		];
+		if (this.via) {
+			cmdJson.push(
+				{
+					text: '(',
+				},
+				{
+					text: this.via,
+					color: 'aqua',
+				},
+				{
+					text: ')',
+					color: 'gray',
+				}
+			);
+		}
+		cmdJson.push(
 			{
-				text: 'web',
-				color: 'aqua',
-			},
-			{
-				text: ') whispers to you: ',
+				text: ' whispers to you: ',
 				color: 'gray',
 			},
 			{
 				text: message,
 				color: 'gray',
-			},
-		];
+			}
+		);
 		const result = await this.client.send(
 			`tellraw ${to} ${JSON.stringify(cmdJson)}`
 		);
