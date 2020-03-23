@@ -1,4 +1,5 @@
 import { Client, Message, TextChannel } from 'discord.js';
+import Rcon from 'modern-rcon';
 import { Logger } from 'winston';
 import { Action } from './Action';
 import { ActionResult } from './ActionResult';
@@ -18,7 +19,9 @@ import { getVersion } from './getVersion';
 import { ChatMessage } from './MinecraftLogClient/ChatMessage';
 import { LogInOutMessage } from './MinecraftLogClient/LogInOutMessage';
 import { MinecraftLogClient } from './MinecraftLogClient/MinecraftLogClient';
+import { RconChat } from './Rcon/RconChat';
 import { StatTracker } from './StatTracker';
+import { sleep } from './util/sleep';
 
 export interface DashBotOptions {
 	client: Client;
@@ -26,6 +29,7 @@ export interface DashBotOptions {
 	stats: StatTracker;
 	logger: Logger;
 	minecraftClient?: MinecraftLogClient;
+	rcon?: MinecraftRconConfig;
 }
 
 export default class DashBot {
@@ -34,6 +38,7 @@ export default class DashBot {
 	public readonly config: DashBotConfig;
 	public readonly logger: Logger;
 	public readonly minecraftClient?: MinecraftLogClient;
+	public readonly rcon?: MinecraftRconConfig;
 
 	private actions: Action[] = [];
 
@@ -45,12 +50,14 @@ export default class DashBot {
 		stats,
 		logger,
 		minecraftClient,
+		rcon,
 	}: DashBotOptions) {
 		this.client = client;
 		this.config = config;
 		this.stats = stats;
 		this.logger = logger;
 		this.minecraftClient = minecraftClient;
+		this.rcon = rcon;
 		this.minecraftRelayChannel = null;
 
 		this.bindEvents();
@@ -119,6 +126,27 @@ export default class DashBot {
 					message.event === 'joined' ? 'in' : 'out'
 				}.`
 			);
+		}
+
+		if (this.rcon) {
+			if (message.event === 'joined') {
+				const rcon = new Rcon(
+					this.rcon.host,
+					this.rcon.port,
+					this.rcon.password
+				);
+
+				await Promise.all([rcon.connect(), sleep(5)]);
+
+				const chat = new RconChat(rcon, 'DashBot');
+
+				await chat.whisper(
+					message.who,
+					`Welcome to the server ${message.who}`
+				);
+
+				rcon.disconnect();
+			}
 		}
 	}
 

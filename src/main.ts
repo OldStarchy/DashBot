@@ -130,9 +130,7 @@ if (config.minecraft) {
 		}
 	}
 
-	if (config.minecraft.rcon) {
-		//TODO: Rcon
-	}
+	options.rcon = config.minecraft.rcon;
 }
 
 options.minecraftClient?.on('chatMessage', message => {

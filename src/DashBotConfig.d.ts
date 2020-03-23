@@ -29,7 +29,8 @@ interface MinecraftLogPumpConfig {
 
 interface MinecraftRconConfig {
 	host: string;
-	port: string;
+	port: number;
+	password: string;
 }
 
 interface DashBotConfig {

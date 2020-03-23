@@ -1993,6 +1993,11 @@ mocha@^7.0.1:
     yargs-parser "13.1.1"
     yargs-unparser "1.6.0"
 
+modern-rcon@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/modern-rcon/-/modern-rcon-1.0.3.tgz#bf01ba59d3b517c2206fa3cb9ef4e0f805758b52"
+  integrity sha1-vwG6WdO1F8Igb6PLnvTg+AV1i1I=
+
 ms@2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/ms/-/ms-2.0.0.tgz#5608aeadfc00be6c2901df5f9861788de0d597c8"
