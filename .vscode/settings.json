@@ -2,7 +2,10 @@
 	"cSpell.words": [
 		"DashBot",
 		"Emoji",
-		"Greenlock"
+		"Extendable",
+		"Greenlock",
+		"Minecraft's",
+		"rcon"
 	],
 	"prettier.configPath": ".prettierrc",
 	"eslint.validate": ["javascript", "typescript"],
