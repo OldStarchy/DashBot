@@ -1,10 +1,15 @@
 import { EventEmitter } from 'events';
 import { Logger } from 'winston';
 import { ChatMessage } from './ChatMessage';
+import { LogInOutMessage } from './LogInOutMessage';
 import { LogMessage } from './LogMessage';
 
 export interface MinecraftLogClient {
 	on(event: 'chatMessage', listener: (message: ChatMessage) => void): this;
+	on(
+		event: 'logInOutMessage',
+		listener: (message: LogInOutMessage) => void
+	): this;
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	on(event: string, listener: (...args: any[]) => void): this;
 }
@@ -28,8 +33,12 @@ export abstract class MinecraftLogClient extends EventEmitter {
 
 		const message = LogMessage.parse(line);
 
-		if (message != null && message instanceof ChatMessage) {
-			this.emit('chatMessage', message);
+		if (message !== null) {
+			if (message instanceof ChatMessage) {
+				this.emit('chatMessage', message);
+			} else if (message instanceof LogInOutMessage) {
+				this.emit('logInOutMessage', message);
+			}
 		}
 	}
 }

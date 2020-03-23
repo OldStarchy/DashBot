@@ -16,6 +16,7 @@ import { StatsAction } from './Actions/StatsAction';
 import { TraceryAction } from './Actions/TraceryAction';
 import { getVersion } from './getVersion';
 import { ChatMessage } from './MinecraftLogClient/ChatMessage';
+import { LogInOutMessage } from './MinecraftLogClient/LogInOutMessage';
 import { MinecraftLogClient } from './MinecraftLogClient/MinecraftLogClient';
 import { StatTracker } from './StatTracker';
 
@@ -79,6 +80,10 @@ export default class DashBot {
 				'chatMessage',
 				this.onMinecraftMessage.bind(this)
 			);
+			this.minecraftClient.on(
+				'logInOutMessage',
+				this.onMinecraftLogInOutMessage.bind(this)
+			);
 		}
 		this.client.on('message', this.onMessage.bind(this));
 	}
@@ -103,6 +108,16 @@ export default class DashBot {
 		if (this.minecraftRelayChannel) {
 			await this.minecraftRelayChannel.send(
 				`<${message.author}> ${message.message}`
+			);
+		}
+	}
+
+	private async onMinecraftLogInOutMessage(message: LogInOutMessage) {
+		if (this.minecraftRelayChannel) {
+			await this.minecraftRelayChannel.send(
+				`${message.who} logged ${
+					message.event === 'joined' ? 'in' : 'out'
+				}.`
 			);
 		}
 	}
