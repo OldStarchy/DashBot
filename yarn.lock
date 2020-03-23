@@ -266,6 +266,11 @@
   dependencies:
     "@types/node" "*"
 
+"@types/deep-extend@^0.4.31":
+  version "0.4.31"
+  resolved "https://registry.yarnpkg.com/@types/deep-extend/-/deep-extend-0.4.31.tgz#3fa9d027df52b0819c3c8662aa403ca813a7e56d"
+  integrity sha512-0stqrMZB7vxsRTe//XEpr6A9+fThL2y/g6qzDG5ZgMJwuOceqOBDfh+g99tuN/XS58V52aPNTfWVS49Xvh842w==
+
 "@types/eslint-visitor-keys@^1.0.0":
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/@types/eslint-visitor-keys/-/eslint-visitor-keys-1.0.0.tgz#1ee30d79544ca84d68d4b3cdb0af4f205663dd2d"
@@ -883,6 +888,11 @@ deep-eql@^3.0.1:
   integrity sha512-+QeIQyN5ZuO+3Uk5DYh6/1eKO0m0YmJFGNmFHGACpf1ClL1nmlV/p4gNgbl2pJGxgXb4faqo6UE+M5ACEMyVcw==
   dependencies:
     type-detect "^4.0.0"
+
+deep-extend@^0.6.0:
+  version "0.6.0"
+  resolved "https://registry.yarnpkg.com/deep-extend/-/deep-extend-0.6.0.tgz#c4fa7c95404a17a9c3e8ca7e1537312b736330ac"
+  integrity sha512-LOHxIOaPYdHlJRtCQfDIVZtfw/ufM8+rVj649RIHzcm/vGwQRXFt6OPqIFWsm2XEMrNIEtWR64sY1LEKD2vAOA==
 
 deep-is@~0.1.3:
   version "0.1.3"

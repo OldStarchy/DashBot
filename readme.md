@@ -38,7 +38,7 @@ This project uses Yarn, information on how to install and use yarn can be found 
 1. Clone this repo somewhere!
 2. Install the dependencies with yarn by running `yarn install` in the project root.
 3. Build the project with `yarn build`, you should now have a `dist` folder.
-4. Create a config file `dashbot.config.js`. The only two required properties are `discordBotToken` and `statsFileLocation`
+4. Create a config file `dashbot.config.js`. The only required property is `discordBotToken`
 
     ```javascript
     /* eslint-disable @typescript-eslint/triple-slash-reference */
@@ -47,7 +47,6 @@ This project uses Yarn, information on how to install and use yarn can be found 
     /** @type DashbotConfig */
     const Config = {
     	discordBotToken: '',
-    	statsFileLocation: 'stats.json',
     	minecraftClient: {
     		type: 'webhook',
     		maintainerEmail: 'your.email@exmaple.com',

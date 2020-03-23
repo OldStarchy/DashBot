@@ -1,13 +1,14 @@
 {
   "name": "dashbot",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "main": "index.js",
   "author": "Nicholas Sorokin <nicholas.sorokin@hotmail.com>",
   "license": "Apache-2.0",
   "scripts": {
-    "build": "tsc",
-    "build:prod": "tsc -p tsconfig.prod.json",
-    "watch": "tsc -w",
+    "injectVersion": "node scripts/injectVersion.js",
+    "build": "yarn injectVersion && tsc",
+    "build:prod": "yarn injectVersion && tsc -p tsconfig.prod.json",
+    "watch": "yarn injectVersion && tsc -w",
     "run": "node dist/main.js",
     "build:docker": "docker build -t oldstarchy/dashbot .",
     "publish": "yarn build:docker && docker push oldstarchy/dashbot",
@@ -19,6 +20,7 @@
   },
   "dependencies": {
     "@types/node": "^13.5.0",
+    "deep-extend": "^0.6.0",
     "discord.js": "^11.5.1",
     "express": "^4.17.1",
     "greenlock-express": "^4.0.3",
@@ -31,6 +33,7 @@
   "devDependencies": {
     "@istanbuljs/nyc-config-typescript": "^1.0.1",
     "@types/chai": "^4.2.8",
+    "@types/deep-extend": "^0.4.31",
     "@types/express": "^4.17.3",
     "@types/mocha": "^7.0.2",
     "@types/node-fetch": "^2.5.4",

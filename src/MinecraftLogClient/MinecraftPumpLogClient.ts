@@ -20,6 +20,8 @@ export interface MinecraftPumpLogClientOptions
 	 * If this is set, the port option is ignored.
 	 */
 	greenlockConfig?: Greenlock.GreenlockOptions;
+
+	whitelist?: string[];
 }
 
 export class MinecraftPumpLogClient extends MinecraftLogClient {
@@ -35,11 +37,23 @@ export class MinecraftPumpLogClient extends MinecraftLogClient {
 		this.app.post<Record<string, string>, never, string>(
 			'/v1/onLogChanged',
 			(req, res) => {
+				if (
+					this.options.whitelist &&
+					!this.options.whitelist.includes(req.ip)
+				) {
+					this.logger.warn(
+						`Blocked request from invalid IP ${req.ip}`,
+						req.ip
+					);
+					res.statusCode = 401;
+					res.end();
+				}
+
 				const body = req.body;
 				const messages = body.split(/[\n\r]+/g);
 
 				messages.forEach(line => this.onLineReceived(line));
-				res.statusCode == 200;
+				res.statusCode == 201;
 				res.end();
 			}
 		);

@@ -6,6 +6,7 @@ COPY yarn.lock .
 COPY tsconfig.prod.json .
 COPY tsconfig.json .
 
+COPY scripts ./scripts
 COPY src ./src
 
 RUN ls

@@ -2,16 +2,24 @@
 
 import { Client as DiscordClient } from 'discord.js';
 import express from 'express';
-import { existsSync } from 'fs';
+import { copyFileSync, existsSync } from 'fs';
 import { dirname, join, resolve } from 'path';
 import winston from 'winston';
 import DashBot, { DashBotOptions } from './DashBot';
+import { getVersion } from './getVersion';
+import loadConfig from './loadConfig';
 import { MinecraftPumpLogClient } from './MinecraftLogClient/MinecraftPumpLogClient';
 import { MinecraftTailLogClient } from './MinecraftLogClient/MinecraftTailLogClient';
 import { StatTracker } from './StatTracker';
 import { formatTime } from './util/formatTime';
 
 const args = process.argv.slice(2);
+
+if ((args.length == 1 && args[0] === '-v') || args[0] === '--version') {
+	// eslint-disable-next-line no-console
+	console.log(`DashBot ${getVersion()}`);
+	process.exit(0);
+}
 
 const storageDir = resolve(
 	((): string => {
@@ -58,53 +66,73 @@ process.on('uncaughtException', e => {
 	process.exit(1);
 });
 
-const config = ((): DashBotConfig => {
-	const configFileName = 'dashbot.config';
-	const path = join(storageDir + '/' + configFileName);
+const config = loadConfig(storageDir);
 
-	// eslint-disable-next-line @typescript-eslint/no-var-requires
-	const config = require(path);
-	logger.info(`Loading config from "${path}"`);
-
-	return config;
-})();
+if (
+	existsSync(join(storageDir, 'stats.json')) &&
+	!existsSync(join(storageDir, 'statistics.json'))
+) {
+	copyFileSync(
+		join(storageDir, 'stats.json'),
+		join(storageDir, 'statistics.json')
+	);
+}
 
 const options: DashBotOptions = {
 	config,
 	client: new DiscordClient(),
-	stats: new StatTracker(join(storageDir, config.statsFileLocation)),
+	stats: StatTracker.load(join(storageDir, 'statistics.json')),
 	logger,
 };
 
-switch (config.minecraftClient?.type) {
-	case undefined:
-	case 'none':
-		break;
+if (config.minecraft) {
+	if (config.minecraft.logClient) {
+		switch (config.minecraft.logClient.type) {
+			case 'webhook':
+				if (config.tls) {
+					options.minecraftClient = new MinecraftPumpLogClient({
+						express,
+						greenlockConfig: {
+							maintainerEmail: config.tls.maintainerEmail,
+							packageAgent: config.tls.packageAgent,
+							configDir: storageDir,
+							packageRoot: dirname(__dirname),
+							cluster: false,
+							package: {
+								name: 'dashbot',
+								version: '1.0.0',
+							},
+						},
+						whitelist: config.minecraft.logClient.whitelist,
+						logger,
+					});
+				} else {
+					if (config.minecraft.logClient.allowInsecure) {
+						options.minecraftClient = new MinecraftPumpLogClient({
+							express,
+							logger,
+							whitelist: config.minecraft.logClient.whitelist,
+						});
+					} else {
+						throw new Error(
+							"config.minecraft.logClient.type is 'webhook' but config.minecraft.logClient.allowInsecure is false and config.tls is not set"
+						);
+					}
+				}
+				break;
 
-	case 'webhook':
-		options.minecraftClient = new MinecraftPumpLogClient({
-			express,
-			greenlockConfig: {
-				maintainerEmail: config.minecraftClient.maintainerEmail,
-				packageAgent: config.minecraftClient.packageAgent,
-				configDir: storageDir,
-				packageRoot: dirname(__dirname),
-				cluster: false,
-				package: {
-					name: 'dashbot',
-					version: '1.0.0',
-				},
-			},
-			logger,
-		});
-		break;
+			case 'tail':
+				options.minecraftClient = new MinecraftTailLogClient({
+					logFilePath: config.minecraft.logClient.logFilePath,
+					logger,
+				});
+				break;
+		}
+	}
 
-	case 'tail':
-		options.minecraftClient = new MinecraftTailLogClient({
-			logFilePath: config.minecraftClient.logFilePath,
-			logger,
-		});
-		break;
+	if (config.minecraft.rcon) {
+		//TODO: Rcon
+	}
 }
 
 options.minecraftClient?.on('chatMessage', message => {

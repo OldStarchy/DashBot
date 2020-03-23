@@ -14,6 +14,7 @@ import { OneOffReplyAction } from './Actions/OneOffReplyAction';
 import { PollAction } from './Actions/PollAction';
 import { StatsAction } from './Actions/StatsAction';
 import { TraceryAction } from './Actions/TraceryAction';
+import { getVersion } from './getVersion';
 import { ChatMessage } from './MinecraftLogClient/ChatMessage';
 import { MinecraftLogClient } from './MinecraftLogClient/MinecraftLogClient';
 import { StatTracker } from './StatTracker';
@@ -140,6 +141,7 @@ export default class DashBot {
 			);
 
 		this.actions.push(
+			new ABResponseAction(this, [['!version', getVersion()]]),
 			new OneOffReplyAction(
 				this,
 				msg => /^compliment( please)?/i.test(msg.content),
