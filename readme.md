@@ -48,6 +48,11 @@ This project uses Yarn, information on how to install and use yarn can be found 
     const Config = {
     	discordBotToken: '',
     	statsFileLocation: 'stats.json',
+    	minecraftClient: {
+    		type: 'webhook',
+    		maintainerEmail: 'your.email@exmaple.com',
+    		packageAgent: 'dashbot/1.0.0',
+    	},
     };
 
     module.exports = Config;

@@ -1,5 +1,9 @@
 {
-	"cSpell.words": ["DashBot", "Emoji"],
+	"cSpell.words": [
+		"DashBot",
+		"Emoji",
+		"Greenlock"
+	],
 	"prettier.configPath": ".prettierrc",
 	"eslint.validate": ["javascript", "typescript"],
 	"search.exclude": {

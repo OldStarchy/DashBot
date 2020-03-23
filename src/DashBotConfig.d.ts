@@ -1,18 +1,8 @@
 interface DashBotConfig {
-	/**
-	 * Not used
-	 */
-	discordClientId?: string;
-	/**
-	 * Not used
-	 */
-	discordClientSecret?: string;
+	botName?: string;
+	botVersion?: string;
 	discordBotToken: string;
 	imgurClientId?: string;
-	/**
-	 * Not used
-	 */
-	imgurClientSecret?: string;
 	statsFileLocation: string;
 
 	/**
@@ -24,10 +14,8 @@ interface DashBotConfig {
 		| { type: 'none' }
 		| {
 				type: 'webhook';
-				/**
-				 * Default 25580
-				 */
-				port?: number;
+				maintainerEmail: string;
+				packageAgent?: string;
 		  }
 		| {
 				type: 'tail';

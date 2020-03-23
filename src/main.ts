@@ -3,7 +3,7 @@
 import { Client as DiscordClient } from 'discord.js';
 import express from 'express';
 import { existsSync } from 'fs';
-import { join, resolve } from 'path';
+import { dirname, join, resolve } from 'path';
 import winston from 'winston';
 import DashBot, { DashBotOptions } from './DashBot';
 import { MinecraftPumpLogClient } from './MinecraftLogClient/MinecraftPumpLogClient';
@@ -84,13 +84,25 @@ switch (config.minecraftClient?.type) {
 	case 'webhook':
 		options.minecraftClient = new MinecraftPumpLogClient({
 			express,
-			port: config.minecraftClient.port ?? 25580,
+			greenlockConfig: {
+				maintainerEmail: config.minecraftClient.maintainerEmail,
+				packageAgent: config.minecraftClient.packageAgent,
+				configDir: storageDir,
+				packageRoot: dirname(__dirname),
+				cluster: false,
+				package: {
+					name: 'dashbot',
+					version: '1.0.0',
+				},
+			},
+			logger,
 		});
 		break;
 
 	case 'tail':
 		options.minecraftClient = new MinecraftTailLogClient({
 			logFilePath: config.minecraftClient.logFilePath,
+			logger,
 		});
 		break;
 }

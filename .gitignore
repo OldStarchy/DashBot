@@ -5,3 +5,4 @@ dashbot.config.js
 storage
 coverage
 .nyc_output
+.greenlockrc

@@ -1,9 +1,10 @@
 import { Tail } from 'tail';
-import { ChatMessage } from './ChatMessage';
-import { LogMessage } from './LogMessage';
-import { MinecraftLogClient } from './MinecraftLogClient';
+import {
+	MinecraftLogClient,
+	MinecraftLogClientOptions,
+} from './MinecraftLogClient';
 
-interface MinecraftTailLogClientOptions {
+interface MinecraftTailLogClientOptions extends MinecraftLogClientOptions {
 	logFilePath: string;
 }
 
@@ -11,9 +12,9 @@ export class MinecraftTailLogClient extends MinecraftLogClient {
 	private readonly logFilePath: string;
 	private tail: Tail | null = null;
 
-	constructor({ logFilePath }: MinecraftTailLogClientOptions) {
-		super();
-		this.logFilePath = logFilePath;
+	constructor(options: MinecraftTailLogClientOptions) {
+		super(options);
+		this.logFilePath = options.logFilePath;
 	}
 
 	start() {
@@ -23,7 +24,7 @@ export class MinecraftTailLogClient extends MinecraftLogClient {
 			});
 
 			this.tail.on('line', line => {
-				this.onLine(line);
+				this.onLineReceived(line);
 			});
 		}
 
@@ -32,13 +33,5 @@ export class MinecraftTailLogClient extends MinecraftLogClient {
 
 	stop() {
 		this.tail?.unwatch();
-	}
-
-	private onLine(line: string) {
-		const message = LogMessage.parse(line);
-
-		if (message instanceof ChatMessage) {
-			this.emit('chatMessage', message);
-		}
 	}
 }

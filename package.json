@@ -21,6 +21,7 @@
     "@types/node": "^13.5.0",
     "discord.js": "^11.5.1",
     "express": "^4.17.1",
+    "greenlock-express": "^4.0.3",
     "haiku-random": "^1.0.0",
     "node-fetch": "^2.6.0",
     "tail": "^2.0.3",

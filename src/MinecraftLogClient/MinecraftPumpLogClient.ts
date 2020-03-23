@@ -1,24 +1,34 @@
 import bodyParser from 'body-parser';
 import { Express } from 'express';
+import Greenlock from 'greenlock-express';
 import { Server } from 'http';
-import { ChatMessage } from './ChatMessage';
-import { LogMessage } from './LogMessage';
-import { MinecraftLogClient } from './MinecraftLogClient';
+import {
+	MinecraftLogClient,
+	MinecraftLogClientOptions,
+} from './MinecraftLogClient';
 
-export interface MinecraftPumpLogClientOptions {
+export interface MinecraftPumpLogClientOptions
+	extends MinecraftLogClientOptions {
 	express: () => Express;
-	port: number;
+	/**
+	 * Specify the port to use for a plain HTTP server, do not use with greenlockConfig
+	 */
+	port?: number;
+
+	/**
+	 * Configuration for automatic Lets Encrypt certificates. Uses default ports 80 and 443 which can't be changed.
+	 * If this is set, the port option is ignored.
+	 */
+	greenlockConfig?: Greenlock.GreenlockOptions;
 }
 
 export class MinecraftPumpLogClient extends MinecraftLogClient {
 	private readonly app: Express;
-	private readonly port: number;
 	private server: Server | null;
 
-	constructor({ express, port }: MinecraftPumpLogClientOptions) {
-		super();
-		this.app = express();
-		this.port = port;
+	constructor(private readonly options: MinecraftPumpLogClientOptions) {
+		super(options);
+		this.app = options.express();
 		this.server = null;
 
 		this.app.use(bodyParser.text());
@@ -26,20 +36,9 @@ export class MinecraftPumpLogClient extends MinecraftLogClient {
 			'/v1/onLogChanged',
 			(req, res) => {
 				const body = req.body;
-				const messages = body
-					.split('\n')
-					.map(LogMessage.parse)
-					.filter(message => message != null) as LogMessage[];
+				const messages = body.split(/[\n\r]+/g);
 
-				const chatMessages = messages.filter(
-					message => message instanceof ChatMessage
-				) as ChatMessage[];
-
-				chatMessages.forEach(chatMessage => {
-					try {
-						this.emit('chatMessage', chatMessage);
-					} catch {}
-				});
+				messages.forEach(line => this.onLineReceived(line));
 				res.statusCode == 200;
 				res.end();
 			}
@@ -48,7 +47,11 @@ export class MinecraftPumpLogClient extends MinecraftLogClient {
 
 	start() {
 		if (this.server === null) {
-			this.server = this.app.listen(this.port);
+			if (this.options.greenlockConfig) {
+				Greenlock.init(this.options.greenlockConfig).serve(this.app);
+			} else {
+				this.server = this.app.listen(this.options.port);
+			}
 		}
 	}
 

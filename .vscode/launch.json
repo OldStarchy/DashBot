@@ -20,7 +20,7 @@
 			"skipFiles": ["<node_internals>/**"],
 			"program": "${workspaceFolder}\\dist\\main.js",
 			"outFiles": ["${workspaceFolder}/**/*.js"],
-			"args": ["--storage", ".."],
+			"args": ["--storage", "..\\storage"],
 			"cwd": "${workspaceFolder}\\dist"
 		}
 	]
