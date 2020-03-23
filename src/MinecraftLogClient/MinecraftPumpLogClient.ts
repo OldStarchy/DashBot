@@ -45,14 +45,17 @@ export class MinecraftPumpLogClient extends MinecraftLogClient {
 						`Blocked request from invalid IP ${req.ip}`,
 						req.ip
 					);
-					res.statusCode = 401;
+					res.statusCode = 403;
 					res.end();
+					return;
 				}
 
 				const body = req.body;
 				const messages = body.split(/[\n\r]+/g);
 
-				messages.forEach(line => this.onLineReceived(line));
+				messages
+					.filter(line => line !== '')
+					.forEach(line => this.onLineReceived(line));
 				res.statusCode == 201;
 				res.end();
 			}
