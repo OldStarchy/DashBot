@@ -1,23 +1,34 @@
 import { Message } from 'discord.js';
 import { Action } from '../Action';
 import DashBot from '../DashBot';
-import StatisticsTracker, { StatisticProvider } from '../StatisticsTracker';
+import StatisticsTracker, {
+	Statistic,
+	StatisticProvider,
+} from '../StatisticsTracker';
 import StorageRegister, { PersistentData } from '../StorageRegister';
 
 function getDayString(date: Date) {
 	return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
 }
 
+interface Person {
+	id: string;
+	type: 'discord' | 'minecraft';
+	name?: string;
+}
+
 interface PetActionStorage {
 	timesPet: number;
 	timesPetToday: number;
 	timesPetTodayDate: string;
+	petsPerPerson: Record<string, number>;
 }
 
 export default class PetAction extends Action implements StatisticProvider {
 	private timesPet = 0;
 	private timesPetToday = 0;
 	private timesPetTodayDate = getDayString(new Date());
+	private petsPerPerson: Record<string, number> = {};
 	private store: PersistentData<PetActionStorage>;
 
 	constructor(
@@ -33,7 +44,8 @@ export default class PetAction extends Action implements StatisticProvider {
 
 	async getStatistics() {
 		this.rolloverDateCount();
-		return [
+
+		const statistics: Statistic[] = [
 			{
 				name: 'Times pet Today',
 				statistic: this.timesPetToday,
@@ -43,6 +55,24 @@ export default class PetAction extends Action implements StatisticProvider {
 				statistic: this.timesPet,
 			},
 		];
+
+		let top: { name: string; count: number } | null = null;
+
+		for (const name of Object.keys(this.petsPerPerson)) {
+			if (top === null || this.petsPerPerson[name] > top.count)
+				top = { name, count: this.petsPerPerson[name] };
+			else if (this.petsPerPerson[name] === top.count)
+				top = { name: `${top.name}, ${name}`, count: top.count };
+		}
+
+		if (top !== null) {
+			statistics.push({
+				name: 'Best person',
+				statistic: top.name,
+			});
+		}
+
+		return statistics;
 	}
 
 	public onReadData(data: PetActionStorage | undefined) {
@@ -64,6 +94,7 @@ export default class PetAction extends Action implements StatisticProvider {
 			timesPet: this.timesPet,
 			timesPetToday: this.timesPetToday,
 			timesPetTodayDate: this.timesPetTodayDate,
+			petsPerPerson: this.petsPerPerson,
 		});
 	}
 
@@ -75,18 +106,26 @@ export default class PetAction extends Action implements StatisticProvider {
 		}
 	}
 
-	private pet() {
+	private pet(petter: Person) {
 		this.rolloverDateCount();
 
 		this.timesPet++;
 		this.timesPetToday++;
+
+		if (petter.name)
+			this.petsPerPerson[petter.name] =
+				(this.petsPerPerson[petter.name] || 0) + 1;
 
 		this.writeData();
 	}
 
 	async handle(message: Message) {
 		if (message.content === '!pet') {
-			this.pet();
+			this.pet({
+				id: message.author.id,
+				name: message.author.username,
+				type: 'discord',
+			});
 
 			message.react('❤️');
 
