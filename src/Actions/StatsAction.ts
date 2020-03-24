@@ -1,6 +1,8 @@
 import { Message } from 'discord.js';
 import { Action } from '../Action';
 import { ActionResult } from '../ActionResult';
+import DashBot from '../DashBot';
+import StatisticsTracker from '../StatisticsTracker';
 import { formatTable } from '../util/formatTable';
 import { sleep } from '../util/sleep';
 
@@ -8,60 +10,28 @@ import { sleep } from '../util/sleep';
  * Shows some stats. Not many things record stats at the moment. Currently its just a couple things like how many dice rolls and how many imgur searches there have been.
  */
 export class StatsAction extends Action {
+	constructor(bot: DashBot, private readonly stats: StatisticsTracker) {
+		super(bot);
+	}
+
 	async handle(message: Message) {
 		if (message.content.toLowerCase() === 'show stats') {
 			await message.channel.send('Gathering stats...');
 			await sleep(1000);
 
 			//#region Gather stats
-			this.bot.stats.recordUserTriggeredEvent(
-				message.author.username,
-				'request stats'
-			);
-			const stats = this.bot.stats.events;
-			const keys = Object.keys(stats).sort();
+			const stats = await this.stats.getStatistics();
+			stats.sort((a, b) => (a.name > b.name ? 1 : -1));
+
 			const r: string[][] = [['Stat', 'Count']];
-			r.push([
-				'time since last nap',
-				(
-					(Date.now() - this.bot.stats.startTrackingTime) /
-					1000
-				).toFixed(0) + ' seconds',
-			]);
-			keys.forEach(key => {
-				r.push([
-					`${key}`,
-					`${stats[key]} time${stats[key] === 1 ? '' : 's'}`,
-				]);
+
+			stats.forEach(stat => {
+				r.push([stat.name, stat.statistic.toString()]);
 			});
 			//#endregion
 
 			message.channel.send(formatTable(r));
 
-			return ActionResult.HANDLED;
-		}
-		if (message.content.toLowerCase() === 'show my stats') {
-			await message.channel.send(
-				`Gathering stats for ${message.author.username}...`
-			);
-			await sleep(1000);
-
-			this.bot.stats.recordUserTriggeredEvent(
-				message.author.username,
-				'request stats'
-			);
-			const stats =
-				this.bot.stats.userTriggeredEvents[message.author.username] ||
-				{};
-			const keys = Object.keys(stats).sort();
-			const r: string[][] = [['Stat', 'Count']];
-			keys.forEach(key => {
-				r.push([
-					`${key}`,
-					`${stats[key]} time${stats[key] === 1 ? '' : 's'}`,
-				]);
-			});
-			message.channel.send(formatTable(r));
 			return ActionResult.HANDLED;
 		}
 		return ActionResult.UNHANDLED;

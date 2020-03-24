@@ -12,6 +12,7 @@ import { HelpAction } from './Actions/HelpAction';
 import { ImgurSearchAction } from './Actions/ImgurSearchAction';
 import { NumberGameAction } from './Actions/NumberGameAction';
 import { OneOffReplyAction } from './Actions/OneOffReplyAction';
+import PetAction from './Actions/PetAction';
 import { PollAction } from './Actions/PollAction';
 import { StatsAction } from './Actions/StatsAction';
 import { TraceryAction } from './Actions/TraceryAction';
@@ -20,48 +21,75 @@ import { ChatMessage } from './MinecraftLogClient/ChatMessage';
 import { LogInOutMessage } from './MinecraftLogClient/LogInOutMessage';
 import { MinecraftLogClient } from './MinecraftLogClient/MinecraftLogClient';
 import { RconChat } from './Rcon/RconChat';
-import { StatTracker } from './StatTracker';
-import Storage from './Storage';
+import StatisticsTracker, { StatisticProvider } from './StatisticsTracker';
+import StorageRegister, { PersistentData } from './StorageRegister';
 import { sleep } from './util/sleep';
 
 export interface DashBotOptions {
 	client: Client;
 	config: DashBotConfig;
-	stats: StatTracker;
+	statistics: StatisticsTracker;
+	storage: StorageRegister;
 	logger: Logger;
 	minecraftClient?: MinecraftLogClient;
 	rcon?: Rcon;
 }
 
-export default class DashBot {
-	public readonly stats: StatTracker;
+interface DashBotData {
+	minecraftRelayChannelId: null | string;
+}
+
+export default class DashBot implements StatisticProvider {
+	private startTime = Date.now();
+
+	public readonly statistics: StatisticsTracker;
+	public readonly storage: StorageRegister;
 	public readonly client: Client;
 	public readonly config: DashBotConfig;
 	public readonly logger: Logger;
 	public readonly minecraftClient?: MinecraftLogClient;
 	public readonly rcon?: Rcon;
-	private readonly store: Storage<{
-		minecraftRelayChannel: null | string;
-	}> = new Storage('lts.json', () => ({ minecraftRelayChannel: null }));
 
 	private actions: Action[] = [];
 
+	private readonly store: PersistentData<DashBotData>;
+
+	private _minecraftRelayChannelId: string | null = null;
 	private _minecraftRelayChannel: TextChannel | null = null;
+
+	public getUptime() {
+		return Date.now() - this.startTime;
+	}
+
+	async getStatistics() {
+		return [
+			{
+				name: 'time since last nap',
+				statistic: (this.getUptime() / 1000).toFixed(0) + ' seconds',
+			},
+		];
+	}
 
 	constructor({
 		client,
 		config,
-		stats,
+		statistics,
+		storage,
 		logger,
 		minecraftClient,
 		rcon,
 	}: DashBotOptions) {
 		this.client = client;
 		this.config = config;
-		this.stats = stats;
+		this.statistics = statistics;
+		this.storage = storage;
 		this.logger = logger;
 		this.minecraftClient = minecraftClient;
 		this.rcon = rcon;
+
+		this.statistics.register(this);
+		this.store = storage.createStore('DashBot');
+		this.store.on('dataLoaded', this.onReadData.bind(this));
 
 		this.bindEvents();
 		this.initActions();
@@ -69,10 +97,15 @@ export default class DashBot {
 
 	private async getMinecraftRelayChannel() {
 		if (this._minecraftRelayChannel === null) {
-			if (this.store.data.minecraftRelayChannel) {
-				this._minecraftRelayChannel = (await this.client.channels.get(
-					this.store.data.minecraftRelayChannel
-				)) as TextChannel;
+			if (this._minecraftRelayChannelId) {
+				try {
+					this._minecraftRelayChannel = (await this.client.channels.get(
+						this._minecraftRelayChannelId
+					)) as TextChannel;
+				} catch (e) {
+					this.logger.error(e);
+					this.setMinecraftRelayChannel(null);
+				}
 			}
 		}
 
@@ -80,10 +113,15 @@ export default class DashBot {
 	}
 
 	private setMinecraftRelayChannel(channel: TextChannel | null) {
-		this.store.data.minecraftRelayChannel = channel?.id || null;
+		this._minecraftRelayChannelId = channel?.id || null;
 		this._minecraftRelayChannel = channel;
+		this.store.setData({
+			minecraftRelayChannelId: this._minecraftRelayChannelId,
+		});
+	}
 
-		this.store.write();
+	public onReadData(data: DashBotData) {
+		this._minecraftRelayChannelId = data.minecraftRelayChannelId;
 	}
 
 	public async login(): Promise<string> {
@@ -225,6 +263,7 @@ export default class DashBot {
 		}
 
 		this.actions.push(
+			new PetAction(this, this.statistics, this.storage),
 			new ABResponseAction(this, [['!version', getVersion()]]),
 			new OneOffReplyAction(
 				this,
@@ -336,7 +375,7 @@ export default class DashBot {
 			]),
 			new GreetAction(this),
 			new DieAction(this),
-			new StatsAction(this),
+			new StatsAction(this, this.statistics),
 			new DadJokeAction(this),
 			new HaikuAction(this),
 			new TraceryAction(this),

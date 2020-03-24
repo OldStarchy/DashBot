@@ -2,7 +2,7 @@
 
 import { Client as DiscordClient } from 'discord.js';
 import express from 'express';
-import { copyFileSync, existsSync } from 'fs';
+import { existsSync } from 'fs';
 import Rcon from 'modern-rcon';
 import { dirname, join, resolve } from 'path';
 import winston from 'winston';
@@ -11,8 +11,9 @@ import { getVersion } from './getVersion';
 import loadConfig from './loadConfig';
 import { MinecraftPumpLogClient } from './MinecraftLogClient/MinecraftPumpLogClient';
 import { MinecraftTailLogClient } from './MinecraftLogClient/MinecraftTailLogClient';
-import { StatTracker } from './StatTracker';
+import StatisticsTracker from './StatisticsTracker';
 import Storage from './Storage';
+import StorageRegister from './StorageRegister';
 import { formatTime } from './util/formatTime';
 
 const args = process.argv.slice(2);
@@ -65,6 +66,7 @@ const logger = winston.createLogger({
 
 process.on('uncaughtException', e => {
 	logger.error(e);
+	logger.info(e);
 	process.exit(1);
 });
 
@@ -72,20 +74,11 @@ const config = loadConfig(storageDir);
 
 Storage.rootDir = storageDir;
 
-if (
-	existsSync(join(storageDir, 'stats.json')) &&
-	!existsSync(join(storageDir, 'statistics.json'))
-) {
-	copyFileSync(
-		join(storageDir, 'stats.json'),
-		join(storageDir, 'statistics.json')
-	);
-}
-
 const options: DashBotOptions = {
 	config,
 	client: new DiscordClient(),
-	stats: StatTracker.load(join(storageDir, 'statistics.json')),
+	statistics: new StatisticsTracker(),
+	storage: new StorageRegister('storage.json', logger),
 	logger,
 };
 

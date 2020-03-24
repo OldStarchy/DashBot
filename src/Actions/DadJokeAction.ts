@@ -31,11 +31,6 @@ export class DadJokeAction extends Action {
 
 			if (joke.status === 200) {
 				message.channel.send(joke.joke);
-
-				this.bot.stats.recordUserTriggeredEvent(
-					message.author.username,
-					'get joke'
-				);
 			} else {
 				message.channel.send(
 					"icanhazdadjoke.com doesn't like me right now sorry"

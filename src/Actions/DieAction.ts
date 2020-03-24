@@ -39,10 +39,10 @@ export class DieAction extends Action {
 				);
 				return ActionResult.HANDLED;
 			}
-			this.bot.stats.recordUserTriggeredEvent(
-				message.author.username,
-				`roll d${size}`
-			);
+			// this.bot.stats.recordUserTriggeredEvent(
+			// 	message.author.username,
+			// 	`roll d${size}`
+			// );
 			if (size < 0) {
 				size = size * -1;
 				positive = false;
@@ -73,31 +73,31 @@ export class DieAction extends Action {
 		if (/(coin (toss|flip)|(toss|flip) coin)/i.test(message.content)) {
 			const size = 11;
 			const result = Math.floor(Math.random() * size) + 1;
-			this.bot.stats.recordUserTriggeredEvent(
-				message.author.username,
-				`flip coin`
-			);
+			// this.bot.stats.recordUserTriggeredEvent(
+			// 	message.author.username,
+			// 	`flip coin`
+			// );
 			message.channel
 				.send('@' + message.author.username + ', flipping...')
 				.then(() => sleep(1000))
 				.then(() => {
 					if (result === 11) {
 						message.channel.send('Oh no i dropped it :(');
-						this.bot.stats.recordUserTriggeredEvent(
-							message.author.username,
-							`flip coin: coins dropped`
-						);
+						// this.bot.stats.recordUserTriggeredEvent(
+						// 	message.author.username,
+						// 	`flip coin: coins dropped`
+						// );
 						return;
 					}
 					message.channel.send(
 						((result - 1) % 2) + 1 === 1 ? 'Heads!' : 'Tails!'
 					);
-					this.bot.stats.recordUserTriggeredEvent(
-						message.author.username,
-						`flip coin: ${
-							((result - 1) % 2) + 1 === 1 ? 'Heads!' : 'Tails!'
-						}`
-					);
+					// this.bot.stats.recordUserTriggeredEvent(
+					// 	message.author.username,
+					// 	`flip coin: ${
+					// 		((result - 1) % 2) + 1 === 1 ? 'Heads!' : 'Tails!'
+					// 	}`
+					// );
 				});
 			return ActionResult.HANDLED;
 		}

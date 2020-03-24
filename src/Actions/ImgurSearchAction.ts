@@ -34,11 +34,6 @@ export class ImgurSearchAction extends Action {
 				if (img) {
 					await message.channel.send(img.title);
 					await message.channel.send(img.link);
-
-					this.bot.stats.recordUserTriggeredEvent(
-						message.author.username,
-						'search imgur'
-					);
 				} else {
 					message.channel.send('no results... i guess');
 				}
