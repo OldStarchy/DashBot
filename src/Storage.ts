@@ -29,7 +29,7 @@ export default class Storage<T extends {}> {
 	}
 
 	private internalWrite(data: T) {
-		fs.writeFileSync(this.file, JSON.stringify(data));
+		fs.writeFileSync(this.file, JSON.stringify(data, null, '\t'));
 	}
 
 	getData() {
