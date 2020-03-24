@@ -1,4 +1,4 @@
-# DashBot
+w# DashBot
 
 [![CircleCI](https://circleci.com/gh/aNickzz/DashBot.svg?style=svg)](https://circleci.com/gh/aNickzz/DashBot)
 [![codecov.io](https://codecov.io/github/aNickzz/DashBot/coverage.svg?branch=master)](https://codecov.io/github/aNickzz/DashBot?branch=master)
@@ -44,11 +44,20 @@ This project uses Yarn, information on how to install and use yarn can be found 
     /* eslint-disable @typescript-eslint/triple-slash-reference */
     /// <reference path="src/DashBotConfig.d.ts" />
 
-    /** @type DashbotConfig */
+    /** @type DashBotConfig */
     const Config = {
     	discordBotToken: '',
-    	minecraftClient: {
-    		type: 'webhook',
+    	minecraft: {
+    		logClient: {
+    			type: 'webhook',
+    			whitelist: ['your server ip']
+    		}
+    		rcon: {
+    			host: 'my-minecraft-server.com'
+    			password: 'example password'
+    		}
+    	},
+    	tls: {
     		maintainerEmail: 'your.email@exmaple.com',
     		packageAgent: 'dashbot/1.0.0',
     	},
@@ -56,6 +65,8 @@ This project uses Yarn, information on how to install and use yarn can be found 
 
     module.exports = Config;
     ```
+
+    > This readme may get out of date, I suggest you check the [type declaration](src/DashBotConfig.d.ts) for the most up to date specification.
 
     To get a bot token, you need to go to the [Discord Developers](https://discordapp.com/developers/applications) website. You need to create an Application, then go to the Bot page from the menu on the left and create a bot. From there you can get your bot token and put it in the config.
 
