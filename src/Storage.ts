@@ -4,7 +4,7 @@ import path from 'path';
 export default class Storage<T extends {}> {
 	public static rootDir = '.';
 
-	constructor(private readonly file: string, private readonly def: () => T) {
+	constructor(public readonly file: string, private readonly def: () => T) {
 		if (path.isAbsolute(file)) {
 			this.file = file;
 		} else {

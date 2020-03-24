@@ -82,6 +82,8 @@ const options: DashBotOptions = {
 	logger,
 };
 
+options.storage.watch();
+
 if (config.minecraft) {
 	if (config.minecraft.logClient) {
 		switch (config.minecraft.logClient.type) {

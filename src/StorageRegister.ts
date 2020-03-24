@@ -1,4 +1,5 @@
 import { EventEmitter } from 'events';
+import fs from 'fs';
 import { Logger } from 'winston';
 import Storage from './Storage';
 
@@ -39,10 +40,39 @@ export default class StorageRegister {
 	private storage: Storage<Record<string, unknown>>;
 	private stores: Record<string, PersistentData<unknown>> = {};
 	private data: Record<string, unknown> = {};
+	private fileWatcher: fs.FSWatcher | null = null;
+	private changeTimeout: NodeJS.Timeout | null = null;
 
 	constructor(file: string, private readonly logger: Logger) {
 		this.storage = new Storage(file, () => ({}));
 
+		this.load();
+	}
+
+	watch() {
+		if (this.fileWatcher === null) {
+			this.fileWatcher = fs.watch(
+				this.storage.file,
+				this.onChange.bind(this)
+			);
+		}
+	}
+
+	stopWatching() {
+		this.fileWatcher?.close();
+		this.fileWatcher = null;
+	}
+
+	private onChange(/* event: string, filename: string */) {
+		if (this.changeTimeout !== null) {
+			clearTimeout(this.changeTimeout);
+		}
+
+		this.changeTimeout = setTimeout(this.onChangeTimeout.bind(this), 2000);
+	}
+
+	private onChangeTimeout() {
+		this.changeTimeout = null;
 		this.load();
 	}
 
