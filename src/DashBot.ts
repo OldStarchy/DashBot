@@ -120,8 +120,10 @@ export default class DashBot implements StatisticProvider {
 		});
 	}
 
-	public onReadData(data: DashBotData) {
-		this._minecraftRelayChannelId = data.minecraftRelayChannelId;
+	public onReadData(data: DashBotData | undefined) {
+		if (data) {
+			this._minecraftRelayChannelId = data.minecraftRelayChannelId;
+		}
 	}
 
 	public async login(): Promise<string> {

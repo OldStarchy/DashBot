@@ -13,11 +13,11 @@ export class PersistentData<T> extends EventEmitter {
 		this.register.setData(this.name, data);
 	}
 
-	getData(): T {
+	getData(): T | undefined {
 		return this.register.getData(this.name) as T;
 	}
 
-	on(event: 'dataLoaded', callback: (data: T) => void): this;
+	on(event: 'dataLoaded', callback: (data: T | undefined) => void): this;
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	on(event: string, callback: (...args: any[]) => void): this {
 		if (event === 'dataLoaded') {

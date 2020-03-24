@@ -45,15 +45,17 @@ export default class PetAction extends Action implements StatisticProvider {
 		];
 	}
 
-	public onReadData(data: PetActionStorage) {
-		if (typeof data.timesPet === 'number') {
-			this.timesPet = data.timesPet;
-		}
-		if (typeof data.timesPetToday === 'number') {
-			this.timesPetToday = data.timesPetToday;
-		}
-		if (typeof data.timesPetTodayDate === 'string') {
-			this.timesPetTodayDate = data.timesPetTodayDate;
+	public onReadData(data: PetActionStorage | undefined) {
+		if (data) {
+			if (typeof data.timesPet === 'number') {
+				this.timesPet = data.timesPet;
+			}
+			if (typeof data.timesPetToday === 'number') {
+				this.timesPetToday = data.timesPetToday;
+			}
+			if (typeof data.timesPetTodayDate === 'string') {
+				this.timesPetTodayDate = data.timesPetTodayDate;
+			}
 		}
 	}
 
