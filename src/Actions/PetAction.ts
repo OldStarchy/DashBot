@@ -21,6 +21,7 @@ interface PetActionStorage {
 	timesPet: number;
 	timesPetToday: number;
 	timesPetTodayDate: string;
+	mostPetsPerDay: number;
 	petsPerPerson: Record<string, number>;
 }
 
@@ -28,6 +29,7 @@ export default class PetAction extends Action implements StatisticProvider {
 	private timesPet = 0;
 	private timesPetToday = 0;
 	private timesPetTodayDate = getDayString(new Date());
+	private mostPetsPerDay = 0;
 	private petsPerPerson: Record<string, number> = {};
 	private store: PersistentData<PetActionStorage>;
 
@@ -47,14 +49,28 @@ export default class PetAction extends Action implements StatisticProvider {
 
 		const statistics: Statistic[] = [
 			{
-				name: 'Times pet Today',
-				statistic: this.timesPetToday,
-			},
-			{
 				name: 'Times pet Total',
 				statistic: this.timesPet,
 			},
 		];
+
+		if (this.mostPetsPerDay === this.timesPetToday) {
+			statistics.push({
+				name: 'Times pet Today (new record)',
+				statistic: this.timesPetToday,
+			});
+		} else {
+			statistics.push(
+				{
+					name: 'Times pet Today',
+					statistic: this.timesPetToday,
+				},
+				{
+					name: 'Most pets in a single day',
+					statistic: this.mostPetsPerDay,
+				}
+			);
+		}
 
 		let top: { name: string; count: number } | null = null;
 
@@ -86,6 +102,16 @@ export default class PetAction extends Action implements StatisticProvider {
 			if (typeof data.timesPetTodayDate === 'string') {
 				this.timesPetTodayDate = data.timesPetTodayDate;
 			}
+			if (typeof data.mostPetsPerDay === 'string') {
+				this.mostPetsPerDay = data.mostPetsPerDay;
+			}
+			if (typeof data.petsPerPerson === 'object') {
+				for (const name of Object.keys(data.petsPerPerson)) {
+					if (typeof data.petsPerPerson[name] === 'number') {
+						this.petsPerPerson[name] = data.petsPerPerson[name];
+					}
+				}
+			}
 		}
 	}
 
@@ -94,6 +120,7 @@ export default class PetAction extends Action implements StatisticProvider {
 			timesPet: this.timesPet,
 			timesPetToday: this.timesPetToday,
 			timesPetTodayDate: this.timesPetTodayDate,
+			mostPetsPerDay: this.mostPetsPerDay,
 			petsPerPerson: this.petsPerPerson,
 		});
 	}
@@ -111,6 +138,10 @@ export default class PetAction extends Action implements StatisticProvider {
 
 		this.timesPet++;
 		this.timesPetToday++;
+
+		if (this.timesPetToday > this.mostPetsPerDay) {
+			this.mostPetsPerDay = this.timesPetToday;
+		}
 
 		if (petter.name)
 			this.petsPerPerson[petter.name] =
