@@ -1,8 +1,13 @@
 import Discord from 'discord.js';
+import { EventEmitter } from 'events';
+import Rcon from 'modern-rcon';
 import { Logger } from 'winston';
-import StorageRegister, { PersistentData } from './StorageRegister';
+import { MinecraftLogClient } from '../MinecraftLogClient/MinecraftLogClient';
+import { RconChat } from '../Rcon/RconChat';
+import StorageRegister, { PersistentData } from '../StorageRegister';
+import Server from './Server';
 
-abstract class Message {}
+export abstract class Message {}
 class DiscordMessage extends Message {
 	constructor(private message: Discord.Message) {
 		super();
@@ -13,16 +18,14 @@ class DiscordMessage extends Message {
 	}
 }
 
-abstract class TextChannel {
-	abstract canSend(): boolean;
-	abstract canReceive(): boolean;
-	abstract sendText(message: string): Promise<Message>;
+export interface TextChannel {
+	canSend(): boolean;
+	canReceive(): boolean;
+	sendText(message: string): Promise<Message | void>;
 }
 
-class DiscordDmTextChannel extends TextChannel {
-	constructor(private readonly channel: Discord.DMChannel) {
-		super();
-	}
+class DiscordDmTextChannel implements TextChannel {
+	constructor(private readonly channel: Discord.DMChannel) {}
 	canSend() {
 		return true;
 	}
@@ -65,7 +68,8 @@ interface IdentityProvider<TIdentity extends Identity> {
 	getByName(name: string): TIdentity | null;
 }
 
-class MinecraftIdentityCache implements IdentityProvider<MinecraftIdentity> {
+export class MinecraftIdentityCache
+	implements IdentityProvider<MinecraftIdentity> {
 	private cache: { name: string; id?: string }[] = [];
 	private store: PersistentData<MinecraftIdentityCache['cache']>;
 
@@ -149,7 +153,7 @@ class MinecraftIdentityCache implements IdentityProvider<MinecraftIdentity> {
 	}
 }
 
-class IdentityService {
+export class IdentityService {
 	private providers: IdentityProvider<Identity>[] = [];
 	constructor(...identityProviders: IdentityProvider<Identity>[]) {
 		this.providers = identityProviders;
@@ -193,6 +197,115 @@ class MinecraftIdentity extends Identity {
 	}
 }
 
-class Person {
+export class Person {
 	constructor(private readonly identities: Identity[]) {}
+}
+
+export interface TextChatProvider {
+	on(event: 'message', listener: (message: Message) => void): this;
+	on(event: string, listener: (...args: any[]) => void): this;
+}
+
+export class DiscordChatProvider implements TextChatProvider {
+	constructor(private discordClient: Discord.Client) {}
+
+	on(event: string, listener: (...args: any[]) => void): this {
+		switch (event) {
+			case 'message':
+				this.discordClient.on(event, message =>
+					listener(new DiscordMessage(message))
+				);
+				break;
+			default:
+				this.discordClient.on(event, listener);
+				break;
+		}
+		return this;
+	}
+}
+
+export class TextChatService extends EventEmitter implements TextChatProvider {
+	static readonly eventTypes: Readonly<string[]> = ['message'];
+
+	private readonly providers: Readonly<TextChatProvider[]>;
+
+	constructor(...textChatProviders: TextChatProvider[]) {
+		super();
+		this.providers = textChatProviders;
+
+		for (const provider of this.providers) {
+			for (const eventType of TextChatService.eventTypes) {
+				provider.on(eventType, this.emit.bind(this, eventType));
+			}
+		}
+	}
+
+	eventNames() {
+		return [...TextChatService.eventTypes];
+	}
+}
+
+export class DashBot2 {
+	constructor(
+		private identityService: IdentityService,
+		private textChatService: TextChatService
+	) {
+		textChatService.on('message', this.onMessage.bind(this));
+	}
+
+	private onMessage(message: Message) {
+		return;
+	}
+}
+export interface AudioChannel {
+	blah: string;
+}
+export type EventListener<T extends unknown[] = any[]> = (...args: T) => void;
+export class MinecraftTextChannel implements TextChannel {
+	constructor(private rcon: Rcon) {}
+
+	canSend() {
+		return true;
+	}
+	canReceive() {
+		return true;
+	}
+
+	async sendText(message: string) {
+		//TODO: "DashBot" magic variable
+		const chat = new RconChat(this.rcon, 'DashBot');
+		await chat.broadcast(message);
+	}
+}
+
+export class MinecraftServer implements Server {
+	private textChannel: TextChannel;
+
+	constructor(private logReader: MinecraftLogClient, rcon: Rcon) {
+		this.textChannel = new MinecraftTextChannel(rcon);
+	}
+
+	async getTextChannels() {
+		return [this.textChannel];
+	}
+
+	async getAudioChannels() {
+		return [];
+	}
+
+	on(event: string, listener: EventListener) {
+		if (event === 'message') {
+			this.logReader.on('chatMessage', listener);
+		}
+
+		//TODO: other events
+	}
+}
+
+export class MinecraftServerProvider {
+	constructor(private servers: MinecraftServer[]) {}
+
+	getServers() {
+		return this.servers;
+	}
 }

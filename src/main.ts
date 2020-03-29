@@ -6,7 +6,13 @@ import { existsSync } from 'fs';
 import Rcon from 'modern-rcon';
 import { dirname, join, resolve } from 'path';
 import winston from 'winston';
-import DashBot, { DashBotOptions } from './DashBot';
+import { DashBotOptions } from './DashBot';
+import {
+	DashBot2,
+	IdentityService,
+	MinecraftIdentityCache,
+	TextChatService,
+} from './DashBot2/Identity';
 import { getVersion } from './getVersion';
 import loadConfig from './loadConfig';
 import { MinecraftPumpLogClient } from './MinecraftLogClient/MinecraftPumpLogClient';
@@ -143,11 +149,21 @@ options.minecraftClient?.on('chatMessage', message => {
 	console.log('Received message from ' + message.author);
 });
 
-const bot = new DashBot(options);
+const bot = new DashBot2(
+	new IdentityService(
+		new MinecraftIdentityCache(
+			logger,
+			new StorageRegister('storage2.json', logger)
+		)
+	),
+	new TextChatService()
+);
 
-bot.login();
+// const bot = new DashBot(options);
+
+// bot.login();
 
 process.on('SIGINT', e => {
 	logger.warn(e);
-	bot.destroy().then(() => process.exit());
+	// bot.destroy().then(() => process.exit());
 });

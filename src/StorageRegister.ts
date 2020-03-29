@@ -19,7 +19,6 @@ export class PersistentData<T> extends EventEmitter {
 	}
 
 	on(event: 'dataLoaded', callback: (data: T | undefined) => void): this;
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	on(event: string, callback: (...args: any[]) => void): this {
 		if (event === 'dataLoaded') {
 			callback(this.getData());
@@ -30,7 +29,6 @@ export class PersistentData<T> extends EventEmitter {
 	}
 
 	emit(event: 'dataLoaded', data: T): boolean;
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	emit(event: string, ...args: any[]): boolean {
 		return super.emit(event, ...args);
 	}

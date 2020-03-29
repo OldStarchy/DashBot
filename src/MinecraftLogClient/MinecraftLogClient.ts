@@ -10,7 +10,6 @@ export interface MinecraftLogClient {
 		event: 'logInOutMessage',
 		listener: (message: LogInOutMessage) => void
 	): this;
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	on(event: string, listener: (...args: any[]) => void): this;
 }
 
