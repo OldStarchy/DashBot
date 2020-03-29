@@ -1,7 +1,6 @@
 import AudioChannel from './AudioChannel';
 import Identity from './Identity';
 import Message from './Message';
-import { EventListener } from './notebook';
 import Person from './Person';
 import TextChannel from './TextChannel';
 
@@ -13,6 +12,6 @@ export default interface ChatServer {
 	getTextChannels(): Promise<TextChannel[]>;
 	getPrivateChatChannel(person: Person): TextChannel | null;
 	getIdentityById(id: string): Identity | null;
-	on(event: 'message', listener: EventListener<[Message]>): void;
-	on(event: string, listener: EventListener): void;
+	on(event: 'message', listener: (message: Message) => void): void;
+	on(event: string, listener: (...args: any[]) => void): void;
 }

@@ -42,4 +42,3 @@ export class DashBot2 {
 		return;
 	}
 }
-export type EventListener<T extends unknown[] = any[]> = (...args: T) => void;
