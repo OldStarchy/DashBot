@@ -7,12 +7,12 @@ import Rcon from 'modern-rcon';
 import { dirname, join, resolve } from 'path';
 import winston from 'winston';
 import { DashBotOptions } from './DashBot';
-import {
-	DashBot2,
-	IdentityService,
-	MinecraftIdentityCache,
-	TextChatService,
-} from './DashBot2/Identity';
+import DiscordServer from './DashBot2/Discord/DiscordServer';
+import IdentityService from './DashBot2/IdentityService';
+import MinecraftIdentityCache from './DashBot2/MinecraftIdentityCache';
+import MinecraftServer from './DashBot2/MinecraftServer';
+import { DashBot2 } from './DashBot2/notebook';
+import ChatServer from './DashBot2/Server';
 import { getVersion } from './getVersion';
 import loadConfig from './loadConfig';
 import { MinecraftPumpLogClient } from './MinecraftLogClient/MinecraftPumpLogClient';
@@ -149,19 +149,33 @@ options.minecraftClient?.on('chatMessage', message => {
 	console.log('Received message from ' + message.author);
 });
 
-const bot = new DashBot2(
-	new IdentityService(
-		new MinecraftIdentityCache(
-			logger,
-			new StorageRegister('storage2.json', logger)
-		)
-	),
-	new TextChatService()
+const identityService = new IdentityService(
+	new MinecraftIdentityCache(
+		logger,
+		new StorageRegister('storage2.json', logger)
+	)
 );
+
+const servers: ChatServer[] = [];
+
+if (options.minecraftClient && options.rcon) {
+	servers.push(
+		new MinecraftServer(
+			options.minecraftClient,
+			options.rcon,
+			identityService
+		)
+	);
+}
+servers.push(
+	new DiscordServer(options.client, { botToken: config.discordBotToken })
+);
+
+const bot = new DashBot2(logger, servers);
 
 // const bot = new DashBot(options);
 
-// bot.login();
+bot.connect();
 
 process.on('SIGINT', e => {
 	logger.warn(e);
