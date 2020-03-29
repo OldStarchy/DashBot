@@ -67,7 +67,7 @@ export class MinecraftPumpLogClient extends MinecraftLogClient {
 			if (this.options.greenlockConfig) {
 				Greenlock.init(this.options.greenlockConfig).serve(this.app);
 			} else {
-				this.server = this.app.listen(this.options.port);
+				this.server = this.app.listen(this.options.port || 80);
 			}
 		}
 	}

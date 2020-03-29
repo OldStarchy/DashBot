@@ -8,9 +8,8 @@ import { dirname, join, resolve } from 'path';
 import winston from 'winston';
 import { DashBotOptions } from './DashBot';
 import DiscordServer from './DashBot2/Discord/DiscordServer';
-import IdentityService from './DashBot2/IdentityService';
-import MinecraftIdentityCache from './DashBot2/MinecraftIdentityCache';
-import MinecraftServer from './DashBot2/MinecraftServer';
+import MinecraftIdentityCache from './DashBot2/Minecraft/MinecraftIdentityCache';
+import MinecraftServer from './DashBot2/Minecraft/MinecraftServer';
 import { DashBot2 } from './DashBot2/notebook';
 import ChatServer from './DashBot2/Server';
 import { getVersion } from './getVersion';
@@ -144,29 +143,21 @@ if (config.minecraft) {
 	}
 }
 
-options.minecraftClient?.on('chatMessage', message => {
-	// eslint-disable-next-line no-console
-	console.log('Received message from ' + message.author);
-});
-
-const identityService = new IdentityService(
-	new MinecraftIdentityCache(
-		logger,
-		new StorageRegister('storage2.json', logger)
-	)
-);
-
 const servers: ChatServer[] = [];
 
-if (options.minecraftClient && options.rcon) {
+if (options.minecraftClient) {
 	servers.push(
 		new MinecraftServer(
 			options.minecraftClient,
-			options.rcon,
-			identityService
+			options.rcon || null,
+			new MinecraftIdentityCache(
+				logger,
+				new StorageRegister('storage2.json', logger)
+			)
 		)
 	);
 }
+
 servers.push(
 	new DiscordServer(options.client, { botToken: config.discordBotToken })
 );

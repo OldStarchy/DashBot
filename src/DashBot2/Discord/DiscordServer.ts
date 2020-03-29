@@ -1,8 +1,9 @@
 import Discord from 'discord.js';
+import Person from '../Person';
+import ChatServer from '../Server';
+import DiscordIdentity from './DiscordIdentity';
 import DiscordMessage from './DiscordMessage';
 import DiscordTextChannel from './DiscordTextChannel';
-import Person from './Person';
-import ChatServer from './Server';
 
 export default class DiscordServer implements ChatServer {
 	private channelCache: Record<string, DiscordTextChannel> = {};
@@ -74,5 +75,11 @@ export default class DiscordServer implements ChatServer {
 
 	getPrivateChatChannel(person: Person) {
 		return null;
+	}
+
+	getIdentityById(id: string) {
+		return new DiscordIdentity(
+			this.discordClient.users.find(user => user.id === id)
+		);
 	}
 }

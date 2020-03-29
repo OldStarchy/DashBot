@@ -1,7 +1,7 @@
 import Discord from 'discord.js';
+import Message from '../Message';
 import DiscordIdentity from './DiscordIdentity';
 import DiscordTextChannel from './DiscordTextChannel';
-import Message from './Message';
 
 export default class DiscordMessage implements Message {
 	constructor(
@@ -19,5 +19,9 @@ export default class DiscordMessage implements Message {
 
 	getId() {
 		return this.message.id;
+	}
+
+	getTextContent() {
+		return this.message.cleanContent;
 	}
 }

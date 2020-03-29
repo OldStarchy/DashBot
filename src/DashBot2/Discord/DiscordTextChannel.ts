@@ -1,7 +1,7 @@
 import Discord from 'discord.js';
+import TextChannel from '../TextChannel';
 import DiscordMessage from './DiscordMessage';
 import DiscordServer from './DiscordServer';
-import TextChannel from './TextChannel';
 
 export default class DiscordTextChannel implements TextChannel {
 	constructor(

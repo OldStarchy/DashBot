@@ -5,4 +5,5 @@ export default interface Message {
 	getChannel(): TextChannel;
 	getAuthor(): Identity;
 	getId(): string | undefined;
+	getTextContent(): string;
 }

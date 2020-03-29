@@ -24,4 +24,8 @@ export default class IdentityService {
 
 		return new Person(identities);
 	}
+
+	addProvider<T extends Identity>(provider: IdentityProvider<T>) {
+		this.providers.push(provider);
+	}
 }

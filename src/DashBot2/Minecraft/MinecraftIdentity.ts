@@ -1,4 +1,4 @@
-import Identity from './Identity';
+import Identity from '../Identity';
 
 export default class MinecraftIdentity extends Identity {
 	constructor(

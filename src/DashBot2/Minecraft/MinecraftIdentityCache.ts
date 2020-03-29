@@ -1,6 +1,6 @@
 import { Logger } from 'winston';
-import StorageRegister, { PersistentData } from '../StorageRegister';
-import IdentityProvider from './IdentityProvider';
+import StorageRegister, { PersistentData } from '../../StorageRegister';
+import IdentityProvider from '../IdentityProvider';
 import MinecraftIdentity from './MinecraftIdentity';
 
 export default class MinecraftIdentityCache
@@ -37,7 +37,7 @@ export default class MinecraftIdentityCache
 	}
 	public add({ name, id }: { name: string; id?: string }) {
 		if (id === undefined) {
-			if (this.internalGetByName(name) === null) {
+			if (this.internalGetByName(name) === undefined) {
 				this.cache.push({ name, id });
 				this.write();
 			}
