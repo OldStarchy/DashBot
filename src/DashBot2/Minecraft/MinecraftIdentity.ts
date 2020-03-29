@@ -19,4 +19,8 @@ export default class MinecraftIdentity extends Identity {
 	getPrivateTextChannel() {
 		return null;
 	}
+
+	getIsBot() {
+		return false; //probably
+	}
 }

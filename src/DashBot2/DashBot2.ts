@@ -39,6 +39,22 @@ export class DashBot2 {
 				.getServer()
 				.getName()}`
 		);
+
+		if (message.getAuthor().getIsBot()) {
+			// eslint-disable-next-line no-console
+			console.log('not replying');
+			return;
+		}
+
+		const channel = message.getChannel();
+		if (channel.canSend()) {
+			// eslint-disable-next-line no-console
+			console.log('replying');
+			channel.sendText(`You said: ${message.getTextContent()}`);
+		} else {
+			// eslint-disable-next-line no-console
+			console.log('not replying');
+		}
 		return;
 	}
 }

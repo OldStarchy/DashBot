@@ -13,4 +13,8 @@ export default class DiscordIdentity extends Identity {
 	getName() {
 		return this.person.username;
 	}
+
+	getIsBot() {
+		return this.person.bot;
+	}
 }
