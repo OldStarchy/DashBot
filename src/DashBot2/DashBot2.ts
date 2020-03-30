@@ -1,8 +1,14 @@
 import { Logger } from 'winston';
+import parseArguments from '../util/parseArguments';
+import Command from './Command';
 import Message from './Message';
 import ChatServer from './Server';
 
 export class DashBot2 {
+	private commands: Record<string, Command> = {};
+	private startTime: number | null = null;
+	private stopTime: number | null = null;
+
 	constructor(private logger: Logger, private chatServers: ChatServer[]) {
 		for (const chatServer of this.chatServers) {
 			chatServer.on('message', this.onMessage.bind(this));
@@ -13,6 +19,7 @@ export class DashBot2 {
 		for (const server of this.chatServers) {
 			try {
 				await server.connect();
+				this.startTime = Date.now();
 			} catch (e) {
 				this.logger.error("Couldn't connect to server");
 			}
@@ -23,38 +30,60 @@ export class DashBot2 {
 		for (const server of this.chatServers) {
 			try {
 				await server.disconnect();
+				this.stopTime = Date.now();
 			} catch (e) {
 				this.logger.error("Couldn't disconnect to server");
 			}
 		}
 	}
 
-	private onMessage(message: Message) {
-		// eslint-disable-next-line no-console
-		console.log(
-			`Message Received from ${message
-				.getAuthor()
-				.getName()} in ${message.getChannel().getName()} in ${message
-				.getChannel()
-				.getServer()
-				.getName()}`
-		);
+	public getUptime() {
+		if (this.startTime !== null) {
+			if (this.stopTime !== null) {
+				return this.stopTime - this.startTime;
+			}
 
+			return Date.now() - this.startTime;
+		}
+
+		return 0;
+	}
+
+	registerCommand(key: string, command: Command) {
+		this.commands[key] = command;
+	}
+
+	private async onMessage(message: Message) {
 		if (message.getAuthor().getIsBot()) {
-			// eslint-disable-next-line no-console
-			console.log('not replying');
 			return;
 		}
 
-		const channel = message.getChannel();
-		if (channel.canSend()) {
-			// eslint-disable-next-line no-console
-			console.log('replying');
-			channel.sendText(`You said: ${message.getTextContent()}`);
-		} else {
-			// eslint-disable-next-line no-console
-			console.log('not replying');
+		const text = message.getTextContent();
+		try {
+			if (text.startsWith('!')) {
+				const parameters = parseArguments(text);
+
+				const name = parameters.shift()!.substr(1);
+
+				await this.runCommand(message, name, ...parameters);
+			}
+			// for (const action of this.actions) {
+			// 	const result = await action.handle(message);
+
+			// 	if (ActionResult.isHandled(result)) return;
+			// }
+		} catch (e) {
+			this.logger.error(
+				`Message "${message.getTextContent()}" caused an error`
+			);
+			this.logger.error(e);
+			await message.getChannel().sendText('Something broke :poop:');
 		}
-		return;
+	}
+
+	async runCommand(message: Message | null, name: string, ...args: string[]) {
+		if (this.commands[name]) {
+			await this.commands[name].run(message, name, ...args);
+		}
 	}
 }

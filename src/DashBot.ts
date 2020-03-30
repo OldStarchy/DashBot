@@ -14,14 +14,13 @@ import { NumberGameAction } from './Actions/NumberGameAction';
 import { OneOffReplyAction } from './Actions/OneOffReplyAction';
 import PetAction from './Actions/PetAction';
 import { PollAction } from './Actions/PollAction';
-import { StatsAction } from './Actions/StatsAction';
 import { TraceryAction } from './Actions/TraceryAction';
 import { getVersion } from './getVersion';
 import { ChatMessage } from './MinecraftLogClient/ChatMessage';
 import { LogInOutMessage } from './MinecraftLogClient/LogInOutMessage';
 import { MinecraftLogClient } from './MinecraftLogClient/MinecraftLogClient';
 import { RconChat } from './Rcon/RconChat';
-import StatisticsTracker, { StatisticProvider } from './StatisticsTracker';
+import StatisticsTracker from './StatisticsTracker';
 import StorageRegister, { PersistentData } from './StorageRegister';
 import { sleep } from './util/sleep';
 
@@ -39,9 +38,7 @@ interface DashBotData {
 	minecraftRelayChannelId: null | string;
 }
 
-export default class DashBot implements StatisticProvider {
-	private startTime = Date.now();
-
+export default class DashBot {
 	public readonly statistics: StatisticsTracker;
 	public readonly storage: StorageRegister;
 	public readonly client: Client;
@@ -56,19 +53,6 @@ export default class DashBot implements StatisticProvider {
 
 	private _minecraftRelayChannelId: string | null = null;
 	private _minecraftRelayChannel: TextChannel | null = null;
-
-	public getUptime() {
-		return Date.now() - this.startTime;
-	}
-
-	async getStatistics() {
-		return [
-			{
-				name: 'time since last nap',
-				statistic: (this.getUptime() / 1000).toFixed(0) + ' seconds',
-			},
-		];
-	}
 
 	constructor({
 		client,
@@ -87,7 +71,6 @@ export default class DashBot implements StatisticProvider {
 		this.minecraftClient = minecraftClient;
 		this.rcon = rcon;
 
-		this.statistics.register(this);
 		this.store = storage.createStore('DashBot');
 		this.store.on('dataLoaded', this.onReadData.bind(this));
 
@@ -377,7 +360,6 @@ export default class DashBot implements StatisticProvider {
 			]),
 			new GreetAction(this),
 			new DieAction(this),
-			new StatsAction(this, this.statistics),
 			new DadJokeAction(this),
 			new HaikuAction(this),
 			new TraceryAction(this),

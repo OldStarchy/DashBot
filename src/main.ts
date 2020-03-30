@@ -7,11 +7,13 @@ import Rcon from 'modern-rcon';
 import { dirname, join, resolve } from 'path';
 import winston from 'winston';
 import { DashBotOptions } from './DashBot';
+import StatisticsCommand from './DashBot2/Commands/StatisticsCommand';
 import { DashBot2 } from './DashBot2/DashBot2';
 import DiscordServer from './DashBot2/Discord/DiscordServer';
 import MinecraftIdentityCache from './DashBot2/Minecraft/MinecraftIdentityCache';
 import MinecraftServer from './DashBot2/Minecraft/MinecraftServer';
 import ChatServer from './DashBot2/Server';
+import UptimeTrackerStatistic from './DashBot2/Statistics/UptimeTrackerStatistic';
 import { getVersion } from './getVersion';
 import loadConfig from './loadConfig';
 import { MinecraftPumpLogClient } from './MinecraftLogClient/MinecraftPumpLogClient';
@@ -163,6 +165,18 @@ servers.push(
 );
 
 const bot = new DashBot2(logger, servers);
+options.statistics.register(new UptimeTrackerStatistic(bot));
+options.statistics.register({
+	getStatistics: async () => {
+		return [
+			{
+				name: 'Version',
+				statistic: getVersion(),
+			},
+		];
+	},
+});
+bot.registerCommand('stats', new StatisticsCommand(options.statistics));
 
 // const bot = new DashBot(options);
 
