@@ -4,7 +4,6 @@ import { Logger } from 'winston';
 import { Action } from './Action';
 import { ActionResult } from './ActionResult';
 import { ABResponseAction } from './Actions/ABResponseAction';
-import { DadJokeAction } from './Actions/DadJokeAction';
 import { DieAction } from './Actions/DieAction';
 import { GreetAction } from './Actions/GreetAction';
 import { HaikuAction } from './Actions/HaikuAction';
@@ -359,7 +358,6 @@ export default class DashBot {
 			]),
 			new GreetAction(this),
 			new DieAction(this),
-			new DadJokeAction(this),
 			new HaikuAction(this),
 			new TraceryAction(this),
 			new NumberGameAction(this),
