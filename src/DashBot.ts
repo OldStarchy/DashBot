@@ -6,7 +6,6 @@ import { ActionResult } from './ActionResult';
 import { ABResponseAction } from './Actions/ABResponseAction';
 import { DieAction } from './Actions/DieAction';
 import { GreetAction } from './Actions/GreetAction';
-import { HaikuAction } from './Actions/HaikuAction';
 import { HelpAction } from './Actions/HelpAction';
 import { NumberGameAction } from './Actions/NumberGameAction';
 import { OneOffReplyAction } from './Actions/OneOffReplyAction';
@@ -358,7 +357,6 @@ export default class DashBot {
 			]),
 			new GreetAction(this),
 			new DieAction(this),
-			new HaikuAction(this),
 			new TraceryAction(this),
 			new NumberGameAction(this),
 			new HelpAction(this),

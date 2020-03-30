@@ -7,6 +7,7 @@ import Rcon from 'modern-rcon';
 import { dirname, join, resolve } from 'path';
 import winston from 'winston';
 import { DashBotOptions } from './DashBot';
+import HaikuCommand from './DashBot2/Commands/HaikuCommand';
 import ImgurCommand, { ImgurClient } from './DashBot2/Commands/ImgurCommand';
 import JokeCommand, {
 	ICanHazDadJokeClient,
@@ -182,6 +183,7 @@ options.statistics.register({
 });
 bot.registerCommand('stats', new StatisticsCommand(options.statistics));
 bot.registerCommand('joke', new JokeCommand(new ICanHazDadJokeClient()));
+bot.registerCommand('haiku', new HaikuCommand());
 if (config.imgurClientId) {
 	bot.registerCommand(
 		'imgur',
