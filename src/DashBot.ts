@@ -9,7 +9,6 @@ import { GreetAction } from './Actions/GreetAction';
 import { HelpAction } from './Actions/HelpAction';
 import { NumberGameAction } from './Actions/NumberGameAction';
 import { OneOffReplyAction } from './Actions/OneOffReplyAction';
-import PetAction from './Actions/PetAction';
 import { TraceryAction } from './Actions/TraceryAction';
 import { getVersion } from './getVersion';
 import { ChatMessage } from './MinecraftLogClient/ChatMessage';
@@ -244,7 +243,6 @@ export default class DashBot {
 		}
 
 		this.actions.push(
-			new PetAction(this, this.statistics, this.storage),
 			new ABResponseAction(this, [['!version', getVersion()]]),
 			new OneOffReplyAction(
 				this,

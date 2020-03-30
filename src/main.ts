@@ -12,6 +12,7 @@ import ImgurCommand, { ImgurClient } from './DashBot2/Commands/ImgurCommand';
 import JokeCommand, {
 	ICanHazDadJokeClient,
 } from './DashBot2/Commands/JokeCommand';
+import PetCommand from './DashBot2/Commands/PetCommand';
 import PollCommand from './DashBot2/Commands/PollCommand';
 import StatisticsCommand from './DashBot2/Commands/StatisticsCommand';
 import { DashBot2 } from './DashBot2/DashBot2';
@@ -186,6 +187,10 @@ bot.registerCommand('stats', new StatisticsCommand(options.statistics));
 bot.registerCommand('joke', new JokeCommand(new ICanHazDadJokeClient()));
 bot.registerCommand('haiku', new HaikuCommand());
 bot.registerCommand('poll', new PollCommand());
+const petCommand = new PetCommand(options.storage);
+bot.registerCommand('pet', petCommand);
+options.statistics.register(petCommand);
+
 if (config.imgurClientId) {
 	bot.registerCommand(
 		'imgur',

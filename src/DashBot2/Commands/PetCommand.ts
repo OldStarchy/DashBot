@@ -1,20 +1,10 @@
-import { Message } from 'discord.js';
-import { Action } from '../Action';
-import DashBot from '../DashBot';
-import StatisticsTracker, {
-	Statistic,
-	StatisticProvider,
-} from '../StatisticsTracker';
-import StorageRegister, { PersistentData } from '../StorageRegister';
+import { Statistic, StatisticProvider } from '../../StatisticsTracker';
+import StorageRegister, { PersistentData } from '../../StorageRegister';
+import Command from '../Command';
+import Message from '../Message';
 
 function getDayString(date: Date) {
 	return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
-}
-
-interface Person {
-	id: string;
-	type: 'discord' | 'minecraft';
-	name?: string;
 }
 
 interface PetActionStorage {
@@ -25,7 +15,7 @@ interface PetActionStorage {
 	petsPerPerson: Record<string, number>;
 }
 
-export default class PetAction extends Action implements StatisticProvider {
+export default class PetCommand implements Command, StatisticProvider {
 	private timesPet = 0;
 	private timesPetToday = 0;
 	private timesPetTodayDate = getDayString(new Date());
@@ -33,13 +23,7 @@ export default class PetAction extends Action implements StatisticProvider {
 	private petsPerPerson: Record<string, number> = {};
 	private store: PersistentData<PetActionStorage>;
 
-	constructor(
-		bot: DashBot,
-		stats: StatisticsTracker,
-		storage: StorageRegister
-	) {
-		super(bot);
-		stats.register(this);
+	constructor(storage: StorageRegister) {
 		this.store = storage.createStore('PetAction');
 		this.store.on('dataLoaded', this.onReadData.bind(this));
 	}
@@ -133,7 +117,7 @@ export default class PetAction extends Action implements StatisticProvider {
 		}
 	}
 
-	private pet(petter: Person) {
+	private pet(petterName: string) {
 		this.rolloverDateCount();
 
 		this.timesPet++;
@@ -143,77 +127,73 @@ export default class PetAction extends Action implements StatisticProvider {
 			this.mostPetsPerDay = this.timesPetToday;
 		}
 
-		if (petter.name)
-			this.petsPerPerson[petter.name] =
-				(this.petsPerPerson[petter.name] || 0) + 1;
+		if (petterName)
+			this.petsPerPerson[petterName] =
+				(this.petsPerPerson[petterName] || 0) + 1;
 
 		this.writeData();
 	}
 
-	async handle(message: Message) {
-		if (message.content === '!pet') {
-			this.pet({
-				id: message.author.id,
-				name: message.author.username,
-				type: 'discord',
-			});
-
-			message.react('❤️');
-
-			switch (this.timesPetToday) {
-				case 1: {
-					message.reply('First pet of the day!');
-					break;
-				}
-				case 2: {
-					message.reply('Second pet of the day!');
-					break;
-				}
-				case 4: {
-					message.reply('Fourth pet of the day!');
-					break;
-				}
-				case 8: {
-					message.reply('Eighth pet of the day!');
-					break;
-				}
-				case 16: {
-					message.reply('Sixteenth pet of the day!');
-					break;
-				}
-				case 32: {
-					message.reply('Thirty Second pet of the day!');
-					break;
-				}
-				case 64: {
-					message.reply('Sixty Fourth pet of the day!');
-					break;
-				}
-				case 128: {
-					message.reply(
-						'One Hundred and Twenty Eighth pet of the day!'
-					);
-					break;
-				}
-				case 256: {
-					message.reply(
-						'Two Hundred and Fifty Sixth pet of the day!'
-					);
-					break;
-				}
-				case 512: {
-					message.reply('Five Hundred and Twelfth pet of the day!');
-					break;
-				}
-				case 1024: {
-					message.reply(
-						'One Thousand and Twenty Fourth pet of the day!'
-					);
-					break;
-				}
-			}
-			return true;
+	async run(message: Message) {
+		if (message === null) {
+			return;
 		}
-		return false;
+
+		const channel = message.getChannel();
+
+		this.pet(message.getAuthor().getName());
+
+		if (channel.getSupportsReactions()) message.react('❤️');
+
+		switch (this.timesPetToday) {
+			case 1: {
+				channel.sendText('First pet of the day!');
+				break;
+			}
+			case 2: {
+				channel.sendText('Second pet of the day!');
+				break;
+			}
+			case 4: {
+				channel.sendText('Fourth pet of the day!');
+				break;
+			}
+			case 8: {
+				channel.sendText('Eighth pet of the day!');
+				break;
+			}
+			case 16: {
+				channel.sendText('Sixteenth pet of the day!');
+				break;
+			}
+			case 32: {
+				channel.sendText('Thirty Second pet of the day!');
+				break;
+			}
+			case 64: {
+				channel.sendText('Sixty Fourth pet of the day!');
+				break;
+			}
+			case 128: {
+				channel.sendText(
+					'One Hundred and Twenty Eighth pet of the day!'
+				);
+				break;
+			}
+			case 256: {
+				channel.sendText('Two Hundred and Fifty Sixth pet of the day!');
+				break;
+			}
+			case 512: {
+				channel.sendText('Five Hundred and Twelfth pet of the day!');
+				break;
+			}
+			case 1024: {
+				channel.sendText(
+					'One Thousand and Twenty Fourth pet of the day!'
+				);
+				break;
+			}
+		}
 	}
 }
