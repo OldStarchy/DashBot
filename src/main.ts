@@ -91,7 +91,6 @@ Storage.rootDir = storageDir;
 const options: DashBotOptions = {
 	config,
 	client: new DiscordClient(),
-	statistics: new StatisticsTracker(),
 	storage: new StorageRegister('storage.json', logger),
 	logger,
 };
@@ -172,8 +171,10 @@ servers.push(
 );
 
 const bot = new DashBot2(logger, servers);
-options.statistics.register(new UptimeTrackerStatistic(bot));
-options.statistics.register({
+const statistics = new StatisticsTracker();
+
+statistics.register(new UptimeTrackerStatistic(bot));
+statistics.register({
 	getStatistics: async () => {
 		return [
 			{
@@ -183,13 +184,13 @@ options.statistics.register({
 		];
 	},
 });
-bot.registerCommand('stats', new StatisticsCommand(options.statistics));
+bot.registerCommand('stats', new StatisticsCommand(statistics));
 bot.registerCommand('joke', new JokeCommand(new ICanHazDadJokeClient()));
 bot.registerCommand('haiku', new HaikuCommand());
 bot.registerCommand('poll', new PollCommand());
 const petCommand = new PetCommand(options.storage);
 bot.registerCommand('pet', petCommand);
-options.statistics.register(petCommand);
+statistics.register(petCommand);
 
 if (config.imgurClientId) {
 	bot.registerCommand(

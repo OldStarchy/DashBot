@@ -15,14 +15,12 @@ import { ChatMessage } from './MinecraftLogClient/ChatMessage';
 import { LogInOutMessage } from './MinecraftLogClient/LogInOutMessage';
 import { MinecraftLogClient } from './MinecraftLogClient/MinecraftLogClient';
 import { RconChat } from './Rcon/RconChat';
-import StatisticsTracker from './StatisticsTracker';
 import StorageRegister, { PersistentData } from './StorageRegister';
 import { sleep } from './util/sleep';
 
 export interface DashBotOptions {
 	client: Client;
 	config: DashBotConfig;
-	statistics: StatisticsTracker;
 	storage: StorageRegister;
 	logger: Logger;
 	minecraftClient?: MinecraftLogClient;
@@ -34,7 +32,6 @@ interface DashBotData {
 }
 
 export default class DashBot {
-	public readonly statistics: StatisticsTracker;
 	public readonly storage: StorageRegister;
 	public readonly client: Client;
 	public readonly config: DashBotConfig;
@@ -52,7 +49,6 @@ export default class DashBot {
 	constructor({
 		client,
 		config,
-		statistics,
 		storage,
 		logger,
 		minecraftClient,
@@ -60,7 +56,6 @@ export default class DashBot {
 	}: DashBotOptions) {
 		this.client = client;
 		this.config = config;
-		this.statistics = statistics;
 		this.storage = storage;
 		this.logger = logger;
 		this.minecraftClient = minecraftClient;
