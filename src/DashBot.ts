@@ -9,7 +9,6 @@ import { DieAction } from './Actions/DieAction';
 import { GreetAction } from './Actions/GreetAction';
 import { HaikuAction } from './Actions/HaikuAction';
 import { HelpAction } from './Actions/HelpAction';
-import { ImgurSearchAction } from './Actions/ImgurSearchAction';
 import { NumberGameAction } from './Actions/NumberGameAction';
 import { OneOffReplyAction } from './Actions/OneOffReplyAction';
 import PetAction from './Actions/PetAction';
@@ -377,9 +376,5 @@ export default class DashBot {
 			})(this),
 			new PollAction(this)
 		);
-
-		if (this.config.imgurClientId) {
-			this.actions.push(new ImgurSearchAction(this));
-		}
 	}
 }

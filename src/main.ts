@@ -7,6 +7,7 @@ import Rcon from 'modern-rcon';
 import { dirname, join, resolve } from 'path';
 import winston from 'winston';
 import { DashBotOptions } from './DashBot';
+import ImgurCommand, { ImgurClient } from './DashBot2/Commands/ImgurCommand';
 import StatisticsCommand from './DashBot2/Commands/StatisticsCommand';
 import { DashBot2 } from './DashBot2/DashBot2';
 import DiscordServer from './DashBot2/Discord/DiscordServer';
@@ -177,6 +178,12 @@ options.statistics.register({
 	},
 });
 bot.registerCommand('stats', new StatisticsCommand(options.statistics));
+if (config.imgurClientId) {
+	bot.registerCommand(
+		'imgur',
+		new ImgurCommand(new ImgurClient(config.imgurClientId))
+	);
+}
 
 // const bot = new DashBot(options);
 
