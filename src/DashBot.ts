@@ -9,7 +9,6 @@ import { GreetAction } from './Actions/GreetAction';
 import { HelpAction } from './Actions/HelpAction';
 import { NumberGameAction } from './Actions/NumberGameAction';
 import { OneOffReplyAction } from './Actions/OneOffReplyAction';
-import { TraceryAction } from './Actions/TraceryAction';
 import { getVersion } from './getVersion';
 import { ChatMessage } from './MinecraftLogClient/ChatMessage';
 import { LogInOutMessage } from './MinecraftLogClient/LogInOutMessage';
@@ -349,7 +348,6 @@ export default class DashBot {
 			]),
 			new GreetAction(this),
 			new DieAction(this),
-			new TraceryAction(this),
 			new NumberGameAction(this),
 			new HelpAction(this),
 			new (class extends Action {
