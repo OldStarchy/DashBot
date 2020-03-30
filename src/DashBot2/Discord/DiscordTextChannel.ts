@@ -36,4 +36,8 @@ export default class DiscordTextChannel implements TextChannel {
 	getServer() {
 		return this.server;
 	}
+
+	getSupportsReactions() {
+		return true;
+	}
 }

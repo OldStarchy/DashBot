@@ -10,7 +10,6 @@ import { HelpAction } from './Actions/HelpAction';
 import { NumberGameAction } from './Actions/NumberGameAction';
 import { OneOffReplyAction } from './Actions/OneOffReplyAction';
 import PetAction from './Actions/PetAction';
-import { PollAction } from './Actions/PollAction';
 import { TraceryAction } from './Actions/TraceryAction';
 import { getVersion } from './getVersion';
 import { ChatMessage } from './MinecraftLogClient/ChatMessage';
@@ -369,8 +368,7 @@ export default class DashBot {
 					}
 					return false;
 				}
-			})(this),
-			new PollAction(this)
+			})(this)
 		);
 	}
 }

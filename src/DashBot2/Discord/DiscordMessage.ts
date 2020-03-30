@@ -24,4 +24,8 @@ export default class DiscordMessage implements Message {
 	getTextContent() {
 		return this.message.cleanContent;
 	}
+
+	async react(emoji: string) {
+		this.message.react(emoji);
+	}
 }

@@ -32,4 +32,8 @@ export default class MinecraftTextChannel implements TextChannel {
 	getServer() {
 		return this.server;
 	}
+
+	getSupportsReactions() {
+		return false;
+	}
 }

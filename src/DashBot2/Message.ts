@@ -6,4 +6,6 @@ export default interface Message {
 	getAuthor(): Identity;
 	getId(): string | undefined;
 	getTextContent(): string;
+
+	react(emoji: string): Promise<void>;
 }

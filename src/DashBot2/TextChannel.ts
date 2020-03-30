@@ -7,4 +7,5 @@ export default interface TextChannel {
 	canReceive(): boolean;
 	sendText(message: string): Promise<Message | void>;
 	getServer(): ChatServer;
+	getSupportsReactions(): boolean;
 }
