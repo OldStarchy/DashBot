@@ -12,6 +12,22 @@ export default class DiscordTextChannel implements TextChannel {
 			| Discord.GroupDMChannel
 	) {}
 
+	getId() {
+		return this.channel.id;
+	}
+
+	getName() {
+		if (this.channel instanceof Discord.DMChannel) {
+			return 'DM with ' + this.channel.recipient.username;
+		} else {
+			return this.channel.name;
+		}
+	}
+
+	getServer() {
+		return this.server;
+	}
+
 	canSend() {
 		return true;
 	}
@@ -23,18 +39,6 @@ export default class DiscordTextChannel implements TextChannel {
 	async sendText(message: string): Promise<DiscordMessage> {
 		const discordMessage = await this.channel.send(message);
 		return new DiscordMessage(this, discordMessage);
-	}
-
-	getName() {
-		if (this.channel instanceof Discord.DMChannel) {
-			return 'Direct Message';
-		} else {
-			return this.channel.name;
-		}
-	}
-
-	getServer() {
-		return this.server;
 	}
 
 	getSupportsReactions() {

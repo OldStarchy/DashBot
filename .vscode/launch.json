@@ -21,7 +21,8 @@
 			"program": "${workspaceFolder}\\dist\\main.js",
 			"outFiles": ["${workspaceFolder}/**/*.js"],
 			"args": ["--storage", "..\\storage"],
-			"cwd": "${workspaceFolder}\\dist"
+			"cwd": "${workspaceFolder}\\dist",
+			"outputCapture": "std"
 		}
 	]
 }

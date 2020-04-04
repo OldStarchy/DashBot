@@ -17,6 +17,7 @@ import PollCommand from './DashBot2/Commands/PollCommand';
 import StatisticsCommand from './DashBot2/Commands/StatisticsCommand';
 import { DashBot2 } from './DashBot2/DashBot2';
 import DiscordServer from './DashBot2/Discord/DiscordServer';
+import { NumberGameInteraction } from './DashBot2/Interactions/NumberGameInteraction';
 import MinecraftIdentityCache from './DashBot2/Minecraft/MinecraftIdentityCache';
 import MinecraftServer from './DashBot2/Minecraft/MinecraftServer';
 import ChatServer from './DashBot2/Server';
@@ -78,9 +79,10 @@ const logger = winston.createLogger({
 	],
 });
 
+logger.info('logger test');
+
 process.on('uncaughtException', e => {
 	logger.error(e);
-	logger.info(e);
 	process.exit(1);
 });
 
@@ -199,11 +201,29 @@ if (config.imgurClientId) {
 	);
 }
 
+new NumberGameInteraction(options.storage).register(bot);
 // const bot = new DashBot(options);
 
 bot.connect();
 
-process.on('SIGINT', e => {
-	logger.warn(e);
-	// bot.destroy().then(() => process.exit());
-});
+const signals: Record<'SIGHUP' | 'SIGINT' | 'SIGTERM', number> = {
+	SIGHUP: 1,
+	SIGINT: 2,
+	SIGTERM: 15,
+};
+
+const shutdown = async (signal: string, value: number) => {
+	logger.info(`Shutting down due to ${signal}`);
+	await bot.disconnect();
+
+	logger.info(`server stopped by ${signal} with value ${value}`);
+	process.exit(128 + value);
+};
+
+(Object.keys(signals) as ('SIGHUP' | 'SIGINT' | 'SIGTERM')[]).forEach(
+	signal => {
+		process.on(signal, () => {
+			shutdown(signal, signals[signal]);
+		});
+	}
+);

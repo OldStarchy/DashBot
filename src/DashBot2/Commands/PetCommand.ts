@@ -1,6 +1,7 @@
 import { Statistic, StatisticProvider } from '../../StatisticsTracker';
 import StorageRegister, { PersistentData } from '../../StorageRegister';
 import Command from '../Command';
+import { Event } from '../Events';
 import Message from '../Message';
 
 function getDayString(date: Date) {
@@ -75,7 +76,9 @@ export default class PetCommand implements Command, StatisticProvider {
 		return statistics;
 	}
 
-	public onReadData(data: PetActionStorage | undefined) {
+	public onReadData(event: Event<PetActionStorage | undefined>) {
+		const data = event.data;
+
 		if (data) {
 			if (typeof data.timesPet === 'number') {
 				this.timesPet = data.timesPet;

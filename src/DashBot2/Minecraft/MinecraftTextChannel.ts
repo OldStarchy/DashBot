@@ -9,20 +9,8 @@ export default class MinecraftTextChannel implements TextChannel {
 		private rcon: Rcon | null = null
 	) {}
 
-	canSend() {
-		return this.rcon !== null;
-	}
-
-	canReceive() {
-		return true;
-	}
-
-	async sendText(message: string) {
-		if (this.rcon) {
-			//TODO: "DashBot" magic variable
-			const chat = new RconChat(this.rcon, 'DashBot');
-			await chat.broadcast(message);
-		}
+	getId() {
+		return '0';
 	}
 
 	getName() {
@@ -33,7 +21,23 @@ export default class MinecraftTextChannel implements TextChannel {
 		return this.server;
 	}
 
+	canSend() {
+		return this.rcon !== null;
+	}
+
+	canReceive() {
+		return true;
+	}
+
 	getSupportsReactions() {
 		return false;
+	}
+
+	async sendText(message: string) {
+		if (this.rcon) {
+			//TODO: "DashBot" magic variable
+			const chat = new RconChat(this.rcon, 'DashBot');
+			await chat.broadcast(message);
+		}
 	}
 }

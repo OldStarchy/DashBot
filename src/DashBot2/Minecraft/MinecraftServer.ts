@@ -1,6 +1,5 @@
 import Rcon from 'modern-rcon';
 import { MinecraftLogClient } from '../../MinecraftLogClient/MinecraftLogClient';
-import Message from '../Message';
 import Person from '../Person';
 import ChatServer from '../Server';
 import MinecraftIdentityCache from './MinecraftIdentityCache';
@@ -26,7 +25,6 @@ export default class MinecraftServer implements ChatServer {
 		return [];
 	}
 
-	on(event: 'message', listener: (message: Message) => void): void;
 	on(event: string, listener: (...args: any[]) => void) {
 		if (event === 'message') {
 			this.logReader.on('chatMessage', chatMessage => {

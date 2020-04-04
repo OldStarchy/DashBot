@@ -1,15 +1,18 @@
 import { Logger } from 'winston';
 import parseArguments from '../util/parseArguments';
 import Command from './Command';
+import { Event, EventEmitter, EventHandler } from './Events';
 import Message from './Message';
 import ChatServer from './Server';
 
-export class DashBot2 {
+export class DashBot2 extends EventEmitter {
 	private commands: Record<string, Command> = {};
 	private startTime: number | null = null;
 	private stopTime: number | null = null;
 
 	constructor(private logger: Logger, private chatServers: ChatServer[]) {
+		super();
+
 		for (const chatServer of this.chatServers) {
 			chatServer.on('message', this.onMessage.bind(this));
 		}
@@ -66,6 +69,8 @@ export class DashBot2 {
 				const name = parameters.shift()!.substr(1);
 
 				await this.runCommand(message, name, ...parameters);
+			} else {
+				this.emit(new Event('message', message));
 			}
 			// for (const action of this.actions) {
 			// 	const result = await action.handle(message);
@@ -85,5 +90,10 @@ export class DashBot2 {
 		if (this.commands[name]) {
 			await this.commands[name].run(message, name, ...args);
 		}
+	}
+
+	on(event: 'message', handler: EventHandler<Message>): void;
+	on(event: string, handler: EventHandler<any>): void {
+		return super.on(event, handler);
 	}
 }

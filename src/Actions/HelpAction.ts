@@ -1,7 +1,8 @@
+/*
 import { Message } from 'discord.js';
+import { OngoingAction } from '../DashBot2/Interactions/OngoingInteraction';
 import { Tracery } from '../tracery/Tracery';
 import { lazy } from '../util/lazy';
-import { OngoingAction } from './OngoingAction';
 
 const HelpActionGrammar = {
 	help: ['#greeting#, #description#'],
@@ -29,7 +30,7 @@ interface HelpActionSession {
 
 /**
  * Placeholder help action supposed to give people hints as to what DashBot can do, however due to the "conversational"-like invocation phrases I feel like it doesn't really make sense to just list all the "commands" so not much work has been put in this.
- */
+ */ /*
 export class HelpAction extends OngoingAction<HelpActionSession> {
 	private static defaultSession: Readonly<HelpActionSession> = {
 		pendingAnswer: false,
@@ -87,3 +88,4 @@ export class HelpAction extends OngoingAction<HelpActionSession> {
 		return false;
 	}
 }
+*/

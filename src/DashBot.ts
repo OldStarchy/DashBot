@@ -6,8 +6,6 @@ import { ActionResult } from './ActionResult';
 import { ABResponseAction } from './Actions/ABResponseAction';
 import { DieAction } from './Actions/DieAction';
 import { GreetAction } from './Actions/GreetAction';
-import { HelpAction } from './Actions/HelpAction';
-import { NumberGameAction } from './Actions/NumberGameAction';
 import { OneOffReplyAction } from './Actions/OneOffReplyAction';
 import { getVersion } from './getVersion';
 import { ChatMessage } from './MinecraftLogClient/ChatMessage';
@@ -61,7 +59,7 @@ export default class DashBot {
 		this.rcon = rcon;
 
 		this.store = storage.createStore('DashBot');
-		this.store.on('dataLoaded', this.onReadData.bind(this));
+		// this.store.on('dataLoaded', this.onReadData.bind(this));
 
 		this.bindEvents();
 		this.initActions();
@@ -92,11 +90,11 @@ export default class DashBot {
 		});
 	}
 
-	public onReadData(data: DashBotData | undefined) {
-		if (data) {
-			this._minecraftRelayChannelId = data.minecraftRelayChannelId;
-		}
-	}
+	// public onReadData(data: DashBotData | undefined) {
+	// 	if (data) {
+	// 		this._minecraftRelayChannelId = data.minecraftRelayChannelId;
+	// 	}
+	// }
 
 	public async login(): Promise<string> {
 		this.minecraftClient?.start();
@@ -346,8 +344,6 @@ export default class DashBot {
 			]),
 			new GreetAction(this),
 			new DieAction(this),
-			new NumberGameAction(this),
-			new HelpAction(this),
 			new (class extends Action {
 				async handle(message: Message) {
 					//TODO: Maybe check to see who's triggered a disconnect so not anyone can do it

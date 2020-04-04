@@ -1,5 +1,6 @@
 import { Logger } from 'winston';
 import StorageRegister, { PersistentData } from '../../StorageRegister';
+import { Event } from '../Events';
 import IdentityProvider from '../IdentityProvider';
 import MinecraftIdentity from './MinecraftIdentity';
 
@@ -23,7 +24,10 @@ export default class MinecraftIdentityCache
 			(ton === 'undefined' && toi === 'string')
 		);
 	}
-	private onDataLoaded(data: MinecraftIdentityCache['cache'] | undefined) {
+	private onDataLoaded(
+		event: Event<MinecraftIdentityCache['cache'] | undefined>
+	) {
+		const data = event.data;
 		if (data && typeof data == 'object' && data instanceof Array) {
 			for (const item of data) {
 				if (this.verifyCacheItem(item)) {

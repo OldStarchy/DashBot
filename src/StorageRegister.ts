@@ -1,36 +1,38 @@
-import { EventEmitter } from 'events';
 import fs from 'fs';
 import { Logger } from 'winston';
+import { Event, EventEmitter, EventHandler } from './DashBot2/Events';
 import Storage from './Storage';
 
-export class PersistentData<T> extends EventEmitter {
+export interface DataStore<TData> {
+	setData(data: TData): void;
+	getData(): TData | undefined;
+
+	on(event: 'dataLoaded', handler: EventHandler<TData | undefined>): void;
+	emit(event: Event<TData | undefined>): void;
+}
+
+export class PersistentData<TData> extends EventEmitter
+	implements DataStore<TData> {
 	constructor(
 		private readonly name: string,
 		private readonly register: StorageRegister
 	) {
 		super();
 	}
-	setData(data: T): void {
+	setData(data: TData): void {
 		this.register.setData(this.name, data);
 	}
 
-	getData(): T | undefined {
-		return this.register.getData(this.name) as T;
+	getData(): TData | undefined {
+		return this.register.getData(this.name) as TData;
 	}
 
-	on(event: 'dataLoaded', callback: (data: T | undefined) => void): this;
-	on(event: string, callback: (...args: any[]) => void): this {
-		if (event === 'dataLoaded') {
-			callback(this.getData());
-		}
-
-		super.on(event, callback);
-		return this;
+	on(event: 'dataLoaded', handler: EventHandler<TData>): void {
+		super.on(event, handler);
 	}
 
-	emit(event: 'dataLoaded', data: T): boolean;
-	emit(event: string, ...args: any[]): boolean {
-		return super.emit(event, ...args);
+	emit(event: Event<TData | undefined>): Event<TData | undefined> {
+		return super.emit(event) as Event<TData | undefined>;
 	}
 }
 
@@ -80,7 +82,7 @@ export default class StorageRegister {
 
 		if (this.data[key]) {
 			try {
-				store.emit('dataLoaded', this.data[key] as T);
+				store.emit(new Event('dataLoaded', this.data[key] as T));
 			} catch (e) {
 				this.logger.error(e);
 			}
@@ -97,7 +99,7 @@ export default class StorageRegister {
 
 				if (this.data[key]) {
 					try {
-						store.emit('dataLoaded', this.data[key]);
+						store.emit(new Event('dataLoaded', this.data[key]));
 					} catch (e) {
 						this.logger.error(e);
 					}
