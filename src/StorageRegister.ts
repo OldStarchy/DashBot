@@ -22,8 +22,11 @@ export class PersistentData<TData> extends EventEmitter
 	setData(data: TData): void {
 		this._register.setData(this._name, data);
 	}
+	clearData() {
+		this._register.clearData(this._name);
+	}
 
-	getData(def: () => TData): TData;
+	getData(def: () => TData): Readonly<TData>;
 	getData(): TData | undefined;
 	getData(def?: () => TData) {
 		const data = this._register.getData(this._name) as TData | undefined;
@@ -125,6 +128,12 @@ export default class StorageRegister {
 
 	setData(key: string, data: unknown) {
 		this._data[key] = data;
+
+		this._storage.setData(this._data);
+	}
+
+	clearData(key: string) {
+		delete this._data[key];
 
 		this._storage.setData(this._data);
 	}

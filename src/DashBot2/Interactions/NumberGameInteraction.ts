@@ -63,11 +63,13 @@ export class NumberGameInteraction implements Interaction {
 				channel.sendText(
 					`OK, @${author.username}, I'm thinking of a number between 1 and 100, inclusive`
 				);
-				sessionData.playing = true;
-				sessionData.number = number;
-				sessionData.guesses = 0;
 
-				session.setData(sessionData);
+				session.setData({
+					...sessionData,
+					playing: true,
+					number: number,
+					guesses: 0,
+				});
 			}
 		} else {
 			if (/^\d+$/.test(textContent)) {
@@ -83,19 +85,30 @@ export class NumberGameInteraction implements Interaction {
 				if (guess < sessionData.number) {
 					const response = tracery.generate('higher');
 					channel.sendText(response);
-					sessionData.guesses++;
-				} else if (guess > sessionData.number) {
+					session.setData({
+						...sessionData,
+						guesses: sessionData.guesses + 1,
+					});
+					return;
+				}
+
+				if (guess > sessionData.number) {
 					const response = tracery.generate('lower');
 					channel.sendText(response);
-					sessionData.guesses++;
-				} else if (guess === sessionData.number) {
+					session.setData({
+						...sessionData,
+						guesses: sessionData.guesses + 1,
+					});
+					return;
+				}
+
+				if (guess === sessionData.number) {
 					channel.sendText(
 						`You win, you made ${sessionData.guesses} guesses. Well done, you're parents must be proud.`
 					);
-					sessionData.playing = false;
+					session.clearData();
+					return;
 				}
-
-				session.setData(sessionData);
 			}
 		}
 	}

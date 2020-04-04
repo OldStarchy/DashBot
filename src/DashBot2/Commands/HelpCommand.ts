@@ -74,10 +74,10 @@ export class HelpCommand implements Command, Interaction {
 		if (helpRegex.test(textContent)) {
 			channel.sendText(tracery().generate('help'));
 
-			session.sentMessageTime = Date.now();
-			session.pendingAnswer = true;
-
-			sessionStore.setData(session);
+			sessionStore.setData({
+				sentMessageTime: Date.now(),
+				pendingAnswer: true,
+			});
 			return;
 		}
 
@@ -99,22 +99,18 @@ export class HelpCommand implements Command, Interaction {
 						tracery().generate('no-private-chat')
 					);
 				}
-
-				session.pendingAnswer = false;
 			} else if (regex.no.test(textContent)) {
 				await channel.sendText(tracery().generate('ok-no'));
-				session.pendingAnswer = false;
 			} else {
 				return;
 			}
 
-			sessionStore.setData(session);
+			sessionStore.clearData();
 			return;
 		}
 
 		// Didn't reply in time or reply was some other thing.
-		if (session.pendingAnswer) session.pendingAnswer = false;
-		sessionStore.setData(session);
+		if (session.pendingAnswer) sessionStore.clearData();
 	}
 
 	private async onMessage(event: Event<Message>) {
