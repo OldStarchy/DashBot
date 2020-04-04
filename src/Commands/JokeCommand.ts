@@ -1,6 +1,6 @@
 import fetch from 'node-fetch';
+import Message from '../ChatServer/Message';
 import Command from '../Command';
-import Message from '../Message';
 
 /**
  * Performs an Imgur search and posts a random result

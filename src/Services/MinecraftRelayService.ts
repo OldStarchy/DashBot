@@ -1,15 +1,15 @@
-import RconChat from '../../Rcon/RconChat';
-import StorageRegister, { PersistentData } from '../../StorageRegister';
-import Tracery from '../../tracery/Tracery';
-import selectRandom from '../../util/selectRandom';
+import IdentityService from '../ChatServer/IdentityService';
+import Message from '../ChatServer/Message';
+import MinecraftServer from '../ChatServer/Minecraft/MinecraftServer';
+import TextChannel from '../ChatServer/TextChannel';
 import Command from '../Command';
 import DashBot from '../DashBot';
 import { Event } from '../Events';
-import IdentityService from '../IdentityService';
-import Message from '../Message';
-import MinecraftServer from '../Minecraft/MinecraftServer';
+import RconChat from '../Rcon/RconChat';
 import Service from '../Service';
-import TextChannel from '../TextChannel';
+import StorageRegister, { PersistentData } from '../StorageRegister';
+import Tracery from '../tracery/Tracery';
+import selectRandom from '../util/selectRandom';
 
 interface MinecraftRelayServiceState {
 	relays: MinecraftRelayData[];

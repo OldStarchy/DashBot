@@ -1,5 +1,5 @@
+import NotSupportedException from '../../NotSupportedException';
 import Message from '../Message';
-import NotSupportedException from '../NotSupportedException';
 import MinecraftIdentity from './MinecraftIdentity';
 import MinecraftTextChannel from './MinecraftTextChannel';
 

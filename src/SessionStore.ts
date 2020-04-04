@@ -1,5 +1,5 @@
-import StorageRegister, { PersistentData } from '../StorageRegister';
-import Message from './Message';
+import Message from './ChatServer/Message';
+import StorageRegister, { PersistentData } from './StorageRegister';
 
 /**
  * Keeps a state object based on the message channel ID and the message author ID.

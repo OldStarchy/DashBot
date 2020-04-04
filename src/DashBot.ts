@@ -1,10 +1,10 @@
 import { Logger } from 'winston';
-import parseArguments from '../util/parseArguments';
-import ChatServer from './ChatServer';
+import ChatServer from './ChatServer/ChatServer';
+import Identity from './ChatServer/Identity';
+import Message from './ChatServer/Message';
 import Command from './Command';
 import { Event, EventEmitter, EventHandler } from './Events';
-import Identity from './Identity';
-import Message from './Message';
+import parseArguments from './util/parseArguments';
 
 export default class DashBot extends EventEmitter {
 	private _commands: Record<string, Command> = {};

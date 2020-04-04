@@ -1,5 +1,5 @@
+import { Event, EventEmitter, EventHandler } from '../../Events';
 import StorageRegister, { PersistentData } from '../../StorageRegister';
-import { Event, EventEmitter, EventHandler } from '../Events';
 import MinecraftIdentity from './MinecraftIdentity';
 import MinecraftServer from './MinecraftServer';
 

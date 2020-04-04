@@ -1,8 +1,8 @@
-import { Statistic, StatisticProvider } from '../../StatisticsTracker';
-import StorageRegister, { PersistentData } from '../../StorageRegister';
+import Message from '../ChatServer/Message';
 import Command from '../Command';
 import { Event } from '../Events';
-import Message from '../Message';
+import { Statistic, StatisticProvider } from '../StatisticsTracker';
+import StorageRegister, { PersistentData } from '../StorageRegister';
 
 function getDayString(date: Date) {
 	return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;

@@ -1,6 +1,6 @@
 import fs from 'fs';
 import { Logger } from 'winston';
-import { Event, EventEmitter, EventHandler } from './DashBot2/Events';
+import { Event, EventEmitter, EventHandler } from './Events';
 import Storage from './Storage';
 
 export interface DataStore<TData> {

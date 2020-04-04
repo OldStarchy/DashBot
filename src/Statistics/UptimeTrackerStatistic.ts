@@ -1,4 +1,4 @@
-import { StatisticProvider } from '../../StatisticsTracker';
+import { StatisticProvider } from '../StatisticsTracker';
 
 export default class UptimeTrackerStatistic implements StatisticProvider {
 	constructor(private _target: { getUptime: () => number }) {}

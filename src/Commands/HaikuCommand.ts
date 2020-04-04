@@ -1,6 +1,6 @@
 import { random as getHaiku } from 'haiku-random';
+import Message from '../ChatServer/Message';
 import Command from '../Command';
-import Message from '../Message';
 
 export default class HaikuCommand implements Command {
 	async run(message: Message | null) {

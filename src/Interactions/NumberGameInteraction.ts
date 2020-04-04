@@ -1,10 +1,10 @@
-import StorageRegister from '../../StorageRegister';
-import Tracery from '../../tracery/Tracery';
+import Interaction from '../ChatServer/Interaction';
+import Message from '../ChatServer/Message';
 import DashBot from '../DashBot';
 import { Event } from '../Events';
-import Interaction from '../Interaction';
-import Message from '../Message';
 import SessionStore from '../SessionStore';
+import StorageRegister from '../StorageRegister';
+import Tracery from '../tracery/Tracery';
 
 interface NumberGameState {
 	playing: boolean;

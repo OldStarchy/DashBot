@@ -1,8 +1,8 @@
-import StatisticsTracker from '../../StatisticsTracker';
-import formatTable from '../../util/formatTable';
-import sleep from '../../util/sleep';
+import Message from '../ChatServer/Message';
 import Command from '../Command';
-import Message from '../Message';
+import StatisticsTracker from '../StatisticsTracker';
+import formatTable from '../util/formatTable';
+import sleep from '../util/sleep';
 
 export default class StatisticsCommand implements Command {
 	constructor(private readonly _stats: StatisticsTracker) {}

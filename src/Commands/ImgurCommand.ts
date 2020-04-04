@@ -1,8 +1,8 @@
 import fetch from 'node-fetch';
-import ImgurResponse from '../../ImgurResponse';
-import selectRandom from '../../util/selectRandom';
+import Message from '../ChatServer/Message';
 import Command from '../Command';
-import Message from '../Message';
+import ImgurResponse from '../ImgurResponse';
+import selectRandom from '../util/selectRandom';
 
 /**
  * Performs an Imgur search and posts a random result

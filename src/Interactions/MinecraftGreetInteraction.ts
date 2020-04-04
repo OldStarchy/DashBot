@@ -1,8 +1,8 @@
+import Identity from '../ChatServer/Identity';
+import Interaction from '../ChatServer/Interaction';
+import MinecraftServer from '../ChatServer/Minecraft/MinecraftServer';
 import DashBot from '../DashBot';
 import { Event } from '../Events';
-import Identity from '../Identity';
-import Interaction from '../Interaction';
-import MinecraftServer from '../Minecraft/MinecraftServer';
 
 export default class MinecraftGreetInteraction implements Interaction {
 	register(bot: DashBot) {

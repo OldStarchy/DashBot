@@ -1,12 +1,12 @@
-import StorageRegister from '../../StorageRegister';
-import Tracery from '../../tracery/Tracery';
-import lazy from '../../util/lazy';
+import Interaction from '../ChatServer/Interaction';
+import Message from '../ChatServer/Message';
 import Command from '../Command';
 import DashBot from '../DashBot';
 import { Event } from '../Events';
-import Interaction from '../Interaction';
-import Message from '../Message';
 import SessionStore from '../SessionStore';
+import StorageRegister from '../StorageRegister';
+import Tracery from '../tracery/Tracery';
+import lazy from '../util/lazy';
 
 const HelpCommandGrammar = {
 	help: ['#greeting#, #description#'],

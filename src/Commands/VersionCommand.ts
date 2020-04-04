@@ -1,6 +1,6 @@
-import getVersion from '../../getVersion';
+import Message from '../ChatServer/Message';
 import Command from '../Command';
-import Message from '../Message';
+import getVersion from '../getVersion';
 
 export default class VersionCommand implements Command {
 	async run(message: Message | null) {

@@ -1,4 +1,4 @@
-import Message from './Message';
+import Message from './ChatServer/Message';
 
 export default interface Command {
 	run(

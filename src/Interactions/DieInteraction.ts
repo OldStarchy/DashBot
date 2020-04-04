@@ -1,8 +1,8 @@
-import sleep from '../../util/sleep';
+import Interaction from '../ChatServer/Interaction';
+import Message from '../ChatServer/Message';
 import DashBot from '../DashBot';
 import { Event } from '../Events';
-import Interaction from '../Interaction';
-import Message from '../Message';
+import sleep from '../util/sleep';
 
 /**
  * Rolls dice and flips coins.

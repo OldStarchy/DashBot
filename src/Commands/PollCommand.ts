@@ -1,7 +1,7 @@
-import Tracery from '../../tracery/Tracery';
-import Emoji from '../../util/emoji';
+import Message from '../ChatServer/Message';
 import Command from '../Command';
-import Message from '../Message';
+import Tracery from '../tracery/Tracery';
+import Emoji from '../util/emoji';
 
 const grammar = {
 	errTooManyArgs: [
