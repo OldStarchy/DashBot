@@ -41,25 +41,29 @@ export default class DashBot extends EventEmitter {
 	}
 
 	public async connect() {
-		for (const server of this._chatServers) {
-			try {
-				await server.connect();
-				this._startTime = Date.now();
-			} catch (e) {
-				this._logger.error("Couldn't connect to server");
-			}
-		}
+		await Promise.all(
+			this._chatServers.map(async server => {
+				try {
+					await server.connect();
+				} catch (e) {
+					this._logger.error("Couldn't connect to server");
+				}
+			})
+		);
+		this._startTime = Date.now();
 	}
 
 	public async disconnect() {
-		for (const server of this._chatServers) {
-			try {
-				await server.disconnect();
-				this._stopTime = Date.now();
-			} catch (e) {
-				this._logger.error("Couldn't disconnect to server");
-			}
-		}
+		await Promise.all(
+			this._chatServers.map(async server => {
+				try {
+					await server.disconnect();
+					this._stopTime = Date.now();
+				} catch (e) {
+					this._logger.error("Couldn't disconnect from server");
+				}
+			})
+		);
 	}
 
 	public getUptime() {
