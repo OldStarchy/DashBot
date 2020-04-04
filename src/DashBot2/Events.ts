@@ -1,8 +1,8 @@
-export class Event<TData = unknown> {
+export class Event<TData> {
 	private cancelled = false;
 	constructor(
 		public readonly event: string,
-		public data?: TData,
+		public data: TData,
 		public readonly cancellable: boolean = true
 	) {}
 

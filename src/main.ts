@@ -17,6 +17,7 @@ import PollCommand from './DashBot2/Commands/PollCommand';
 import StatisticsCommand from './DashBot2/Commands/StatisticsCommand';
 import { DashBot2 } from './DashBot2/DashBot2';
 import DiscordServer from './DashBot2/Discord/DiscordServer';
+import { GreetInteraction } from './DashBot2/Interactions/GreetInteraction';
 import { NumberGameInteraction } from './DashBot2/Interactions/NumberGameInteraction';
 import MinecraftIdentityCache from './DashBot2/Minecraft/MinecraftIdentityCache';
 import MinecraftServer from './DashBot2/Minecraft/MinecraftServer';
@@ -202,6 +203,7 @@ if (config.imgurClientId) {
 }
 
 new NumberGameInteraction(options.storage).register(bot);
+new GreetInteraction().register(bot);
 // const bot = new DashBot(options);
 
 bot.connect();
