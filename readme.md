@@ -1,4 +1,4 @@
-# DashBot
+# DashBot v0.2.0
 
 [![CircleCI](https://circleci.com/gh/aNickzz/DashBot.svg?style=svg)](https://circleci.com/gh/aNickzz/DashBot)
 [![codecov.io](https://codecov.io/github/aNickzz/DashBot/coverage.svg?branch=master)](https://codecov.io/github/aNickzz/DashBot?branch=master)
@@ -7,27 +7,27 @@ A chatbot that does whatever I feel like implementing at the time.
 
 ## What can it do
 
-Dashbot will listen for messages on all text channels it has access to and do some simple matching (usually a regex test) to figure out which `Action` to run. Actions are registered in the `initActions` method in [DashBot.ts](src/DashBot.ts).
+Dashbot will listen for messages on all text channels it has access to and do some simple matching (usually a regex test) to figure out which `Interaction` or `Command` to run. Interactions and Commands are registered in the [main.ts](src/main.ts) file.
 
 See the documentation in each Action to see what it does, however, some notable ones are
 
--   [DieAction](src/Actions/DieAction.ts)
+-   [DieInteraction](src/Interactions/DieInteraction.ts)
 
     Rolls dice and flips coins, invoke with either `roll dX` (where X can be any whole number > 1 or < -1) or a few variants of the phrase `flip coin`.
 
--   [OneOffReplyAction](src/Actions/OneOffReplyAction.ts)
+-   [ABResponseInteraction](src/Interactions/ABResponseInteraction.ts)
 
     There are a few of these that have different responses. Eg. `compliment` will cause DashBot to give you a random compliment. `link` will post a random link to a picture of Link. This is the most simple type of Action, all responses need to be predefined, and it will pick one randomly.
 
--   [ImgurSearchAction](src/Actions/ImgurSearchAction.ts)
+-   [ImgurCommand](src/Commands/ImgurCommand.ts)
 
     If you have an imgur ClientId set, this action will post an random image from the first 20 results of a [Imgur](https://imgur.com) search. Usage `!imgur cats`.
 
--   [NumberGameAction](src/Actions/NumberGameAction.ts)
+-   [NumberGameInteraction](src/Interactions/NumberGameInteraction.ts)
 
-    This is one of 2 actions that deal with multiple messages and replies (see [OngoingAction](src/Actions/OngoingAction.ts)). After invoking it with "I want to guess a number", it will prompt you to try to guess the number its thinking.
+    This is one of 2 actions that deal with multiple messages and replies (see [OngoingAction](src/Interactions/OngoingAction.ts)). After invoking it with "I want to guess a number", it will prompt you to try to guess the number its thinking.
 
--   [PollAction](src/Actions/PollAction.ts)
+-   [PollCommand](src/Commands/PollCommand.ts)
 
     Allows you to create polls (much like other existing poll bots). `!poll "this is my question" yes no maybe "i don't know"`.
 

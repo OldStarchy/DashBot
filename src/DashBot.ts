@@ -94,11 +94,6 @@ export default class DashBot extends EventEmitter {
 			} else {
 				this.emit(new Event('message', message));
 			}
-			// for (const action of this.actions) {
-			// 	const result = await action.handle(message);
-
-			// 	if (ActionResult.isHandled(result)) return;
-			// }
 		} catch (e) {
 			this._logger.error(
 				`Message "${message.textContent}" caused an error`
