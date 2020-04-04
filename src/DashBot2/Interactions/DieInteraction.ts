@@ -1,7 +1,8 @@
-import { Message } from 'discord.js';
-import { Action } from '../Action';
-import { ActionResult } from '../ActionResult';
-import { sleep } from '../util/sleep';
+import { sleep } from '../../util/sleep';
+import { DashBot2 } from '../DashBot2';
+import { Event } from '../Events';
+import Interaction from '../Interaction';
+import Message from '../Message';
 
 /**
  * Rolls dice and flips coins.
@@ -14,11 +15,22 @@ import { sleep } from '../util/sleep';
  *
  * `flip coin`
  */
-export class DieAction extends Action {
-	async handle(message: Message) {
-		const match = /^roll (d(-?\d+)|dice)$/i.exec(message.content);
+export class DieInteraction implements Interaction {
+	register(bot: DashBot2) {
+		bot.on('message', this.onMessage.bind(this));
+	}
+
+	async onMessage(event: Event<Message>) {
+		const message = event.data;
+		const content = message.getTextContent();
+		const author = message.getAuthor();
+		const channel = message.getChannel();
+
+		const match = /^roll (d(-?\d+)|dice)$/i.exec(content);
 
 		if (match) {
+			event.cancel();
+
 			let size = 0;
 			if (match[1] === 'dice') {
 				size = 6;
@@ -27,20 +39,20 @@ export class DieAction extends Action {
 			}
 			let positive = true;
 			if (size === 0) {
-				message.channel.send(
+				channel.sendText(
 					"hey what kind of bot do you take me for, there's no such thing as a " +
 						match![1]
 				);
-				return ActionResult.HANDLED;
+				return;
 			}
 			if (size === 1) {
-				message.channel.send(
+				channel.sendText(
 					`something tells me the result of rolling a ${match[1]} would be awfully predictable...`
 				);
-				return ActionResult.HANDLED;
+				return;
 			}
 			// this.bot.stats.recordUserTriggeredEvent(
-			// 	message.author.username,
+			// 	author.getName(),
 			// 	`roll d${size}`
 			// );
 			if (size < 0) {
@@ -50,57 +62,60 @@ export class DieAction extends Action {
 			const result = Math.floor(Math.random() * size) + 1;
 
 			(async () => {
-				await message.channel.send(
-					`@${message.author.username}, rolling a D${(
+				await channel.sendText(
+					`@${author.getName()}, rolling a D${(
 						size * (positive ? 1 : -1)
 					).toFixed(0)}...`
 				);
 
 				await sleep(1000);
 
-				if (positive) message.channel.send(result.toFixed(0));
-				else message.channel.send('-' + result.toFixed(0));
+				if (positive) channel.sendText(result.toFixed(0));
+				else channel.sendText('-' + result.toFixed(0));
 			})();
 
-			return ActionResult.HANDLED;
+			return;
 		}
-		if (/^roll (d(-?\d+)e\d+)$/i.test(message.content)) {
-			message.channel.send(
-				'get out of here with those silly numbers nerd'
-			);
-			return ActionResult.HANDLED;
+
+		if (/^roll (d(-?\d+)e\d+)$/i.test(content)) {
+			event.cancel();
+			channel.sendText('get out of here with those silly numbers nerd');
+
+			return;
 		}
-		if (/(coin (toss|flip)|(toss|flip) coin)/i.test(message.content)) {
+
+		if (/(coin (toss|flip)|(toss|flip) coin)/i.test(content)) {
+			event.cancel();
 			const size = 11;
 			const result = Math.floor(Math.random() * size) + 1;
 			// this.bot.stats.recordUserTriggeredEvent(
-			// 	message.author.username,
+			// 	author.getName(),
 			// 	`flip coin`
 			// );
-			message.channel
-				.send('@' + message.author.username + ', flipping...')
+			channel
+				.sendText('@' + author.getName() + ', flipping...')
 				.then(() => sleep(1000))
 				.then(() => {
 					if (result === 11) {
-						message.channel.send('Oh no i dropped it :(');
+						channel.sendText('Oh no i dropped it :(');
 						// this.bot.stats.recordUserTriggeredEvent(
-						// 	message.author.username,
+						// 	author.getName(),
 						// 	`flip coin: coins dropped`
 						// );
 						return;
 					}
-					message.channel.send(
+					channel.sendText(
 						((result - 1) % 2) + 1 === 1 ? 'Heads!' : 'Tails!'
 					);
 					// this.bot.stats.recordUserTriggeredEvent(
-					// 	message.author.username,
+					// 	author.getName(),
 					// 	`flip coin: ${
 					// 		((result - 1) % 2) + 1 === 1 ? 'Heads!' : 'Tails!'
 					// 	}`
 					// );
 				});
-			return ActionResult.HANDLED;
+
+			return;
 		}
-		return ActionResult.UNHANDLED;
 	}
 }

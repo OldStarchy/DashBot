@@ -4,7 +4,6 @@ import { Logger } from 'winston';
 import { Action } from './Action';
 import { ActionResult } from './ActionResult';
 import { ABResponseAction } from './Actions/ABResponseAction';
-import { DieAction } from './Actions/DieAction';
 import { OneOffReplyAction } from './Actions/OneOffReplyAction';
 import { getVersion } from './getVersion';
 import { ChatMessage } from './MinecraftLogClient/ChatMessage';
@@ -341,7 +340,6 @@ export default class DashBot {
 				['rock paper scissors', "um.. I don't have hands"],
 				['pi', '22/7'],
 			]),
-			new DieAction(this),
 			new (class extends Action {
 				async handle(message: Message) {
 					//TODO: Maybe check to see who's triggered a disconnect so not anyone can do it
