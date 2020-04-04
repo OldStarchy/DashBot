@@ -3,7 +3,7 @@ jobs:
   test-source:
     description: 'ESLint source files'
     docker:
-      - image: node:10
+      - image: node:13
     steps:
       - checkout
       - setup_remote_docker

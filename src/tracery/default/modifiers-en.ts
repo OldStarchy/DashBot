@@ -1,7 +1,7 @@
 import { Modifier } from '../Tracery';
 import { Collection, escapeRegExp, isAlphaNum, isVowel } from '../Util';
 
-export const DefaultModifiersEn: Collection<Modifier> = {
+const DefaultModifiersEn: Collection<Modifier> = {
 	replace: function(s, params) {
 		//http://stackoverflow.com/questions/1144783/replacing-all-occurrences-of-a-string-in-javascript
 		if (!params || params.length < 2) throw 'Missing regex in modifier';
@@ -117,3 +117,5 @@ export const DefaultModifiersEn: Collection<Modifier> = {
 		}
 	},
 };
+
+export default DefaultModifiersEn;

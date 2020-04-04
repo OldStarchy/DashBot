@@ -1,7 +1,7 @@
 import { fail, throws } from 'assert';
 import { expect } from 'chai';
 import 'mocha';
-import { Tracery } from '../src/tracery/Tracery';
+import Tracery from '../src/tracery/Tracery';
 
 describe('Tracery3', () => {
 	it('Should interpolate', () => {
@@ -296,5 +296,34 @@ describe('Tracery3', () => {
 		);
 
 		expect(result).to.equal('First line\nSecond line');
+	});
+
+	it('Should allow escaped control characters', () => {
+		const result = Tracery.generate(
+			{
+				origin: 'I like having \\# and \\[ symbols in my text',
+			},
+			'origin'
+		);
+
+		expect(result).to.equal('I like having # and [ symbols in my text');
+	});
+
+	it('Should work with property getters', () => {
+		class Thing {
+			get value() {
+				return 'foo';
+			}
+		}
+
+		const result = Tracery.generate(
+			{
+				origin: '#thing.value#',
+				thing: new Thing(),
+			},
+			'origin'
+		);
+
+		expect(result).to.equal('foo');
 	});
 });

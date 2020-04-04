@@ -1,6 +1,6 @@
 {
   "name": "dashbot",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "main": "index.js",
   "author": "Nicholas Sorokin <nicholas.sorokin@hotmail.com>",
   "license": "Apache-2.0",
@@ -21,7 +21,7 @@
   "dependencies": {
     "@types/node": "^13.5.0",
     "deep-extend": "^0.6.0",
-    "discord.js": "^11.5.1",
+    "discord.js": "^12.1.1",
     "express": "^4.17.1",
     "greenlock-express": "^4.0.3",
     "haiku-random": "^1.0.0",
@@ -39,6 +39,7 @@
     "@types/mocha": "^7.0.2",
     "@types/node-fetch": "^2.5.4",
     "@types/tail": "^2.0.0",
+    "@types/ws": "^7.2.3",
     "@typescript-eslint/eslint-plugin": "^2.18.0",
     "@typescript-eslint/parser": "^2.18.0",
     "chai": "^4.2.0",

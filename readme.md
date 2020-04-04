@@ -1,4 +1,4 @@
-w# DashBot
+# DashBot
 
 [![CircleCI](https://circleci.com/gh/aNickzz/DashBot.svg?style=svg)](https://circleci.com/gh/aNickzz/DashBot)
 [![codecov.io](https://codecov.io/github/aNickzz/DashBot/coverage.svg?branch=master)](https://codecov.io/github/aNickzz/DashBot?branch=master)

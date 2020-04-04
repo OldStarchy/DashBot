@@ -1,31 +1,31 @@
 import Rcon from 'modern-rcon';
-import { RichText } from './RichText';
+import RichText from './RichText';
 
-export class RconChat {
+export default class RconChat {
 	constructor(
-		private client: Rcon,
-		private from: string,
-		private via: string | null = null
+		private _client: Rcon,
+		private _from: string,
+		private _via: string | null = null
 	) {}
 
 	async broadcast(message: string) {
 		const cmdJson: RichText = [
 			{ text: '<' },
-			{ text: this.from, color: 'dark_green' },
-			{ text: ' ' },
+			{ text: this._from, color: 'dark_green' },
 		];
 
-		if (this.via) {
+		if (this._via) {
 			cmdJson.push(
+				{ text: ' ' },
 				{ text: '(' },
-				{ text: this.via, color: 'aqua' },
+				{ text: this._via, color: 'aqua' },
 				{ text: ')' }
 			);
 		}
 
 		cmdJson.push({ text: '>: ' }, { text: message });
 
-		await this.client.send(`tellraw @a ${JSON.stringify(cmdJson)}`);
+		await this._client.send(`tellraw @a ${JSON.stringify(cmdJson)}`);
 	}
 
 	async whisper(to: string, message: string) {
@@ -35,20 +35,20 @@ export class RconChat {
 
 		const cmdJson: RichText = [
 			{
-				text: this.from,
+				text: this._from,
 				color: 'gray',
 			},
 			{
 				text: ' ',
 			},
 		];
-		if (this.via) {
+		if (this._via) {
 			cmdJson.push(
 				{
 					text: '(',
 				},
 				{
-					text: this.via,
+					text: this._via,
 					color: 'aqua',
 				},
 				{
@@ -67,7 +67,7 @@ export class RconChat {
 				color: 'gray',
 			}
 		);
-		const result = await this.client.send(
+		const result = await this._client.send(
 			`tellraw ${to} ${JSON.stringify(cmdJson)}`
 		);
 

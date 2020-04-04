@@ -25,4 +25,5 @@ export type RichTextObj = {
 	strikethrough?: boolean;
 };
 
-export type RichText = string | RichTextObj | Array<string | RichTextObj>;
+type RichText = string | RichTextObj | Array<string | RichTextObj>;
+export default RichText;

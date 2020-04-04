@@ -1,8 +1,8 @@
-import { ChatMessage } from './ChatMessage';
-import { LogInOutMessage } from './LogInOutMessage';
-import { LogMessage } from './LogMessage';
+import ChatMessage from './ChatMessage';
+import LogInOutMessage from './LogInOutMessage';
+import LogMessage from './LogMessage';
 
-export class LogMessageParser {
+export default class LogMessageParser {
 	static parse(rawMessage: string): LogMessage | null {
 		const match = LogMessage.LINE_REGEX.exec(rawMessage);
 

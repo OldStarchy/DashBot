@@ -1,6 +1,6 @@
-import { LogMessage } from './LogMessage';
+import LogMessage from './LogMessage';
 
-export class ChatMessage extends LogMessage {
+export default class ChatMessage extends LogMessage {
 	public readonly author: string;
 	public readonly message: string;
 

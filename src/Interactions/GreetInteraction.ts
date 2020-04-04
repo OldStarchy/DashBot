@@ -1,8 +1,8 @@
-import { Message } from 'discord.js';
-import { Action } from '../Action';
-import { ActionResult } from '../ActionResult';
-import { Tracery } from '../tracery/Tracery';
-import { escapeSpecialCharacters } from '../util/escapeSpecialCharacters';
+import Interaction from '../ChatServer/Interaction';
+import Message from '../ChatServer/Message';
+import DashBot from '../DashBot';
+import { Event } from '../Events';
+import Tracery from '../tracery/Tracery';
 
 const GreetingGrammar = {
 	greeting: [
@@ -29,24 +29,29 @@ const GreetingGrammar = {
 /**
  * Could probably be replaced with a OneOffReplyAction.
  */
-export class GreetAction extends Action {
-	async handle(message: Message) {
-		const name = escapeSpecialCharacters(this.client.user.username);
+export default class GreetInteraction implements Interaction {
+	register(bot: DashBot) {
+		bot.on('message', this.onMessage.bind(this));
+	}
+	async onMessage(event: Event<Message>) {
+		//TODO: Get name from config
+		const name = 'DashBot';
 		const regexString = `^(oh )?((hey|hi|hello),? )?(there )?(dash|${name})( ?bot)?!?`;
+		const message = event.data;
+		const { author, textContent, channel } = message;
+
 		const regexObj = new RegExp(regexString, 'i');
-		if (regexObj.test(message.content)) {
+		if (regexObj.test(textContent)) {
+			event.cancel();
 			const greeting = Tracery.generate(
 				{
 					...GreetingGrammar,
-					target: message.author,
+					target: author,
 				},
 				'greeting'
 			);
 
-			message.channel.send(greeting);
-			return ActionResult.HANDLED;
+			channel.sendText(greeting);
 		}
-
-		return ActionResult.UNHANDLED;
 	}
 }
