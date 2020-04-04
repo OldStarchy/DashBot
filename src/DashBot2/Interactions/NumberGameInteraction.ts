@@ -1,6 +1,6 @@
 import StorageRegister from '../../StorageRegister';
 import Tracery from '../../tracery/Tracery';
-import DashBot2 from '../DashBot2';
+import DashBot from '../DashBot';
 import { Event } from '../Events';
 import Interaction from '../Interaction';
 import Message from '../Message';
@@ -37,7 +37,7 @@ export default class NumberGameInteraction implements Interaction {
 		this._sessionStore = new SessionStore(storage);
 	}
 
-	register(bot: DashBot2) {
+	register(bot: DashBot) {
 		bot.on('message', this.onMessage.bind(this));
 	}
 

@@ -1,5 +1,5 @@
 import Tracery from '../../tracery/Tracery';
-import DashBot2 from '../DashBot2';
+import DashBot from '../DashBot';
 import { Event } from '../Events';
 import Interaction from '../Interaction';
 import Message from '../Message';
@@ -20,7 +20,7 @@ type Response = string | string[];
 export default class ABResponseInteraction implements Interaction {
 	constructor(protected aBResponses: [Trigger, Response][]) {}
 
-	register(bot: DashBot2) {
+	register(bot: DashBot) {
 		bot.on('message', this.onMessage.bind(this));
 	}
 	async onMessage(event: Event<Message>) {

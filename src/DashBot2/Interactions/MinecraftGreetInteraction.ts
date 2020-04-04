@@ -1,11 +1,11 @@
-import DashBot2 from '../DashBot2';
+import DashBot from '../DashBot';
 import { Event } from '../Events';
 import Identity from '../Identity';
 import Interaction from '../Interaction';
 import MinecraftServer from '../Minecraft/MinecraftServer';
 
 export default class MinecraftGreetInteraction implements Interaction {
-	register(bot: DashBot2) {
+	register(bot: DashBot) {
 		bot.on('presenceUpdate', this.onUserJoined.bind(this));
 	}
 

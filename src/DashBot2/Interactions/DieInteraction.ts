@@ -1,5 +1,5 @@
 import sleep from '../../util/sleep';
-import DashBot2 from '../DashBot2';
+import DashBot from '../DashBot';
 import { Event } from '../Events';
 import Interaction from '../Interaction';
 import Message from '../Message';
@@ -16,7 +16,7 @@ import Message from '../Message';
  * `flip coin`
  */
 export default class DieInteraction implements Interaction {
-	register(bot: DashBot2) {
+	register(bot: DashBot) {
 		bot.on('message', this.onMessage.bind(this));
 	}
 

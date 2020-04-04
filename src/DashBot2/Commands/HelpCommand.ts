@@ -2,7 +2,7 @@ import StorageRegister from '../../StorageRegister';
 import Tracery from '../../tracery/Tracery';
 import lazy from '../../util/lazy';
 import Command from '../Command';
-import DashBot2 from '../DashBot2';
+import DashBot from '../DashBot';
 import { Event } from '../Events';
 import Interaction from '../Interaction';
 import Message from '../Message';
@@ -116,7 +116,7 @@ export default class HelpCommand implements Command, Interaction {
 		await this.run(event.data);
 	}
 
-	register(bot: DashBot2) {
+	register(bot: DashBot) {
 		bot.on('message', this.onMessage.bind(this));
 	}
 }

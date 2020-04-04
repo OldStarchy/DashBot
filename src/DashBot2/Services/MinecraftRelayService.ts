@@ -3,7 +3,7 @@ import StorageRegister, { PersistentData } from '../../StorageRegister';
 import Tracery from '../../tracery/Tracery';
 import selectRandom from '../../util/selectRandom';
 import Command from '../Command';
-import DashBot2 from '../DashBot2';
+import DashBot from '../DashBot';
 import { Event } from '../Events';
 import IdentityService from '../IdentityService';
 import Message from '../Message';
@@ -84,7 +84,7 @@ export default class MinecraftRelayService implements Service {
 		this._store.on('dataLoaded', this.onDataLoaded.bind(this));
 	}
 
-	register(bot: DashBot2) {
+	register(bot: DashBot) {
 		bot.on('message', this.onMessage.bind(this));
 	}
 

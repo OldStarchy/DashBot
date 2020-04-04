@@ -1,5 +1,5 @@
 import Tracery from '../../tracery/Tracery';
-import DashBot2 from '../DashBot2';
+import DashBot from '../DashBot';
 import { Event } from '../Events';
 import Interaction from '../Interaction';
 import Message from '../Message';
@@ -30,7 +30,7 @@ const GreetingGrammar = {
  * Could probably be replaced with a OneOffReplyAction.
  */
 export default class GreetInteraction implements Interaction {
-	register(bot: DashBot2) {
+	register(bot: DashBot) {
 		bot.on('message', this.onMessage.bind(this));
 	}
 	async onMessage(event: Event<Message>) {

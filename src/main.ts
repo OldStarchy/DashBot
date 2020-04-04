@@ -16,7 +16,7 @@ import PetCommand from './DashBot2/Commands/PetCommand';
 import PollCommand from './DashBot2/Commands/PollCommand';
 import StatisticsCommand from './DashBot2/Commands/StatisticsCommand';
 import VersionCommand from './DashBot2/Commands/VersionCommand';
-import DashBot2 from './DashBot2/DashBot2';
+import DashBot from './DashBot2/DashBot';
 import DiscordServer from './DashBot2/Discord/DiscordServer';
 import IdentityService from './DashBot2/IdentityService';
 import ABResponseInteraction from './DashBot2/Interactions/ABResponseInteraction';
@@ -153,7 +153,7 @@ if (config.minecraft) {
 	}
 }
 
-const bot = new DashBot2(logger);
+const bot = new DashBot(logger);
 const storage = new StorageRegister('storage.json', logger);
 const identityService = new IdentityService(storage);
 const statistics = new StatisticsTracker();
