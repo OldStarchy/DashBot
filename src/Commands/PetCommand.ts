@@ -89,7 +89,7 @@ export default class PetCommand implements Command, StatisticProvider {
 			if (typeof data.timesPetTodayDate === 'string') {
 				this._timesPetTodayDate = data.timesPetTodayDate;
 			}
-			if (typeof data.mostPetsPerDay === 'string') {
+			if (typeof data.mostPetsPerDay === 'number') {
 				this._mostPetsPerDay = data.mostPetsPerDay;
 			}
 			if (typeof data.petsPerPerson === 'object') {
