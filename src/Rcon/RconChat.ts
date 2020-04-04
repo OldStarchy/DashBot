@@ -12,11 +12,11 @@ export class RconChat {
 		const cmdJson: RichText = [
 			{ text: '<' },
 			{ text: this._from, color: 'dark_green' },
-			{ text: ' ' },
 		];
 
 		if (this._via) {
 			cmdJson.push(
+				{ text: ' ' },
 				{ text: '(' },
 				{ text: this._via, color: 'aqua' },
 				{ text: ')' }

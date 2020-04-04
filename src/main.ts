@@ -25,6 +25,7 @@ import { DieInteraction } from './DashBot2/Interactions/DieInteraction';
 import { GreetInteraction } from './DashBot2/Interactions/GreetInteraction';
 import { NumberGameInteraction } from './DashBot2/Interactions/NumberGameInteraction';
 import MinecraftServer from './DashBot2/Minecraft/MinecraftServer';
+import MinecraftRelayService from './DashBot2/Services/MinecraftRelayService';
 import UptimeTrackerStatistic from './DashBot2/Statistics/UptimeTrackerStatistic';
 import { getVersion } from './getVersion';
 import loadConfig from './loadConfig';
@@ -86,7 +87,7 @@ const logger = winston.createLogger({
 logger.info('logger test');
 
 process.on('uncaughtException', e => {
-	logger.error(e);
+	logger.error(e.message);
 	process.exit(1);
 });
 
@@ -200,6 +201,12 @@ bot.registerCommand('pet', petCommand);
 bot.registerCommand('help', helpCommand);
 bot.registerCommand('version', new VersionCommand());
 statistics.register(petCommand);
+const minecraftRelayService = new MinecraftRelayService(
+	identityService,
+	storage
+);
+minecraftRelayService.register(bot);
+bot.registerCommand('minecraft', minecraftRelayService.getEnableCommand());
 
 if (config.imgurClientId) {
 	bot.registerCommand(

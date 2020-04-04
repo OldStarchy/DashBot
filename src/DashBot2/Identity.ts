@@ -8,5 +8,5 @@ export default interface Identity {
 	readonly isBot: boolean;
 	readonly server: ChatServer;
 	getPrivateTextChannel(): Promise<TextChannel | null>;
-	getPerson(): Person;
+	getPerson(): Promise<Person>;
 }

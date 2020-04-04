@@ -31,6 +31,22 @@ export default class MinecraftServer
 		return [];
 	}
 
+	async getTextChannel(id: string) {
+		if (id === this._textChannel.id) {
+			return this._textChannel;
+		}
+
+		return null;
+	}
+
+	getRcon() {
+		return this._rcon;
+	}
+
+	async awaitConnected() {
+		return this;
+	}
+
 	on(event: string, listener: (...args: any[]) => void) {
 		if (event === 'message') {
 			this._logReader.on('chatMessage', chatMessage => {
@@ -66,7 +82,7 @@ export default class MinecraftServer
 		await this._rcon?.disconnect();
 	}
 
-	getIdentityById(id: string) {
+	async getIdentityById(id: string) {
 		return this._identityCache.getById(id);
 	}
 

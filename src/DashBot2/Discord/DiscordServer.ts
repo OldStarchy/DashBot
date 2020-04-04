@@ -1,4 +1,6 @@
 import Discord from 'discord.js';
+import deferred from '../../util/deferred';
+import AudioChannel from '../AudioChannel';
 import Identity from '../Identity';
 import IdentityService from '../IdentityService';
 import ChatServer from '../Server';
@@ -7,14 +9,19 @@ import DiscordIdentity from './DiscordIdentity';
 import DiscordMessage from './DiscordMessage';
 import DiscordTextChannel from './DiscordTextChannel';
 
+type TDiscordTextChannel = Discord.Message['channel'];
+
 export default class DiscordServer
 	implements ChatServer<DiscordIdentity, DiscordTextChannel> {
 	private _channelCache: Record<string, DiscordTextChannel> = {};
+	private _loggedIn = deferred<this>();
 	constructor(
 		private _discordClient: Discord.Client,
 		private _config: { botToken: string },
 		private _identityService: IdentityService
-	) {}
+	) {
+		this._discordClient.on('ready', () => this._loggedIn.resolve(this));
+	}
 
 	get id() {
 		return 'Discord';
@@ -26,6 +33,11 @@ export default class DiscordServer
 
 	async disconnect() {
 		await this._discordClient.destroy();
+		this._loggedIn.reject('disconnected');
+	}
+
+	async awaitConnected() {
+		return this._loggedIn;
 	}
 
 	on(event: string, listener: (...args: any[]) => void): this {
@@ -42,19 +54,14 @@ export default class DiscordServer
 				break;
 
 			default:
-				this._discordClient.on(event, listener);
+				// this._discordClient.on(event, listener);
 				break;
 		}
 
 		return this;
 	}
 
-	private getChannel(
-		internalChannel:
-			| Discord.TextChannel
-			| Discord.DMChannel
-			| Discord.GroupDMChannel
-	) {
+	private getChannel(internalChannel: TDiscordTextChannel) {
 		const id = internalChannel.id;
 
 		if (this._channelCache[id] === undefined) {
@@ -67,14 +74,29 @@ export default class DiscordServer
 		return this._channelCache[id];
 	}
 
-	async getAudioChannels() {
+	async getAudioChannels(): Promise<AudioChannel[]> {
 		//TODO: this
-		return [];
+		throw new Error('Not implemented');
 	}
 
-	async getTextChannels() {
-		//TODO: this
-		return [];
+	async getTextChannels(): Promise<DiscordTextChannel[]> {
+		return this._discordClient.channels.cache
+			.filter(
+				channel =>
+					channel instanceof Discord.TextChannel ||
+					channel instanceof Discord.DMChannel ||
+					channel instanceof Discord.NewsChannel
+			)
+			.map(channel => this.getChannel(channel as TDiscordTextChannel));
+	}
+
+	async getTextChannel(id: string) {
+		const channel = await this._discordClient.channels.fetch(id);
+		if (channel) {
+			return this.getChannel(channel as TDiscordTextChannel);
+		}
+
+		return null;
 	}
 
 	async getPrivateTextChannel(
@@ -86,16 +108,16 @@ export default class DiscordServer
 		if (identity instanceof DiscordIdentity) {
 			const dm = await identity.getDiscordUser().createDM();
 
-			return new DiscordTextChannel(this, dm);
+			return this.getChannel(dm);
 		}
 
 		return null;
 	}
 
-	getIdentityById(id: string) {
+	async getIdentityById(id: string) {
 		return new DiscordIdentity(
 			this,
-			this._discordClient.users.find(user => user.id === id)
+			await this._discordClient.users.fetch(id)
 		);
 	}
 

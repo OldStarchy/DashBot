@@ -6,10 +6,7 @@ import DiscordServer from './DiscordServer';
 export default class DiscordTextChannel implements TextChannel {
 	constructor(
 		private readonly _server: DiscordServer,
-		private readonly _channel:
-			| Discord.DMChannel
-			| Discord.TextChannel
-			| Discord.GroupDMChannel
+		private readonly _channel: Discord.Message['channel']
 	) {}
 
 	get id() {

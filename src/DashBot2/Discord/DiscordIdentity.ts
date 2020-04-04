@@ -28,8 +28,8 @@ export default class DiscordIdentity implements Identity {
 		return this._person;
 	}
 
-	getPerson() {
-		return this.server
+	async getPerson() {
+		return await this.server
 			.getIdentityService()
 			.getById(this.server.id, this.id);
 	}

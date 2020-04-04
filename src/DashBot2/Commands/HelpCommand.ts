@@ -87,9 +87,9 @@ export class HelpCommand implements Command, Interaction {
 			Date.now() - session.sentMessageTime < thirtyMinutes
 		) {
 			if (regex.yes.test(textContent)) {
-				const dmChannel = await author
-					.getPerson()
-					.getPrivateTextChannel(author.server);
+				const dmChannel = await (
+					await author.getPerson()
+				).getPrivateTextChannel(author.server);
 
 				if (dmChannel) {
 					await channel.sendText(tracery().generate('ok-yes'));

@@ -1,9 +1,8 @@
-import { Client, Message, TextChannel } from 'discord.js';
+import { Client, Message } from 'discord.js';
 import Rcon from 'modern-rcon';
 import { Logger } from 'winston';
 import { Action } from './Action';
 import { ActionResult } from './ActionResult';
-import { ChatMessage } from './MinecraftLogClient/ChatMessage';
 import { LogInOutMessage } from './MinecraftLogClient/LogInOutMessage';
 import { MinecraftLogClient } from './MinecraftLogClient/MinecraftLogClient';
 import { RconChat } from './Rcon/RconChat';
@@ -17,12 +16,7 @@ export interface DashBotOptions {
 	rcon?: Rcon;
 }
 
-interface DashBotData {
-	minecraftRelayChannelId: null | string;
-}
-
 export default class DashBot {
-	// public readonly storage: StorageRegister;
 	public readonly client: Client;
 	public readonly config: DashBotConfig;
 	public readonly logger: Logger;
@@ -30,11 +24,6 @@ export default class DashBot {
 	public readonly rcon?: Rcon;
 
 	private _actions: Action[] = [];
-
-	// private readonly store: PersistentData<DashBotData>;
-
-	private _minecraftRelayChannelId: string | null = null;
-	private _minecraftRelayChannel: TextChannel | null = null;
 
 	constructor({
 		client,
@@ -49,43 +38,9 @@ export default class DashBot {
 		this.minecraftClient = minecraftClient;
 		this.rcon = rcon;
 
-		// this.store = storage.createStore('DashBot');
-		// this.store.on('dataLoaded', this.onReadData.bind(this));
-
 		this.bindEvents();
 		this.initActions();
 	}
-
-	private async getMinecraftRelayChannel() {
-		if (this._minecraftRelayChannel === null) {
-			if (this._minecraftRelayChannelId) {
-				try {
-					this._minecraftRelayChannel = (await this.client.channels.get(
-						this._minecraftRelayChannelId
-					)) as TextChannel;
-				} catch (e) {
-					this.logger.error(e);
-					this.setMinecraftRelayChannel(null);
-				}
-			}
-		}
-
-		return this._minecraftRelayChannel;
-	}
-
-	private setMinecraftRelayChannel(channel: TextChannel | null) {
-		this._minecraftRelayChannelId = channel?.id || null;
-		this._minecraftRelayChannel = channel;
-		// this.store.setData({
-		// 	minecraftRelayChannelId: this._minecraftRelayChannelId,
-		// });
-	}
-
-	// public onReadData(data: DashBotData | undefined) {
-	// 	if (data) {
-	// 		this._minecraftRelayChannelId = data.minecraftRelayChannelId;
-	// 	}
-	// }
 
 	public async login(): Promise<string> {
 		this.minecraftClient?.start();
@@ -105,14 +60,10 @@ export default class DashBot {
 		}
 
 		this.client.on('ready', () => {
-			this.logger.info(`Logged in as ${this.client.user.tag}!`);
+			this.logger.info(`Logged in as ${this.client.user!.tag}!`);
 		});
 
 		if (this.minecraftClient) {
-			this.minecraftClient.on(
-				'chatMessage',
-				this.onMinecraftMessage.bind(this)
-			);
 			this.minecraftClient.on(
 				'logInOutMessage',
 				this.onMinecraftLogInOutMessage.bind(this)
@@ -137,23 +88,7 @@ export default class DashBot {
 		}
 	}
 
-	private async onMinecraftMessage(message: ChatMessage) {
-		const channel = await this.getMinecraftRelayChannel();
-		if (channel) {
-			await channel.send(`<${message.author}> ${message.message}`);
-		}
-	}
-
 	private async onMinecraftLogInOutMessage(message: LogInOutMessage) {
-		const channel = await this.getMinecraftRelayChannel();
-		if (channel) {
-			await channel.send(
-				`${message.who} logged ${
-					message.event === 'joined' ? 'in' : 'out'
-				}.`
-			);
-		}
-
 		if (this.rcon) {
 			if (message.event === 'joined') {
 				await sleep(5);
@@ -169,62 +104,6 @@ export default class DashBot {
 	}
 
 	private initActions(): void {
-		if (this.minecraftClient) {
-			this._actions.push(
-				new (class extends Action {
-					async handle(message: Message) {
-						if (message.content == '!minecraft') {
-							const relayChannel = await this.bot.getMinecraftRelayChannel();
-							if (relayChannel === null) {
-								this.bot.setMinecraftRelayChannel(
-									message.channel as TextChannel
-								);
-								message.reply(
-									"OK, I'll relay messages from Minecraft to this channel"
-								);
-							} else {
-								if (relayChannel.id === message.channel.id) {
-									this.bot.setMinecraftRelayChannel(null);
-									message.reply(
-										"I'll stop sending messages from Minecraft to this channel"
-									);
-								} else {
-									message.reply(
-										`I\'m already sending Minecraft messages to the ${relayChannel.name} channel. Send \`!minecraft\` to that channel again to stop it there first.`
-									);
-								}
-							}
-							return true;
-						}
-						return false;
-					}
-				})(this)
-			);
-
-			if (this.rcon) {
-				this._actions.push(
-					new (class extends Action {
-						async handle(message: Message) {
-							const relayChannel = await this.bot.getMinecraftRelayChannel();
-							if (message.channel.id === relayChannel?.id) {
-								const chat = new RconChat(
-									this.bot.rcon!,
-									message.author.username.replace(
-										/[^a-zA-Z0-9 _-]+/g,
-										''
-									),
-									'discord'
-								);
-
-								await chat.broadcast(message.cleanContent);
-							}
-							return false;
-						}
-					})(this)
-				);
-			}
-		}
-
 		this._actions.push(
 			new (class extends Action {
 				async handle(message: Message) {

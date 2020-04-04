@@ -29,7 +29,7 @@ export default class IdentityService {
 		this._people = data.map(id => ({ identities: { ...id.identities } }));
 	}
 
-	getById(serverId: string, id: string) {
+	async getById(serverId: string, id: string) {
 		const person = this._people.find(
 			person => person.identities[serverId] === id
 		);
@@ -38,7 +38,7 @@ export default class IdentityService {
 
 		if (person) {
 			for (const serverId of Object.keys(person.identities)) {
-				const identity = this._servers
+				const identity = await this._servers
 					.find(server => server.id == serverId)
 					?.getIdentityById(person.identities[serverId]);
 
@@ -53,7 +53,7 @@ export default class IdentityService {
 		const server = this._servers.find(server => server.id === serverId);
 
 		if (server) {
-			const identity = server.getIdentityById(id);
+			const identity = await server.getIdentityById(id);
 
 			if (identity) {
 				this._people.push({
@@ -74,5 +74,9 @@ export default class IdentityService {
 
 	addProvider(server: ChatServer) {
 		this._servers.push(server);
+	}
+
+	getServer(id: string) {
+		return this._servers.find(server => server.id === id) || null;
 	}
 }

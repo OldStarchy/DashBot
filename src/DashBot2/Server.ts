@@ -13,10 +13,12 @@ export default interface ChatServer<
 	disconnect(): Promise<void>;
 	getAudioChannels(): Promise<AudioChannel[]>;
 	getTextChannels(): Promise<TTextChannel[]>;
+	getTextChannel(id: string): Promise<TTextChannel | null>;
 	getPrivateTextChannel(person: TIdentity): Promise<TTextChannel | null>;
-	getIdentityById(id: string): TIdentity | null;
+	getIdentityById(id: string): Promise<TIdentity | null>;
 	on(event: 'message', listener: (message: Message) => void): void;
 	on(event: string, listener: (...args: any[]) => void): void;
 
 	getIdentityService(): IdentityService;
+	awaitConnected(): Promise<this>;
 }

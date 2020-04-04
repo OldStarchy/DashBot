@@ -43,6 +43,10 @@ export class PersistentData<TData> extends EventEmitter
 
 	on(event: 'dataLoaded', handler: EventHandler<TData>): void {
 		super.on(event, handler);
+		const current = this._register.getData(this._name) as TData | undefined;
+		if (current) {
+			this.emit(new Event<TData>('dataLoaded', current));
+		}
 	}
 
 	emit(event: Event<TData | undefined>): Event<TData | undefined> {
@@ -95,14 +99,6 @@ export default class StorageRegister {
 
 		if (bindEvents) {
 			this._stores[key] = store;
-
-			if (this._data[key]) {
-				try {
-					store.emit(new Event('dataLoaded', this._data[key] as T));
-				} catch (e) {
-					this._logger.error(e);
-				}
-			}
 		}
 
 		return store;

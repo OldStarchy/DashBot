@@ -292,7 +292,7 @@ class Rule {
 				modifiers[0]
 			);
 			if (descriptor?.get) {
-				objectLookupResult = descriptor?.get();
+				objectLookupResult = descriptor?.get.call(obj);
 				gotProperty = true;
 			}
 		}
