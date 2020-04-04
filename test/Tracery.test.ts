@@ -308,4 +308,22 @@ describe('Tracery3', () => {
 
 		expect(result).to.equal('I like having # and [ symbols in my text');
 	});
+
+	it('Should work with property getters', () => {
+		class Thing {
+			get value() {
+				return 'foo';
+			}
+		}
+
+		const result = Tracery.generate(
+			{
+				origin: '#thing.value#',
+				thing: new Thing(),
+			},
+			'origin'
+		);
+
+		expect(result).to.equal('foo');
+	});
 });

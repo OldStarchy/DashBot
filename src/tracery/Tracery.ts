@@ -278,12 +278,26 @@ class Rule {
 			throw new Error('Object could not be reduced to string or number');
 		}
 
+		let gotProperty = false;
+		let objectLookupResult = undefined;
 		if (obj.hasOwnProperty(modifiers[0])) {
-			const objectLookupResult = this.safeGetProperty(
+			objectLookupResult = this.safeGetProperty(
 				obj as Record<string, unknown>,
 				modifiers[0]
 			);
+			gotProperty = true;
+		} else {
+			const descriptor = Object.getOwnPropertyDescriptor(
+				obj.__proto__,
+				modifiers[0]
+			);
+			if (descriptor?.get) {
+				objectLookupResult = descriptor?.get();
+				gotProperty = true;
+			}
+		}
 
+		if (gotProperty) {
 			const remainingModifiers = modifiers.slice(1);
 
 			if (
