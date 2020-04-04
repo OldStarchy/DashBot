@@ -47,9 +47,7 @@ export class NumberGameInteraction implements Interaction {
 			return;
 		}
 
-		const content = message.textContent;
-		const channel = message.channel;
-		const author = message.author;
+		const { textContent, channel, author } = message;
 
 		const session = this._sessionStore.getSession(message);
 		const sessionData = session.getData(
@@ -57,7 +55,7 @@ export class NumberGameInteraction implements Interaction {
 		);
 
 		if (sessionData.playing === false) {
-			if (/^i want to guess a number$/i.test(content)) {
+			if (/^i want to guess a number$/i.test(textContent)) {
 				event.cancel();
 
 				const number = Math.floor(Math.random() * 99) + 1;
@@ -72,7 +70,7 @@ export class NumberGameInteraction implements Interaction {
 				session.setData(sessionData);
 			}
 		} else {
-			if (/^\d+$/.test(content)) {
+			if (/^\d+$/.test(textContent)) {
 				const tracery = new Tracery({
 					...NumberGuessGrammar,
 					target: author,
@@ -80,7 +78,7 @@ export class NumberGameInteraction implements Interaction {
 
 				event.cancel();
 
-				const guess = Number.parseInt(content);
+				const guess = Number.parseInt(textContent);
 
 				if (guess < sessionData.number) {
 					const response = tracery.generate('higher');

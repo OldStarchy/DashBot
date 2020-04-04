@@ -57,9 +57,7 @@ export class HelpCommand implements Command, Interaction {
 	): Promise<void> {
 		if (message == null) return;
 
-		const content = message.textContent;
-		const channel = message.channel;
-		const author = message.author;
+		const { textContent, channel, author } = message;
 
 		const helpRegex = /^(\!?help)$/;
 		const sessionStore = this._session.getSession(message);
@@ -73,7 +71,7 @@ export class HelpCommand implements Command, Interaction {
 				})
 		);
 
-		if (helpRegex.test(content)) {
+		if (helpRegex.test(textContent)) {
 			channel.sendText(tracery().generate('help'));
 
 			session.sentMessageTime = Date.now();
@@ -88,7 +86,7 @@ export class HelpCommand implements Command, Interaction {
 			session.pendingAnswer &&
 			Date.now() - session.sentMessageTime < thirtyMinutes
 		) {
-			if (regex.yes.test(content)) {
+			if (regex.yes.test(textContent)) {
 				const dmChannel = await author
 					.getPerson()
 					.getPrivateTextChannel(author.server);
@@ -103,7 +101,7 @@ export class HelpCommand implements Command, Interaction {
 				}
 
 				session.pendingAnswer = false;
-			} else if (regex.no.test(content)) {
+			} else if (regex.no.test(textContent)) {
 				await channel.sendText(tracery().generate('ok-no'));
 				session.pendingAnswer = false;
 			} else {

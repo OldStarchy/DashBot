@@ -22,11 +22,10 @@ export class DieInteraction implements Interaction {
 
 	async onMessage(event: Event<Message>) {
 		const message = event.data;
-		const content = message.textContent;
-		const author = message.author;
-		const channel = message.channel;
 
-		const match = /^roll (d(-?\d+)|dice)$/i.exec(content);
+		const { textContent, author, channel } = message;
+
+		const match = /^roll (d(-?\d+)|dice)$/i.exec(textContent);
 
 		if (match) {
 			event.cancel();
@@ -77,14 +76,14 @@ export class DieInteraction implements Interaction {
 			return;
 		}
 
-		if (/^roll (d(-?\d+)e\d+)$/i.test(content)) {
+		if (/^roll (d(-?\d+)e\d+)$/i.test(textContent)) {
 			event.cancel();
 			channel.sendText('get out of here with those silly numbers nerd');
 
 			return;
 		}
 
-		if (/(coin (toss|flip)|(toss|flip) coin)/i.test(content)) {
+		if (/(coin (toss|flip)|(toss|flip) coin)/i.test(textContent)) {
 			event.cancel();
 			const size = 11;
 			const result = Math.floor(Math.random() * size) + 1;

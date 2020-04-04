@@ -38,12 +38,10 @@ export class GreetInteraction implements Interaction {
 		const name = 'DashBot';
 		const regexString = `^(oh )?((hey|hi|hello),? )?(there )?(dash|${name})( ?bot)?!?`;
 		const message = event.data;
-		const author = message.author;
-		const content = message.textContent;
-		const channel = message.channel;
+		const { author, textContent, channel } = message;
 
 		const regexObj = new RegExp(regexString, 'i');
-		if (regexObj.test(content)) {
+		if (regexObj.test(textContent)) {
 			event.cancel();
 			const greeting = Tracery.generate(
 				{

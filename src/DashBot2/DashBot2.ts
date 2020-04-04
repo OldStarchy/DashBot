@@ -63,10 +63,10 @@ export class DashBot2 extends EventEmitter {
 			return;
 		}
 
-		const text = message.textContent;
+		const textContent = message.textContent;
 		try {
-			if (text.startsWith('!')) {
-				const parameters = parseArguments(text);
+			if (textContent.startsWith('!')) {
+				const parameters = parseArguments(textContent);
 
 				const name = parameters.shift()!.substr(1);
 
