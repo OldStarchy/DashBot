@@ -75,9 +75,7 @@ export class NumberGameInteraction implements Interaction {
 			if (/^\d+$/.test(content)) {
 				const tracery = new Tracery({
 					...NumberGuessGrammar,
-					target: {
-						username: author.username,
-					},
+					target: author,
 				});
 
 				event.cancel();

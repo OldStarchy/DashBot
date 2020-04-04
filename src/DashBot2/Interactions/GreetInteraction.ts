@@ -48,9 +48,7 @@ export class GreetInteraction implements Interaction {
 			const greeting = Tracery.generate(
 				{
 					...GreetingGrammar,
-					target: {
-						username: author.username,
-					},
+					target: author,
 				},
 				'greeting'
 			);

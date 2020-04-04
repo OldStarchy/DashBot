@@ -69,9 +69,7 @@ export class HelpCommand implements Command, Interaction {
 			() =>
 				new Tracery({
 					...HelpCommandGrammar,
-					target: {
-						username: author.username,
-					},
+					target: author,
 				})
 		);
 
