@@ -16,6 +16,7 @@ import JokeCommand, {
 import PetCommand from './DashBot2/Commands/PetCommand';
 import PollCommand from './DashBot2/Commands/PollCommand';
 import StatisticsCommand from './DashBot2/Commands/StatisticsCommand';
+import VersionCommand from './DashBot2/Commands/VersionCommand';
 import { DashBot2 } from './DashBot2/DashBot2';
 import DiscordServer from './DashBot2/Discord/DiscordServer';
 import IdentityService from './DashBot2/IdentityService';
@@ -197,6 +198,7 @@ bot.registerCommand('poll', new PollCommand());
 const petCommand = new PetCommand(storage);
 bot.registerCommand('pet', petCommand);
 bot.registerCommand('help', helpCommand);
+bot.registerCommand('version', new VersionCommand());
 statistics.register(petCommand);
 
 if (config.imgurClientId) {

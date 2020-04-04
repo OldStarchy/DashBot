@@ -226,7 +226,6 @@ export default class DashBot {
 		}
 
 		this.actions.push(
-			// new ABResponseAction(this, [['!version', getVersion()]]),
 			new (class extends Action {
 				async handle(message: Message) {
 					//TODO: Maybe check to see who's triggered a disconnect so not anyone can do it
