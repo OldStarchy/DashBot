@@ -1,4 +1,5 @@
 import Discord from 'discord.js';
+import { Logger } from 'winston';
 import deferred from '../../util/deferred';
 import AudioChannel from '../AudioChannel';
 import ChatServer, { ChatServerEvents } from '../ChatServer';
@@ -18,9 +19,13 @@ export default class DiscordServer
 	constructor(
 		private _discordClient: Discord.Client,
 		private _config: { botToken: string },
-		private _identityService: IdentityService
+		private _identityService: IdentityService,
+		private _logger: Logger
 	) {
-		this._discordClient.on('ready', () => this._loggedIn.resolve(this));
+		this._discordClient.on('ready', () => {
+			this._loggedIn.resolve(this);
+			this._logger.info('Logged in to discord');
+		});
 	}
 
 	get id() {

@@ -162,7 +162,7 @@ if (minecraftClient) {
 	const mcServer = new MinecraftServer(
 		minecraftClient,
 		rcon || null,
-		new StorageRegister('storage2.json', logger),
+		storage,
 		identityService
 	);
 	bot.addServer(mcServer);
@@ -172,7 +172,8 @@ if (minecraftClient) {
 const dcServer = new DiscordServer(
 	discordClient,
 	{ botToken: config.discordBotToken },
-	identityService
+	identityService,
+	logger
 );
 bot.addServer(dcServer);
 identityService.addProvider(dcServer);
