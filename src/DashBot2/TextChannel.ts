@@ -1,5 +1,5 @@
+import ChatServer from './ChatServer';
 import Message from './Message';
-import ChatServer from './Server';
 
 export default interface TextChannel {
 	readonly id: string;

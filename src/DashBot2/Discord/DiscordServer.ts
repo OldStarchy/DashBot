@@ -1,9 +1,9 @@
 import Discord from 'discord.js';
 import deferred from '../../util/deferred';
 import AudioChannel from '../AudioChannel';
+import ChatServer, { ChatServerEvents } from '../ChatServer';
 import Identity from '../Identity';
 import IdentityService from '../IdentityService';
-import ChatServer, { ChatServerEvents } from '../Server';
 import TextChannel from '../TextChannel';
 import DiscordIdentity from './DiscordIdentity';
 import DiscordMessage from './DiscordMessage';

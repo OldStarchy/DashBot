@@ -1,8 +1,8 @@
 import StorageRegister, { PersistentData } from '../StorageRegister';
+import ChatServer from './ChatServer';
 import { Event } from './Events';
 import Identity from './Identity';
 import Person from './Person';
-import ChatServer from './Server';
 
 export interface PersonIdentityMap {
 	identities: { [serverId: string]: string };

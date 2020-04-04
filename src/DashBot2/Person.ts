@@ -1,5 +1,5 @@
+import ChatServer from './ChatServer';
 import Identity from './Identity';
-import ChatServer from './Server';
 
 export default class Person {
 	constructor(private readonly _identities: Record<string, Identity>) {}

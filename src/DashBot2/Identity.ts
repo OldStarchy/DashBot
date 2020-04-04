@@ -1,5 +1,5 @@
+import ChatServer from './ChatServer';
 import Person from './Person';
-import ChatServer from './Server';
 import TextChannel from './TextChannel';
 
 export default interface Identity {

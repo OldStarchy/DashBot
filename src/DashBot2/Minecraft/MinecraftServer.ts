@@ -1,8 +1,8 @@
 import Rcon from 'modern-rcon';
 import MinecraftLogClient from '../../MinecraftLogClient/MinecraftLogClient';
 import StorageRegister from '../../StorageRegister';
+import ChatServer, { ChatServerEvents } from '../ChatServer';
 import IdentityService from '../IdentityService';
-import ChatServer, { ChatServerEvents } from '../Server';
 import MinecraftIdentity from './MinecraftIdentity';
 import MinecraftIdentityCache from './MinecraftIdentityCache';
 import MinecraftMessage from './MinecraftMessage';
