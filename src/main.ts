@@ -112,7 +112,7 @@ if (config.minecraft) {
 							cluster: false,
 							package: {
 								name: 'dashbot',
-								version: '1.0.0',
+								version: getVersion(),
 							},
 						},
 						whitelist: config.minecraft.logClient.whitelist,
