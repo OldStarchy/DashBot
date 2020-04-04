@@ -2,8 +2,9 @@ import StorageRegister from '../../StorageRegister';
 import { Tracery } from '../../tracery/Tracery';
 import { DashBot2 } from '../DashBot2';
 import { Event } from '../Events';
+import Interaction from '../Interaction';
 import Message from '../Message';
-import { OngoingInteraction } from './OngoingInteraction';
+import SessionStore from '../SessionStore';
 
 interface NumberGameState {
 	playing: boolean;
@@ -23,19 +24,17 @@ const NumberGuessGrammar = {
 /**
  * Plays the "I'm thinking of a number" game, currently it only thinks of a number, but does not guess your number.
  */
-export class NumberGameInteraction extends OngoingInteraction<NumberGameState> {
+export class NumberGameInteraction implements Interaction {
 	private static readonly defaultState: Readonly<NumberGameState> = {
 		playing: false,
 		number: 0,
 		guesses: 0,
 	};
 
+	private sessionStore: SessionStore<NumberGameState>;
+
 	constructor(storage: StorageRegister) {
-		super(
-			storage.createStore<Record<string, NumberGameState>>(
-				'NumberGameInteraction'
-			)
-		);
+		this.sessionStore = new SessionStore(storage);
 	}
 
 	register(bot: DashBot2) {
@@ -52,12 +51,12 @@ export class NumberGameInteraction extends OngoingInteraction<NumberGameState> {
 		const channel = message.getChannel();
 		const author = message.getAuthor();
 
-		const session = this.getSession(
-			message,
+		const session = this.sessionStore.getSession(message);
+		const sessionData = session.getData(
 			() => NumberGameInteraction.defaultState
 		);
 
-		if (session.playing === false) {
+		if (sessionData.playing === false) {
 			if (/^i want to guess a number$/i.test(content)) {
 				event.cancel();
 
@@ -66,11 +65,12 @@ export class NumberGameInteraction extends OngoingInteraction<NumberGameState> {
 				channel.sendText(
 					`OK, @${author.getName()}, I'm thinking of a number between 1 and 100, inclusive`
 				);
-				session.playing = true;
-				session.number = number;
-				session.guesses = 0;
+				sessionData.playing = true;
+				sessionData.number = number;
+				sessionData.guesses = 0;
+
+				session.setData(sessionData);
 			}
-			return;
 		} else {
 			if (/^\d+$/.test(content)) {
 				const tracery = new Tracery({
@@ -84,30 +84,22 @@ export class NumberGameInteraction extends OngoingInteraction<NumberGameState> {
 
 				const guess = Number.parseInt(content);
 
-				if (guess < session.number) {
+				if (guess < sessionData.number) {
 					const response = tracery.generate('higher');
 					channel.sendText(response);
-					session.guesses++;
-
-					return;
-				}
-
-				if (guess > session.number) {
+					sessionData.guesses++;
+				} else if (guess > sessionData.number) {
 					const response = tracery.generate('lower');
 					channel.sendText(response);
-					session.guesses++;
-
-					return;
-				}
-
-				if (guess === session.number) {
+					sessionData.guesses++;
+				} else if (guess === sessionData.number) {
 					channel.sendText(
-						`You win, you made ${session.guesses} guesses. Well done, you're parents must be proud.`
+						`You win, you made ${sessionData.guesses} guesses. Well done, you're parents must be proud.`
 					);
-					session.playing = false;
-
-					return;
+					sessionData.playing = false;
 				}
+
+				session.setData(sessionData);
 			}
 		}
 	}

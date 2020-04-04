@@ -10,13 +10,11 @@ import { ChatMessage } from './MinecraftLogClient/ChatMessage';
 import { LogInOutMessage } from './MinecraftLogClient/LogInOutMessage';
 import { MinecraftLogClient } from './MinecraftLogClient/MinecraftLogClient';
 import { RconChat } from './Rcon/RconChat';
-import StorageRegister, { PersistentData } from './StorageRegister';
 import { sleep } from './util/sleep';
 
 export interface DashBotOptions {
 	client: Client;
 	config: DashBotConfig;
-	storage: StorageRegister;
 	logger: Logger;
 	minecraftClient?: MinecraftLogClient;
 	rcon?: Rcon;
@@ -27,7 +25,7 @@ interface DashBotData {
 }
 
 export default class DashBot {
-	public readonly storage: StorageRegister;
+	// public readonly storage: StorageRegister;
 	public readonly client: Client;
 	public readonly config: DashBotConfig;
 	public readonly logger: Logger;
@@ -36,7 +34,7 @@ export default class DashBot {
 
 	private actions: Action[] = [];
 
-	private readonly store: PersistentData<DashBotData>;
+	// private readonly store: PersistentData<DashBotData>;
 
 	private _minecraftRelayChannelId: string | null = null;
 	private _minecraftRelayChannel: TextChannel | null = null;
@@ -44,19 +42,17 @@ export default class DashBot {
 	constructor({
 		client,
 		config,
-		storage,
 		logger,
 		minecraftClient,
 		rcon,
 	}: DashBotOptions) {
 		this.client = client;
 		this.config = config;
-		this.storage = storage;
 		this.logger = logger;
 		this.minecraftClient = minecraftClient;
 		this.rcon = rcon;
 
-		this.store = storage.createStore('DashBot');
+		// this.store = storage.createStore('DashBot');
 		// this.store.on('dataLoaded', this.onReadData.bind(this));
 
 		this.bindEvents();
@@ -83,9 +79,9 @@ export default class DashBot {
 	private setMinecraftRelayChannel(channel: TextChannel | null) {
 		this._minecraftRelayChannelId = channel?.id || null;
 		this._minecraftRelayChannel = channel;
-		this.store.setData({
-			minecraftRelayChannelId: this._minecraftRelayChannelId,
-		});
+		// this.store.setData({
+		// 	minecraftRelayChannelId: this._minecraftRelayChannelId,
+		// });
 	}
 
 	// public onReadData(data: DashBotData | undefined) {

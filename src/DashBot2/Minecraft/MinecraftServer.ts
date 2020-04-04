@@ -1,20 +1,26 @@
 import Rcon from 'modern-rcon';
 import { MinecraftLogClient } from '../../MinecraftLogClient/MinecraftLogClient';
-import Person from '../Person';
+import StorageRegister from '../../StorageRegister';
+import IdentityService from '../IdentityService';
 import ChatServer from '../Server';
+import MinecraftIdentity from './MinecraftIdentity';
 import MinecraftIdentityCache from './MinecraftIdentityCache';
 import MinecraftMessage from './MinecraftMessage';
 import MinecraftTextChannel from './MinecraftTextChannel';
 
-export default class MinecraftServer implements ChatServer {
+export default class MinecraftServer
+	implements ChatServer<MinecraftIdentity, MinecraftTextChannel> {
 	private textChannel: MinecraftTextChannel;
+	private identityCache: MinecraftIdentityCache;
 
 	constructor(
 		private logReader: MinecraftLogClient,
 		private rcon: Rcon | null,
-		private identityCache: MinecraftIdentityCache
+		storage: StorageRegister,
+		private identityService: IdentityService
 	) {
 		this.textChannel = new MinecraftTextChannel(this, this.rcon);
+		this.identityCache = new MinecraftIdentityCache(this, storage);
 	}
 
 	async getTextChannels() {
@@ -42,12 +48,11 @@ export default class MinecraftServer implements ChatServer {
 		//TODO: other events
 	}
 
-	getPrivateChatChannel(person: Person) {
-		//TODO: this
+	async getPrivateTextChannel(): Promise<null> {
 		return null;
 	}
 
-	getName() {
+	getId() {
 		return 'Minecraft';
 	}
 
@@ -63,5 +68,9 @@ export default class MinecraftServer implements ChatServer {
 
 	getIdentityById(id: string) {
 		return this.identityCache.getById(id);
+	}
+
+	getIdentityService() {
+		return this.identityService;
 	}
 }

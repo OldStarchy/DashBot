@@ -23,8 +23,19 @@ export class PersistentData<TData> extends EventEmitter
 		this.register.setData(this.name, data);
 	}
 
-	getData(): TData | undefined {
-		return this.register.getData(this.name) as TData;
+	getData(def: () => TData): TData;
+	getData(): TData | undefined;
+	getData(def?: () => TData) {
+		const data = this.register.getData(this.name) as TData | undefined;
+
+		if (data == undefined) {
+			if (def) {
+				this.setData(def());
+				return this.register.getData(this.name);
+			}
+		}
+
+		return data;
 	}
 
 	on(event: 'dataLoaded', handler: EventHandler<TData>): void {
@@ -76,17 +87,21 @@ export default class StorageRegister {
 		this.load();
 	}
 
-	createStore<T>(key: string) {
+	createStore<T>(key: string, bindEvents = true) {
 		const store = new PersistentData<T>(key, this);
-		this.stores[key] = store;
 
-		if (this.data[key]) {
-			try {
-				store.emit(new Event('dataLoaded', this.data[key] as T));
-			} catch (e) {
-				this.logger.error(e);
+		if (bindEvents) {
+			this.stores[key] = store;
+
+			if (this.data[key]) {
+				try {
+					store.emit(new Event('dataLoaded', this.data[key] as T));
+				} catch (e) {
+					this.logger.error(e);
+				}
 			}
 		}
+
 		return store;
 	}
 

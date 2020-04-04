@@ -1,18 +1,22 @@
 import Discord from 'discord.js';
-import Person from '../Person';
+import Identity from '../Identity';
+import IdentityService from '../IdentityService';
 import ChatServer from '../Server';
+import TextChannel from '../TextChannel';
 import DiscordIdentity from './DiscordIdentity';
 import DiscordMessage from './DiscordMessage';
 import DiscordTextChannel from './DiscordTextChannel';
 
-export default class DiscordServer implements ChatServer {
+export default class DiscordServer
+	implements ChatServer<DiscordIdentity, DiscordTextChannel> {
 	private channelCache: Record<string, DiscordTextChannel> = {};
 	constructor(
 		private discordClient: Discord.Client,
-		private config: { botToken: string }
+		private config: { botToken: string },
+		private identityService: IdentityService
 	) {}
 
-	getName() {
+	getId() {
 		return 'Discord';
 	}
 
@@ -73,13 +77,29 @@ export default class DiscordServer implements ChatServer {
 		return [];
 	}
 
-	getPrivateChatChannel(person: Person) {
+	async getPrivateTextChannel(
+		identity: DiscordIdentity
+	): Promise<DiscordTextChannel>;
+	async getPrivateTextChannel(
+		identity: Identity
+	): Promise<TextChannel | null> {
+		if (identity instanceof DiscordIdentity) {
+			const dm = await identity.getDiscordUser().createDM();
+
+			return new DiscordTextChannel(this, dm);
+		}
+
 		return null;
 	}
 
 	getIdentityById(id: string) {
 		return new DiscordIdentity(
+			this,
 			this.discordClient.users.find(user => user.id === id)
 		);
+	}
+
+	getIdentityService() {
+		return this.identityService;
 	}
 }

@@ -8,6 +8,7 @@ import { dirname, join, resolve } from 'path';
 import winston from 'winston';
 import { DashBotOptions } from './DashBot';
 import HaikuCommand from './DashBot2/Commands/HaikuCommand';
+import { HelpCommand } from './DashBot2/Commands/HelpCommand';
 import ImgurCommand, { ImgurClient } from './DashBot2/Commands/ImgurCommand';
 import JokeCommand, {
 	ICanHazDadJokeClient,
@@ -17,12 +18,11 @@ import PollCommand from './DashBot2/Commands/PollCommand';
 import StatisticsCommand from './DashBot2/Commands/StatisticsCommand';
 import { DashBot2 } from './DashBot2/DashBot2';
 import DiscordServer from './DashBot2/Discord/DiscordServer';
+import IdentityService from './DashBot2/IdentityService';
 import { DieInteraction } from './DashBot2/Interactions/DieInteraction';
 import { GreetInteraction } from './DashBot2/Interactions/GreetInteraction';
 import { NumberGameInteraction } from './DashBot2/Interactions/NumberGameInteraction';
-import MinecraftIdentityCache from './DashBot2/Minecraft/MinecraftIdentityCache';
 import MinecraftServer from './DashBot2/Minecraft/MinecraftServer';
-import ChatServer from './DashBot2/Server';
 import UptimeTrackerStatistic from './DashBot2/Statistics/UptimeTrackerStatistic';
 import { getVersion } from './getVersion';
 import loadConfig from './loadConfig';
@@ -95,11 +95,8 @@ Storage.rootDir = storageDir;
 const options: DashBotOptions = {
 	config,
 	client: new DiscordClient(),
-	storage: new StorageRegister('storage.json', logger),
 	logger,
 };
-
-options.storage.watch();
 
 if (config.minecraft) {
 	if (config.minecraft.logClient) {
@@ -155,27 +152,30 @@ if (config.minecraft) {
 	}
 }
 
-const servers: ChatServer[] = [];
+const bot = new DashBot2(logger);
+const storage = new StorageRegister('storage.json', logger);
+const identityService = new IdentityService(storage);
+const statistics = new StatisticsTracker();
+storage.watch();
 
 if (options.minecraftClient) {
-	servers.push(
-		new MinecraftServer(
-			options.minecraftClient,
-			options.rcon || null,
-			new MinecraftIdentityCache(
-				logger,
-				new StorageRegister('storage2.json', logger)
-			)
-		)
+	const mcServer = new MinecraftServer(
+		options.minecraftClient,
+		options.rcon || null,
+		new StorageRegister('storage2.json', logger),
+		identityService
 	);
+	bot.addServer(mcServer);
+	identityService.addProvider(mcServer);
 }
 
-servers.push(
-	new DiscordServer(options.client, { botToken: config.discordBotToken })
+const dcServer = new DiscordServer(
+	options.client,
+	{ botToken: config.discordBotToken },
+	identityService
 );
-
-const bot = new DashBot2(logger, servers);
-const statistics = new StatisticsTracker();
+bot.addServer(dcServer);
+identityService.addProvider(dcServer);
 
 statistics.register(new UptimeTrackerStatistic(bot));
 statistics.register({
@@ -188,12 +188,14 @@ statistics.register({
 		];
 	},
 });
+const helpCommand = new HelpCommand(storage);
 bot.registerCommand('stats', new StatisticsCommand(statistics));
 bot.registerCommand('joke', new JokeCommand(new ICanHazDadJokeClient()));
 bot.registerCommand('haiku', new HaikuCommand());
 bot.registerCommand('poll', new PollCommand());
-const petCommand = new PetCommand(options.storage);
+const petCommand = new PetCommand(storage);
 bot.registerCommand('pet', petCommand);
+bot.registerCommand('help', helpCommand);
 statistics.register(petCommand);
 
 if (config.imgurClientId) {
@@ -203,9 +205,10 @@ if (config.imgurClientId) {
 	);
 }
 
-new NumberGameInteraction(options.storage).register(bot);
+new NumberGameInteraction(storage).register(bot);
 new GreetInteraction().register(bot);
 new DieInteraction().register(bot);
+helpCommand.register(bot);
 // const bot = new DashBot(options);
 
 bot.connect();

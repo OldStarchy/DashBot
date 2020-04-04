@@ -1,17 +1,16 @@
-import { Logger } from 'winston';
 import StorageRegister, { PersistentData } from '../../StorageRegister';
-import { Event } from '../Events';
-import IdentityProvider from '../IdentityProvider';
+import { Event, EventEmitter, EventHandler } from '../Events';
 import MinecraftIdentity from './MinecraftIdentity';
+import MinecraftServer from './MinecraftServer';
 
-export default class MinecraftIdentityCache
-	implements IdentityProvider<MinecraftIdentity> {
+export default class MinecraftIdentityCache extends EventEmitter {
 	private cache: {
 		name: string;
 		id?: string;
 	}[] = [];
 	private store: PersistentData<MinecraftIdentityCache['cache']>;
-	constructor(private logger: Logger, storage: StorageRegister) {
+	constructor(private server: MinecraftServer, storage: StorageRegister) {
+		super();
 		this.store = storage.createStore('MinecraftIdentityCache');
 		this.store.on('dataLoaded', this.onDataLoaded.bind(this));
 	}
@@ -50,8 +49,12 @@ export default class MinecraftIdentityCache
 		const item = this.internalGetById(id);
 		if (item) {
 			if (item.name !== name) {
-				this.logger.info(
-					`Updated name for Minecraft ID ${id} from ${item.name} to ${name}`
+				this.emit(
+					new Event('identityChanged', {
+						id,
+						name,
+						oldName: item.name,
+					})
 				);
 			}
 			item.name = name;
@@ -68,7 +71,7 @@ export default class MinecraftIdentityCache
 	public getById(id: string) {
 		const item = this.internalGetById(id);
 		if (item === undefined) return null;
-		return new MinecraftIdentity(item.name, item.id);
+		return new MinecraftIdentity(this.server, item.name, item.id);
 	}
 	private internalGetByName(name: string) {
 		return this.cache.find(item => item.name === name);
@@ -76,6 +79,13 @@ export default class MinecraftIdentityCache
 	public getByName(name: string) {
 		const item = this.internalGetByName(name);
 		if (item === undefined) return null;
-		return new MinecraftIdentity(item.name, item.id);
+		return new MinecraftIdentity(this.server, item.name, item.id);
+	}
+
+	public on(
+		event: 'identityChanged',
+		handler: EventHandler<Record<'id' | 'name' | 'string', string>>
+	) {
+		super.on(event, handler);
 	}
 }

@@ -9,13 +9,15 @@ export class DashBot2 extends EventEmitter {
 	private commands: Record<string, Command> = {};
 	private startTime: number | null = null;
 	private stopTime: number | null = null;
+	private chatServers: ChatServer[] = [];
 
-	constructor(private logger: Logger, private chatServers: ChatServer[]) {
+	constructor(private logger: Logger) {
 		super();
+	}
 
-		for (const chatServer of this.chatServers) {
-			chatServer.on('message', this.onMessage.bind(this));
-		}
+	public addServer(chatServer: ChatServer) {
+		this.chatServers.push(chatServer);
+		chatServer.on('message', this.onMessage.bind(this));
 	}
 
 	public async connect() {
@@ -81,7 +83,9 @@ export class DashBot2 extends EventEmitter {
 			this.logger.error(
 				`Message "${message.getTextContent()}" caused an error`
 			);
-			this.logger.error(e);
+			if (e instanceof Error) {
+				this.logger.error(e.message);
+			}
 			await message.getChannel().sendText('Something broke :poop:');
 		}
 	}

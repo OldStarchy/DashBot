@@ -1,17 +1,22 @@
 import AudioChannel from './AudioChannel';
 import Identity from './Identity';
+import IdentityService from './IdentityService';
 import Message from './Message';
-import Person from './Person';
 import TextChannel from './TextChannel';
 
-export default interface ChatServer {
-	getName(): string;
+export default interface ChatServer<
+	TIdentity extends Identity = Identity,
+	TTextChannel extends TextChannel = TextChannel
+> {
+	getId(): string;
 	connect(): Promise<void>;
 	disconnect(): Promise<void>;
 	getAudioChannels(): Promise<AudioChannel[]>;
-	getTextChannels(): Promise<TextChannel[]>;
-	getPrivateChatChannel(person: Person): TextChannel | null;
-	getIdentityById(id: string): Identity | null;
+	getTextChannels(): Promise<TTextChannel[]>;
+	getPrivateTextChannel(person: TIdentity): Promise<TTextChannel | null>;
+	getIdentityById(id: string): TIdentity | null;
 	on(event: 'message', listener: (message: Message) => void): void;
 	on(event: string, listener: (...args: any[]) => void): void;
+
+	getIdentityService(): IdentityService;
 }
