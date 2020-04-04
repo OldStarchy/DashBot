@@ -297,4 +297,15 @@ describe('Tracery3', () => {
 
 		expect(result).to.equal('First line\nSecond line');
 	});
+
+	it('Should allow escaped control characters', () => {
+		const result = Tracery.generate(
+			{
+				origin: 'I like having \\# and \\[ symbols in my text',
+			},
+			'origin'
+		);
+
+		expect(result).to.equal('I like having # and [ symbols in my text');
+	});
 });

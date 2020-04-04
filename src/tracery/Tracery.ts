@@ -170,15 +170,15 @@ class Rule {
 		}[] = [
 			{
 				tokenName: 'reference',
-				regexp: /^\#(?<text>.*?)(?<ending>\#(?<!\\)|$)/, // Any text between a # and another unescaped #, or # and end of string
+				regexp: /^\#(?<text>.*?)(?<ending>\#|$)/, // Any text between a # and another unescaped #, or # and end of string
 			},
 			{
 				tokenName: 'assignment',
-				regexp: /^\[(?<variable>.*?)(:(?<!\\))(?<expression>[^]*?)(\](?<!\\)|$)/, // Any text between [ and a :, and between the : and an unescaped ], or between the : and end of string
+				regexp: /^\[(?<variable>.*?)(:)(?<expression>[^]*?)((?<!\\)\]|$)/, // Any text between [ and a :, and between the : and an unescaped ], or between the : and end of string
 			},
 			{
 				tokenName: 'plainText',
-				regexp: /^([^]*?)((\#|\[)(?<!\\)|$)/, // Any text up to an unescaped # or [
+				regexp: /^([^]*?)((?<!\\)(\#|\[)|$)/, // Any text up to an unescaped # or [
 			},
 		];
 
@@ -211,7 +211,7 @@ class Rule {
 
 			switch (tokenName) {
 				case 'plainText':
-					parts.push(textPart(match[1]));
+					parts.push(textPart(match[1].replace(/\\([#\[])/g, '$1')));
 					head += match[1].length;
 					break;
 				case 'assignment':
@@ -226,7 +226,13 @@ class Rule {
 						);
 					}
 
-					parts.push(varPart(variable, expression, this.tracery));
+					parts.push(
+						varPart(
+							variable,
+							expression.replace(/\\([#\[])/g, '$1'),
+							this.tracery
+						)
+					);
 
 					head += match[0].length;
 
