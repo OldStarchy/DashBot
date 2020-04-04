@@ -9,11 +9,11 @@ import DiscordTextChannel from './DiscordTextChannel';
 
 export default class DiscordServer
 	implements ChatServer<DiscordIdentity, DiscordTextChannel> {
-	private channelCache: Record<string, DiscordTextChannel> = {};
+	private _channelCache: Record<string, DiscordTextChannel> = {};
 	constructor(
-		private discordClient: Discord.Client,
-		private config: { botToken: string },
-		private identityService: IdentityService
+		private _discordClient: Discord.Client,
+		private _config: { botToken: string },
+		private _identityService: IdentityService
 	) {}
 
 	get id() {
@@ -21,17 +21,17 @@ export default class DiscordServer
 	}
 
 	async connect() {
-		await this.discordClient.login(this.config.botToken);
+		await this._discordClient.login(this._config.botToken);
 	}
 
 	async disconnect() {
-		await this.discordClient.destroy();
+		await this._discordClient.destroy();
 	}
 
 	on(event: string, listener: (...args: any[]) => void): this {
 		switch (event) {
 			case 'message':
-				this.discordClient.on(event, message =>
+				this._discordClient.on(event, message =>
 					listener(
 						new DiscordMessage(
 							this.getChannel(message.channel),
@@ -42,7 +42,7 @@ export default class DiscordServer
 				break;
 
 			default:
-				this.discordClient.on(event, listener);
+				this._discordClient.on(event, listener);
 				break;
 		}
 
@@ -57,14 +57,14 @@ export default class DiscordServer
 	) {
 		const id = internalChannel.id;
 
-		if (this.channelCache[id] === undefined) {
-			this.channelCache[id] = new DiscordTextChannel(
+		if (this._channelCache[id] === undefined) {
+			this._channelCache[id] = new DiscordTextChannel(
 				this,
 				internalChannel
 			);
 		}
 
-		return this.channelCache[id];
+		return this._channelCache[id];
 	}
 
 	async getAudioChannels() {
@@ -95,11 +95,11 @@ export default class DiscordServer
 	getIdentityById(id: string) {
 		return new DiscordIdentity(
 			this,
-			this.discordClient.users.find(user => user.id === id)
+			this._discordClient.users.find(user => user.id === id)
 		);
 	}
 
 	getIdentityService() {
-		return this.identityService;
+		return this._identityService;
 	}
 }

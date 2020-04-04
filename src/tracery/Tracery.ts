@@ -4,11 +4,11 @@ import { DefaultModifiersEn } from './default/modifiers-en';
 export type Modifier = (string: string, ...args: string[]) => string;
 
 export class Tracery<T extends Grammar = Grammar> {
-	private readonly rules: {
+	private readonly _rules: {
 		[ruleName: string]: Rule;
 	};
 
-	private readonly varStack: {
+	private readonly _varStack: {
 		[varName: string]: string;
 	}[];
 
@@ -19,13 +19,13 @@ export class Tracery<T extends Grammar = Grammar> {
 	public randomiser: () => number = Math.random;
 
 	constructor(grammar: T) {
-		this.rules = {};
-		this.varStack = [];
+		this._rules = {};
+		this._varStack = [];
 		this.modifiers = {};
 
 		for (const ruleName in grammar) {
 			if (grammar.hasOwnProperty(ruleName)) {
-				this.rules[ruleName] = new Rule(
+				this._rules[ruleName] = new Rule(
 					this,
 					ruleName,
 					grammar[ruleName]
@@ -66,10 +66,10 @@ export class Tracery<T extends Grammar = Grammar> {
 	}
 
 	setVar(name: string, val: string): void {
-		this.varStack[0][name] = val;
+		this._varStack[0][name] = val;
 	}
 	getVar(name: string): string | null {
-		for (const vars of this.varStack) {
+		for (const vars of this._varStack) {
 			if (typeof vars[name] === 'string') {
 				return vars[name];
 			}
@@ -78,14 +78,14 @@ export class Tracery<T extends Grammar = Grammar> {
 	}
 
 	pushVars(): void {
-		this.varStack.unshift({});
+		this._varStack.unshift({});
 	}
 	popVars(): void {
-		this.varStack.shift();
+		this._varStack.shift();
 	}
 
 	getRule(name: string): Rule {
-		return this.rules[name] || null;
+		return this._rules[name] || null;
 	}
 
 	modify(string: string, modifiers: string[]): string {
@@ -99,16 +99,14 @@ export class Tracery<T extends Grammar = Grammar> {
 
 type CompiledDefinition = (() => string) | object;
 class Rule {
-	private readonly compiledDefinition: CompiledDefinition;
-
-	// private parts: (() => string)[][] = [];
+	private readonly _compiledDefinition: CompiledDefinition;
 
 	public constructor(
-		private readonly tracery: Tracery<Grammar>,
+		private readonly _tracery: Tracery<Grammar>,
 		public readonly name: string | null,
-		private readonly definition: RuleDefinition
+		definition: RuleDefinition
 	) {
-		this.compiledDefinition = this.compileDefinition(definition);
+		this._compiledDefinition = this.compileDefinition(definition);
 	}
 
 	private compileDefinition(
@@ -124,7 +122,7 @@ class Rule {
 			case 'function':
 				return () => {
 					const functionResult = this.compileDefinition(
-						definition(this.tracery)
+						definition(this._tracery)
 					);
 
 					if (functionResult instanceof Function) {
@@ -143,7 +141,7 @@ class Rule {
 						const randomSubDefinition = selectRandom(
 							compiledArrayDefinitions,
 							null,
-							this.tracery.randomiser
+							this._tracery.randomiser
 						);
 
 						if (randomSubDefinition instanceof Function) {
@@ -230,7 +228,7 @@ class Rule {
 						varPart(
 							variable,
 							expression.replace(/\\([#\[])/g, '$1'),
-							this.tracery
+							this._tracery
 						)
 					);
 
@@ -247,7 +245,7 @@ class Rule {
 						throw new Error(`Unclosed # in "${string}"`);
 					}
 
-					parts.push(referencePart(text, this.tracery));
+					parts.push(referencePart(text, this._tracery));
 					head += match[0].length;
 					break;
 			}
@@ -256,11 +254,11 @@ class Rule {
 	}
 
 	public evaluate(modifiers: string[]): string {
-		this.tracery.pushVars();
+		this._tracery.pushVars();
 
-		const result = this.reduce(this.compiledDefinition, modifiers);
+		const result = this.reduce(this._compiledDefinition, modifiers);
 
-		this.tracery.popVars();
+		this._tracery.popVars();
 		return result;
 	}
 
@@ -330,10 +328,10 @@ class Rule {
 	): string {
 		switch (typeof definition) {
 			case 'string':
-				return this.tracery.modify(definition, modifiers);
+				return this._tracery.modify(definition, modifiers);
 
 			case 'number':
-				return this.tracery.modify(definition.toString(), modifiers);
+				return this._tracery.modify(definition.toString(), modifiers);
 
 			case 'function':
 				return this.reduce(definition(), modifiers);

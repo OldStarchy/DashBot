@@ -4,24 +4,24 @@ import DiscordServer from './DiscordServer';
 
 export default class DiscordIdentity implements Identity {
 	constructor(
-		private readonly server: DiscordServer,
-		private readonly person: Discord.User
+		private readonly _server: DiscordServer,
+		private readonly _person: Discord.User
 	) {}
 
 	get id() {
-		return this.person.id;
+		return this._person.id;
 	}
 
 	get username() {
-		return this.person.username;
+		return this._person.username;
 	}
 
 	getIsBot() {
-		return this.person.bot;
+		return this._person.bot;
 	}
 
 	getDiscordUser() {
-		return this.person;
+		return this._person;
 	}
 
 	getPerson() {
@@ -35,6 +35,6 @@ export default class DiscordIdentity implements Identity {
 	}
 
 	getServer() {
-		return this.server;
+		return this._server;
 	}
 }

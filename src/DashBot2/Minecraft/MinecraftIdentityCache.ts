@@ -4,17 +4,17 @@ import MinecraftIdentity from './MinecraftIdentity';
 import MinecraftServer from './MinecraftServer';
 
 export default class MinecraftIdentityCache extends EventEmitter {
-	private cache: {
+	private _cache: {
 		name: string;
 		id?: string;
 	}[] = [];
-	private store: PersistentData<MinecraftIdentityCache['cache']>;
+	private _store: PersistentData<MinecraftIdentityCache['_cache']>;
 	constructor(private server: MinecraftServer, storage: StorageRegister) {
 		super();
-		this.store = storage.createStore('MinecraftIdentityCache');
-		this.store.on('dataLoaded', this.onDataLoaded.bind(this));
+		this._store = storage.createStore('MinecraftIdentityCache');
+		this._store.on('dataLoaded', this.onDataLoaded.bind(this));
 	}
-	private verifyCacheItem(item: MinecraftIdentityCache['cache'][number]) {
+	private verifyCacheItem(item: MinecraftIdentityCache['_cache'][number]) {
 		const ton = typeof item.name;
 		const toi = typeof item.id;
 		return (
@@ -24,7 +24,7 @@ export default class MinecraftIdentityCache extends EventEmitter {
 		);
 	}
 	private onDataLoaded(
-		event: Event<MinecraftIdentityCache['cache'] | undefined>
+		event: Event<MinecraftIdentityCache['_cache'] | undefined>
 	) {
 		const data = event.data;
 		if (data && typeof data == 'object' && data instanceof Array) {
@@ -36,12 +36,12 @@ export default class MinecraftIdentityCache extends EventEmitter {
 		}
 	}
 	private write() {
-		this.store.setData(this.cache);
+		this._store.setData(this._cache);
 	}
 	public add({ name, id }: { name: string; id?: string }) {
 		if (id === undefined) {
 			if (this.internalGetByName(name) === undefined) {
-				this.cache.push({ name, id });
+				this._cache.push({ name, id });
 				this.write();
 			}
 			return;
@@ -61,12 +61,12 @@ export default class MinecraftIdentityCache extends EventEmitter {
 			this.write();
 			return;
 		}
-		this.cache.push({ name, id });
+		this._cache.push({ name, id });
 		this.write();
 		return;
 	}
 	private internalGetById(id: string) {
-		return this.cache.find(item => item.id === id);
+		return this._cache.find(item => item.id === id);
 	}
 	public getById(id: string) {
 		const item = this.internalGetById(id);
@@ -74,7 +74,7 @@ export default class MinecraftIdentityCache extends EventEmitter {
 		return new MinecraftIdentity(this.server, item.name, item.id);
 	}
 	private internalGetByName(name: string) {
-		return this.cache.find(item => item.name === name);
+		return this._cache.find(item => item.name === name);
 	}
 	public getByName(name: string) {
 		const item = this.internalGetByName(name);

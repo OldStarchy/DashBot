@@ -39,15 +39,15 @@ interface HelpCommandSession {
  * Placeholder help action supposed to give people hints as to what DashBot can do, however due to the "conversational"-like invocation phrases I feel like it doesn't really make sense to just list all the "commands" so not much work has been put in this.
  */
 export class HelpCommand implements Command, Interaction {
-	private static defaultSession: Readonly<HelpCommandSession> = {
+	private static readonly defaultSession: Readonly<HelpCommandSession> = {
 		pendingAnswer: false,
 		sentMessageTime: 0,
 	};
 
-	private readonly session: SessionStore<HelpCommandSession>;
+	private readonly _session: SessionStore<HelpCommandSession>;
 
 	constructor(private storage: StorageRegister) {
-		this.session = new SessionStore(storage);
+		this._session = new SessionStore(storage);
 	}
 
 	async run(
@@ -62,7 +62,7 @@ export class HelpCommand implements Command, Interaction {
 		const author = message.author;
 
 		const helpRegex = /^(\!?help)$/;
-		const sessionStore = this.session.getSession(message);
+		const sessionStore = this._session.getSession(message);
 		const session = sessionStore.getData(() => HelpCommand.defaultSession);
 
 		const tracery = lazy(

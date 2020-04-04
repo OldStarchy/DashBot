@@ -14,24 +14,24 @@ export interface DataStore<TData> {
 export class PersistentData<TData> extends EventEmitter
 	implements DataStore<TData> {
 	constructor(
-		private readonly name: string,
-		private readonly register: StorageRegister
+		private readonly _name: string,
+		private readonly _register: StorageRegister
 	) {
 		super();
 	}
 	setData(data: TData): void {
-		this.register.setData(this.name, data);
+		this._register.setData(this._name, data);
 	}
 
 	getData(def: () => TData): TData;
 	getData(): TData | undefined;
 	getData(def?: () => TData) {
-		const data = this.register.getData(this.name) as TData | undefined;
+		const data = this._register.getData(this._name) as TData | undefined;
 
 		if (data == undefined) {
 			if (def) {
 				this.setData(def());
-				return this.register.getData(this.name);
+				return this._register.getData(this._name);
 			}
 		}
 
@@ -48,42 +48,42 @@ export class PersistentData<TData> extends EventEmitter
 }
 
 export default class StorageRegister {
-	private storage: Storage<Record<string, unknown>>;
-	private stores: Record<string, PersistentData<unknown>> = {};
-	private data: Record<string, unknown> = {};
-	private fileWatcher: fs.FSWatcher | null = null;
-	private changeTimeout: NodeJS.Timeout | null = null;
+	private _storage: Storage<Record<string, unknown>>;
+	private _stores: Record<string, PersistentData<unknown>> = {};
+	private _data: Record<string, unknown> = {};
+	private _fileWatcher: fs.FSWatcher | null = null;
+	private _changeTimeout: NodeJS.Timeout | null = null;
 
-	constructor(file: string, private readonly logger: Logger) {
-		this.storage = new Storage(file, () => ({}));
+	constructor(file: string, private readonly _logger: Logger) {
+		this._storage = new Storage(file, () => ({}));
 
 		this.load();
 	}
 
 	watch() {
-		if (this.fileWatcher === null) {
-			this.fileWatcher = fs.watch(
-				this.storage.file,
+		if (this._fileWatcher === null) {
+			this._fileWatcher = fs.watch(
+				this._storage.file,
 				this.onChange.bind(this)
 			);
 		}
 	}
 
 	stopWatching() {
-		this.fileWatcher?.close();
-		this.fileWatcher = null;
+		this._fileWatcher?.close();
+		this._fileWatcher = null;
 	}
 
 	private onChange(/* event: string, filename: string */) {
-		if (this.changeTimeout !== null) {
-			clearTimeout(this.changeTimeout);
+		if (this._changeTimeout !== null) {
+			clearTimeout(this._changeTimeout);
 		}
 
-		this.changeTimeout = setTimeout(this.onChangeTimeout.bind(this), 2000);
+		this._changeTimeout = setTimeout(this.onChangeTimeout.bind(this), 2000);
 	}
 
 	private onChangeTimeout() {
-		this.changeTimeout = null;
+		this._changeTimeout = null;
 		this.load();
 	}
 
@@ -91,13 +91,13 @@ export default class StorageRegister {
 		const store = new PersistentData<T>(key, this);
 
 		if (bindEvents) {
-			this.stores[key] = store;
+			this._stores[key] = store;
 
-			if (this.data[key]) {
+			if (this._data[key]) {
 				try {
-					store.emit(new Event('dataLoaded', this.data[key] as T));
+					store.emit(new Event('dataLoaded', this._data[key] as T));
 				} catch (e) {
-					this.logger.error(e);
+					this._logger.error(e);
 				}
 			}
 		}
@@ -106,17 +106,17 @@ export default class StorageRegister {
 	}
 
 	load() {
-		this.data = this.storage.getData();
+		this._data = this._storage.getData();
 
-		for (const key in this.stores) {
-			if (this.stores.hasOwnProperty(key)) {
-				const store = this.stores[key];
+		for (const key in this._stores) {
+			if (this._stores.hasOwnProperty(key)) {
+				const store = this._stores[key];
 
-				if (this.data[key]) {
+				if (this._data[key]) {
 					try {
-						store.emit(new Event('dataLoaded', this.data[key]));
+						store.emit(new Event('dataLoaded', this._data[key]));
 					} catch (e) {
-						this.logger.error(e);
+						this._logger.error(e);
 					}
 				}
 			}
@@ -124,12 +124,12 @@ export default class StorageRegister {
 	}
 
 	setData(key: string, data: unknown) {
-		this.data[key] = data;
+		this._data[key] = data;
 
-		this.storage.setData(this.data);
+		this._storage.setData(this._data);
 	}
 
 	getData(key: string) {
-		return this.data[key];
+		return this._data[key];
 	}
 }

@@ -4,7 +4,7 @@ import path from 'path';
 export default class Storage<T extends {}> {
 	public static rootDir = '.';
 
-	constructor(public readonly file: string, private readonly def: () => T) {
+	constructor(public readonly file: string, private readonly _def: () => T) {
 		if (path.isAbsolute(file)) {
 			this.file = file;
 		} else {
@@ -17,12 +17,12 @@ export default class Storage<T extends {}> {
 			try {
 				return JSON.parse(fs.readFileSync(this.file, 'utf8'));
 			} catch (e) {
-				const data = this.def();
+				const data = this._def();
 				this.internalWrite(data);
 				return data;
 			}
 		} else {
-			const data = this.def();
+			const data = this._def();
 			this.internalWrite(data);
 			return data;
 		}

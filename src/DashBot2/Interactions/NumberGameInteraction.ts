@@ -31,10 +31,10 @@ export class NumberGameInteraction implements Interaction {
 		guesses: 0,
 	};
 
-	private sessionStore: SessionStore<NumberGameState>;
+	private _sessionStore: SessionStore<NumberGameState>;
 
 	constructor(storage: StorageRegister) {
-		this.sessionStore = new SessionStore(storage);
+		this._sessionStore = new SessionStore(storage);
 	}
 
 	register(bot: DashBot2) {
@@ -51,7 +51,7 @@ export class NumberGameInteraction implements Interaction {
 		const channel = message.channel;
 		const author = message.author;
 
-		const session = this.sessionStore.getSession(message);
+		const session = this._sessionStore.getSession(message);
 		const sessionData = session.getData(
 			() => NumberGameInteraction.defaultState
 		);

@@ -29,7 +29,7 @@ export default class DashBot {
 	public readonly minecraftClient?: MinecraftLogClient;
 	public readonly rcon?: Rcon;
 
-	private actions: Action[] = [];
+	private _actions: Action[] = [];
 
 	// private readonly store: PersistentData<DashBotData>;
 
@@ -125,7 +125,7 @@ export default class DashBot {
 		if (message.author.bot) return;
 
 		try {
-			for (const action of this.actions) {
+			for (const action of this._actions) {
 				const result = await action.handle(message);
 
 				if (ActionResult.isHandled(result)) return;
@@ -170,7 +170,7 @@ export default class DashBot {
 
 	private initActions(): void {
 		if (this.minecraftClient) {
-			this.actions.push(
+			this._actions.push(
 				new (class extends Action {
 					async handle(message: Message) {
 						if (message.content == '!minecraft') {
@@ -202,7 +202,7 @@ export default class DashBot {
 			);
 
 			if (this.rcon) {
-				this.actions.push(
+				this._actions.push(
 					new (class extends Action {
 						async handle(message: Message) {
 							const relayChannel = await this.bot.getMinecraftRelayChannel();
@@ -225,7 +225,7 @@ export default class DashBot {
 			}
 		}
 
-		this.actions.push(
+		this._actions.push(
 			new (class extends Action {
 				async handle(message: Message) {
 					//TODO: Maybe check to see who's triggered a disconnect so not anyone can do it

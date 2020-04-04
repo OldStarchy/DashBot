@@ -1,10 +1,10 @@
 import { StatisticProvider } from '../../StatisticsTracker';
 
 export default class UptimeTrackerStatistic implements StatisticProvider {
-	constructor(private target: { getUptime: () => number }) {}
+	constructor(private _target: { getUptime: () => number }) {}
 
 	async getStatistics() {
-		let seconds = this.target.getUptime() / 1000;
+		let seconds = this._target.getUptime() / 1000;
 		let minutes = Math.floor(seconds / 60);
 		seconds -= minutes * 60;
 		let hours = Math.floor(minutes / 60);

@@ -9,29 +9,29 @@ interface MinecraftTailLogClientOptions extends MinecraftLogClientOptions {
 }
 
 export class MinecraftTailLogClient extends MinecraftLogClient {
-	private readonly logFilePath: string;
-	private tail: Tail | null = null;
+	private readonly _logFilePath: string;
+	private _tail: Tail | null = null;
 
 	constructor(options: MinecraftTailLogClientOptions) {
 		super(options);
-		this.logFilePath = options.logFilePath;
+		this._logFilePath = options.logFilePath;
 	}
 
 	start() {
-		if (this.tail === null) {
-			this.tail = new Tail(this.logFilePath, {
+		if (this._tail === null) {
+			this._tail = new Tail(this._logFilePath, {
 				follow: true,
 			});
 
-			this.tail.on('line', line => {
+			this._tail.on('line', line => {
 				this.onLineReceived(line);
 			});
 		}
 
-		this.tail!.watch();
+		this._tail!.watch();
 	}
 
 	stop() {
-		this.tail?.unwatch();
+		this._tail?.unwatch();
 	}
 }

@@ -6,14 +6,14 @@ import Message from '../Message';
  * Performs an Imgur search and posts a random result
  */
 export default class JokeCommand implements Command {
-	constructor(private readonly jokes: ICanHazDadJokeClient) {}
+	constructor(private readonly _jokes: ICanHazDadJokeClient) {}
 
 	async run(message: Message | null) {
 		if (message === null) {
 			return;
 		}
 
-		const response = await this.jokes.getJoke();
+		const response = await this._jokes.getJoke();
 
 		const reply =
 			response.status === 200

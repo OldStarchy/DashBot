@@ -5,27 +5,27 @@ import DiscordServer from './DiscordServer';
 
 export default class DiscordTextChannel implements TextChannel {
 	constructor(
-		private readonly server: DiscordServer,
-		private readonly channel:
+		private readonly _server: DiscordServer,
+		private readonly _channel:
 			| Discord.DMChannel
 			| Discord.TextChannel
 			| Discord.GroupDMChannel
 	) {}
 
 	get id() {
-		return this.channel.id;
+		return this._channel.id;
 	}
 
 	get name() {
-		if (this.channel instanceof Discord.DMChannel) {
-			return 'DM with ' + this.channel.recipient.username;
+		if (this._channel instanceof Discord.DMChannel) {
+			return 'DM with ' + this._channel.recipient.username;
 		} else {
-			return this.channel.name;
+			return this._channel.name;
 		}
 	}
 
 	getServer() {
-		return this.server;
+		return this._server;
 	}
 
 	canSend() {
@@ -37,7 +37,7 @@ export default class DiscordTextChannel implements TextChannel {
 	}
 
 	async sendText(message: string): Promise<DiscordMessage> {
-		const discordMessage = await this.channel.send(message);
+		const discordMessage = await this._channel.send(message);
 		return new DiscordMessage(this, discordMessage);
 	}
 

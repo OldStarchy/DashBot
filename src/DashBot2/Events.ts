@@ -1,5 +1,6 @@
 export class Event<TData> {
-	private cancelled = false;
+	private _cancelled = false;
+
 	constructor(
 		public readonly event: string,
 		public data: TData,
@@ -7,11 +8,11 @@ export class Event<TData> {
 	) {}
 
 	isCancelled() {
-		return this.cancelled;
+		return this._cancelled;
 	}
 
 	cancel() {
-		this.cancelled = this.cancellable;
+		this._cancelled = this.cancellable;
 	}
 }
 

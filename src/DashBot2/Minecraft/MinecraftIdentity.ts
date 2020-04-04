@@ -3,7 +3,7 @@ import MinecraftServer from './MinecraftServer';
 
 export default class MinecraftIdentity implements Identity {
 	constructor(
-		private readonly server: MinecraftServer,
+		private readonly _server: MinecraftServer,
 		private readonly _username: string,
 		private readonly _id?: string
 	) {}
@@ -18,7 +18,7 @@ export default class MinecraftIdentity implements Identity {
 	}
 
 	getServer() {
-		return this.server;
+		return this._server;
 	}
 
 	async getPrivateTextChannel() {

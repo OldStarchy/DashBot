@@ -10,21 +10,21 @@ import MinecraftTextChannel from './MinecraftTextChannel';
 
 export default class MinecraftServer
 	implements ChatServer<MinecraftIdentity, MinecraftTextChannel> {
-	private textChannel: MinecraftTextChannel;
-	private identityCache: MinecraftIdentityCache;
+	private _textChannel: MinecraftTextChannel;
+	private _identityCache: MinecraftIdentityCache;
 
 	constructor(
-		private logReader: MinecraftLogClient,
-		private rcon: Rcon | null,
+		private _logReader: MinecraftLogClient,
+		private _rcon: Rcon | null,
 		storage: StorageRegister,
-		private identityService: IdentityService
+		private _identityService: IdentityService
 	) {
-		this.textChannel = new MinecraftTextChannel(this, this.rcon);
-		this.identityCache = new MinecraftIdentityCache(this, storage);
+		this._textChannel = new MinecraftTextChannel(this, this._rcon);
+		this._identityCache = new MinecraftIdentityCache(this, storage);
 	}
 
 	async getTextChannels() {
-		return [this.textChannel];
+		return [this._textChannel];
 	}
 
 	async getAudioChannels() {
@@ -33,13 +33,13 @@ export default class MinecraftServer
 
 	on(event: string, listener: (...args: any[]) => void) {
 		if (event === 'message') {
-			this.logReader.on('chatMessage', chatMessage => {
-				this.identityCache.add({ name: chatMessage.author });
+			this._logReader.on('chatMessage', chatMessage => {
+				this._identityCache.add({ name: chatMessage.author });
 
 				listener(
 					new MinecraftMessage(
-						this.textChannel,
-						this.identityCache.getByName(chatMessage.author)!,
+						this._textChannel,
+						this._identityCache.getByName(chatMessage.author)!,
 						chatMessage.message
 					)
 				);
@@ -57,20 +57,20 @@ export default class MinecraftServer
 	}
 
 	async connect() {
-		this.logReader.start();
-		await this.rcon?.connect();
+		this._logReader.start();
+		await this._rcon?.connect();
 	}
 
 	async disconnect() {
-		this.logReader.stop();
-		await this.rcon?.disconnect();
+		this._logReader.stop();
+		await this._rcon?.disconnect();
 	}
 
 	getIdentityById(id: string) {
-		return this.identityCache.getById(id);
+		return this._identityCache.getById(id);
 	}
 
 	getIdentityService() {
-		return this.identityService;
+		return this._identityService;
 	}
 }

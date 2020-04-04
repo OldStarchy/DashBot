@@ -9,15 +9,15 @@ export interface PersonIdentityMap {
 }
 
 export default class IdentityService {
-	private store: PersistentData<PersonIdentityMap[]>;
-	private people: PersonIdentityMap[];
-	private readonly servers: ChatServer[] = [];
+	private _store: PersistentData<PersonIdentityMap[]>;
+	private _people: PersonIdentityMap[];
+	private readonly _servers: ChatServer[] = [];
 
 	constructor(storage: StorageRegister) {
-		this.store = storage.createStore('IdentityMap');
-		this.store.on('dataLoaded', this.onDataLoaded.bind(this));
+		this._store = storage.createStore('IdentityMap');
+		this._store.on('dataLoaded', this.onDataLoaded.bind(this));
 
-		this.people = [];
+		this._people = [];
 	}
 
 	private onDataLoaded(event: Event<PersonIdentityMap[] | undefined>) {
@@ -26,11 +26,11 @@ export default class IdentityService {
 			return;
 		}
 
-		this.people = data.map(id => ({ identities: { ...id.identities } }));
+		this._people = data.map(id => ({ identities: { ...id.identities } }));
 	}
 
 	getById(serverId: string, id: string) {
-		const person = this.people.find(
+		const person = this._people.find(
 			person => person.identities[serverId] === id
 		);
 
@@ -38,7 +38,7 @@ export default class IdentityService {
 
 		if (person) {
 			for (const serverId of Object.keys(person.identities)) {
-				const identity = this.servers
+				const identity = this._servers
 					.find(server => server.id == serverId)
 					?.getIdentityById(person.identities[serverId]);
 
@@ -50,18 +50,18 @@ export default class IdentityService {
 			return new Person(identities);
 		}
 
-		const server = this.servers.find(server => server.id === serverId);
+		const server = this._servers.find(server => server.id === serverId);
 
 		if (server) {
 			const identity = server.getIdentityById(id);
 
 			if (identity) {
-				this.people.push({
+				this._people.push({
 					identities: {
 						[serverId]: id,
 					},
 				});
-				this.store.setData(this.people);
+				this._store.setData(this._people);
 
 				return new Person({
 					[serverId]: identity,
@@ -73,6 +73,6 @@ export default class IdentityService {
 	}
 
 	addProvider(server: ChatServer) {
-		this.servers.push(server);
+		this._servers.push(server);
 	}
 }

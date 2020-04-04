@@ -17,16 +17,16 @@ interface PetActionStorage {
 }
 
 export default class PetCommand implements Command, StatisticProvider {
-	private timesPet = 0;
-	private timesPetToday = 0;
-	private timesPetTodayDate = getDayString(new Date());
-	private mostPetsPerDay = 0;
-	private petsPerPerson: Record<string, number> = {};
-	private store: PersistentData<PetActionStorage>;
+	private _timesPet = 0;
+	private _timesPetToday = 0;
+	private _timesPetTodayDate = getDayString(new Date());
+	private _mostPetsPerDay = 0;
+	private _petsPerPerson: Record<string, number> = {};
+	private _store: PersistentData<PetActionStorage>;
 
 	constructor(storage: StorageRegister) {
-		this.store = storage.createStore('PetAction');
-		this.store.on('dataLoaded', this.onReadData.bind(this));
+		this._store = storage.createStore('PetAction');
+		this._store.on('dataLoaded', this.onReadData.bind(this));
 	}
 
 	async getStatistics() {
@@ -35,34 +35,34 @@ export default class PetCommand implements Command, StatisticProvider {
 		const statistics: Statistic[] = [
 			{
 				name: 'Times pet Total',
-				statistic: this.timesPet,
+				statistic: this._timesPet,
 			},
 		];
 
-		if (this.mostPetsPerDay === this.timesPetToday) {
+		if (this._mostPetsPerDay === this._timesPetToday) {
 			statistics.push({
 				name: 'Times pet Today (new record)',
-				statistic: this.timesPetToday,
+				statistic: this._timesPetToday,
 			});
 		} else {
 			statistics.push(
 				{
 					name: 'Times pet Today',
-					statistic: this.timesPetToday,
+					statistic: this._timesPetToday,
 				},
 				{
 					name: 'Most pets in a single day',
-					statistic: this.mostPetsPerDay,
+					statistic: this._mostPetsPerDay,
 				}
 			);
 		}
 
 		let top: { name: string; count: number } | null = null;
 
-		for (const name of Object.keys(this.petsPerPerson)) {
-			if (top === null || this.petsPerPerson[name] > top.count)
-				top = { name, count: this.petsPerPerson[name] };
-			else if (this.petsPerPerson[name] === top.count)
+		for (const name of Object.keys(this._petsPerPerson)) {
+			if (top === null || this._petsPerPerson[name] > top.count)
+				top = { name, count: this._petsPerPerson[name] };
+			else if (this._petsPerPerson[name] === top.count)
 				top = { name: `${top.name}, ${name}`, count: top.count };
 		}
 
@@ -81,21 +81,21 @@ export default class PetCommand implements Command, StatisticProvider {
 
 		if (data) {
 			if (typeof data.timesPet === 'number') {
-				this.timesPet = data.timesPet;
+				this._timesPet = data.timesPet;
 			}
 			if (typeof data.timesPetToday === 'number') {
-				this.timesPetToday = data.timesPetToday;
+				this._timesPetToday = data.timesPetToday;
 			}
 			if (typeof data.timesPetTodayDate === 'string') {
-				this.timesPetTodayDate = data.timesPetTodayDate;
+				this._timesPetTodayDate = data.timesPetTodayDate;
 			}
 			if (typeof data.mostPetsPerDay === 'string') {
-				this.mostPetsPerDay = data.mostPetsPerDay;
+				this._mostPetsPerDay = data.mostPetsPerDay;
 			}
 			if (typeof data.petsPerPerson === 'object') {
 				for (const name of Object.keys(data.petsPerPerson)) {
 					if (typeof data.petsPerPerson[name] === 'number') {
-						this.petsPerPerson[name] = data.petsPerPerson[name];
+						this._petsPerPerson[name] = data.petsPerPerson[name];
 					}
 				}
 			}
@@ -103,36 +103,36 @@ export default class PetCommand implements Command, StatisticProvider {
 	}
 
 	public writeData() {
-		this.store.setData({
-			timesPet: this.timesPet,
-			timesPetToday: this.timesPetToday,
-			timesPetTodayDate: this.timesPetTodayDate,
-			mostPetsPerDay: this.mostPetsPerDay,
-			petsPerPerson: this.petsPerPerson,
+		this._store.setData({
+			timesPet: this._timesPet,
+			timesPetToday: this._timesPetToday,
+			timesPetTodayDate: this._timesPetTodayDate,
+			mostPetsPerDay: this._mostPetsPerDay,
+			petsPerPerson: this._petsPerPerson,
 		});
 	}
 
 	private rolloverDateCount() {
 		const today = getDayString(new Date());
-		if (today !== this.timesPetTodayDate) {
-			this.timesPetToday = 0;
-			this.timesPetTodayDate = today;
+		if (today !== this._timesPetTodayDate) {
+			this._timesPetToday = 0;
+			this._timesPetTodayDate = today;
 		}
 	}
 
 	private pet(petterName: string) {
 		this.rolloverDateCount();
 
-		this.timesPet++;
-		this.timesPetToday++;
+		this._timesPet++;
+		this._timesPetToday++;
 
-		if (this.timesPetToday > this.mostPetsPerDay) {
-			this.mostPetsPerDay = this.timesPetToday;
+		if (this._timesPetToday > this._mostPetsPerDay) {
+			this._mostPetsPerDay = this._timesPetToday;
 		}
 
 		if (petterName)
-			this.petsPerPerson[petterName] =
-				(this.petsPerPerson[petterName] || 0) + 1;
+			this._petsPerPerson[petterName] =
+				(this._petsPerPerson[petterName] || 0) + 1;
 
 		this.writeData();
 	}
@@ -148,7 +148,7 @@ export default class PetCommand implements Command, StatisticProvider {
 
 		if (channel.getSupportsReactions()) message.react('❤️');
 
-		switch (this.timesPetToday) {
+		switch (this._timesPetToday) {
 			case 1: {
 				channel.sendText('First pet of the day!');
 				break;

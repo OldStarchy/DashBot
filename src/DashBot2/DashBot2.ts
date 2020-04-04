@@ -6,56 +6,56 @@ import Message from './Message';
 import ChatServer from './Server';
 
 export class DashBot2 extends EventEmitter {
-	private commands: Record<string, Command> = {};
-	private startTime: number | null = null;
-	private stopTime: number | null = null;
-	private chatServers: ChatServer[] = [];
+	private _commands: Record<string, Command> = {};
+	private _startTime: number | null = null;
+	private _stopTime: number | null = null;
+	private _chatServers: ChatServer[] = [];
 
-	constructor(private logger: Logger) {
+	constructor(private _logger: Logger) {
 		super();
 	}
 
 	public addServer(chatServer: ChatServer) {
-		this.chatServers.push(chatServer);
+		this._chatServers.push(chatServer);
 		chatServer.on('message', this.onMessage.bind(this));
 	}
 
 	public async connect() {
-		for (const server of this.chatServers) {
+		for (const server of this._chatServers) {
 			try {
 				await server.connect();
-				this.startTime = Date.now();
+				this._startTime = Date.now();
 			} catch (e) {
-				this.logger.error("Couldn't connect to server");
+				this._logger.error("Couldn't connect to server");
 			}
 		}
 	}
 
 	public async disconnect() {
-		for (const server of this.chatServers) {
+		for (const server of this._chatServers) {
 			try {
 				await server.disconnect();
-				this.stopTime = Date.now();
+				this._stopTime = Date.now();
 			} catch (e) {
-				this.logger.error("Couldn't disconnect to server");
+				this._logger.error("Couldn't disconnect to server");
 			}
 		}
 	}
 
 	public getUptime() {
-		if (this.startTime !== null) {
-			if (this.stopTime !== null) {
-				return this.stopTime - this.startTime;
+		if (this._startTime !== null) {
+			if (this._stopTime !== null) {
+				return this._stopTime - this._startTime;
 			}
 
-			return Date.now() - this.startTime;
+			return Date.now() - this._startTime;
 		}
 
 		return 0;
 	}
 
 	registerCommand(key: string, command: Command) {
-		this.commands[key] = command;
+		this._commands[key] = command;
 	}
 
 	private async onMessage(message: Message) {
@@ -80,19 +80,19 @@ export class DashBot2 extends EventEmitter {
 			// 	if (ActionResult.isHandled(result)) return;
 			// }
 		} catch (e) {
-			this.logger.error(
+			this._logger.error(
 				`Message "${message.textContent}" caused an error`
 			);
 			if (e instanceof Error) {
-				this.logger.error(e.message);
+				this._logger.error(e.message);
 			}
 			await message.channel.sendText('Something broke :poop:');
 		}
 	}
 
 	async runCommand(message: Message | null, name: string, ...args: string[]) {
-		if (this.commands[name]) {
-			await this.commands[name].run(message, name, ...args);
+		if (this._commands[name]) {
+			await this._commands[name].run(message, name, ...args);
 		}
 	}
 

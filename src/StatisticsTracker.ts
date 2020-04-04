@@ -8,17 +8,17 @@ export interface StatisticProvider {
 }
 
 export default class StatisticsTracker {
-	private providers: StatisticProvider[] = [];
+	private readonly _providers: StatisticProvider[] = [];
 
 	public register(provider: StatisticProvider) {
-		this.providers.push(provider);
+		this._providers.push(provider);
 	}
 
 	public async getStatistics() {
 		const statistics: Statistic[] = [];
 
 		await Promise.all(
-			this.providers.map(async p =>
+			this._providers.map(async p =>
 				statistics.push(...(await p.getStatistics()))
 			)
 		);

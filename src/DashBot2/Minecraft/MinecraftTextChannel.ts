@@ -5,8 +5,8 @@ import MinecraftServer from './MinecraftServer';
 
 export default class MinecraftTextChannel implements TextChannel {
 	constructor(
-		private server: MinecraftServer,
-		private rcon: Rcon | null = null
+		private _server: MinecraftServer,
+		private _rcon: Rcon | null = null
 	) {}
 
 	get id() {
@@ -18,11 +18,11 @@ export default class MinecraftTextChannel implements TextChannel {
 	}
 
 	getServer() {
-		return this.server;
+		return this._server;
 	}
 
 	canSend() {
-		return this.rcon !== null;
+		return this._rcon !== null;
 	}
 
 	canReceive() {
@@ -34,9 +34,9 @@ export default class MinecraftTextChannel implements TextChannel {
 	}
 
 	async sendText(message: string) {
-		if (this.rcon) {
+		if (this._rcon) {
 			//TODO: "DashBot" magic variable
-			const chat = new RconChat(this.rcon, 'DashBot');
+			const chat = new RconChat(this._rcon, 'DashBot');
 			await chat.broadcast(message);
 		}
 	}

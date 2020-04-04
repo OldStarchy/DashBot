@@ -25,21 +25,21 @@ export interface MinecraftPumpLogClientOptions
 }
 
 export class MinecraftPumpLogClient extends MinecraftLogClient {
-	private readonly app: Express;
-	private server: Server | null;
+	private readonly _app: Express;
+	private _server: Server | null;
 
-	constructor(private readonly options: MinecraftPumpLogClientOptions) {
-		super(options);
-		this.app = options.express();
-		this.server = null;
+	constructor(private readonly _options: MinecraftPumpLogClientOptions) {
+		super(_options);
+		this._app = _options.express();
+		this._server = null;
 
-		this.app.use(bodyParser.text());
-		this.app.post<Record<string, string>, never, string>(
+		this._app.use(bodyParser.text());
+		this._app.post<Record<string, string>, never, string>(
 			'/v1/onLogChanged',
 			(req, res) => {
 				if (
-					this.options.whitelist &&
-					!this.options.whitelist.includes(req.ip)
+					this._options.whitelist &&
+					!this._options.whitelist.includes(req.ip)
 				) {
 					this.logger.warn(
 						`Blocked request from invalid IP ${req.ip}`,
@@ -63,18 +63,18 @@ export class MinecraftPumpLogClient extends MinecraftLogClient {
 	}
 
 	start() {
-		if (this.server === null) {
-			if (this.options.greenlockConfig) {
+		if (this._server === null) {
+			if (this._options.greenlockConfig) {
 				// TODO: https://git.rootprojects.org/root/greenlock-express.js/issues/36#issuecomment-9326
-				Greenlock.init(this.options.greenlockConfig).serve(this.app);
+				Greenlock.init(this._options.greenlockConfig).serve(this._app);
 			} else {
-				this.server = this.app.listen(this.options.port || 80);
+				this._server = this._app.listen(this._options.port || 80);
 			}
 		}
 	}
 
 	stop() {
-		this.server?.close();
-		this.server = null;
+		this._server?.close();
+		this._server = null;
 	}
 }
