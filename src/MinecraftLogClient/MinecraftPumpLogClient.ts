@@ -2,8 +2,7 @@ import bodyParser from 'body-parser';
 import { Express } from 'express';
 import Greenlock from 'greenlock-express';
 import { Server } from 'http';
-import {
-	MinecraftLogClient,
+import MinecraftLogClient, {
 	MinecraftLogClientOptions,
 } from './MinecraftLogClient';
 
@@ -24,7 +23,7 @@ export interface MinecraftPumpLogClientOptions
 	whitelist?: string[];
 }
 
-export class MinecraftPumpLogClient extends MinecraftLogClient {
+export default class MinecraftPumpLogClient extends MinecraftLogClient {
 	private readonly _app: Express;
 	private _server: Server | null;
 

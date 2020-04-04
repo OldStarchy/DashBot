@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 
-export function getVersion() {
+export default function getVersion() {
 	const location = path.join(__dirname, 'version');
 	if (fs.existsSync(location)) {
 		const version = fs.readFileSync(location, 'utf8');

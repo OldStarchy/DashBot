@@ -1,6 +1,6 @@
-import { LogMessage } from './LogMessage';
+import LogMessage from './LogMessage';
 
-export class LogInOutMessage extends LogMessage {
+export default class LogInOutMessage extends LogMessage {
 	public readonly who: string;
 	public readonly event: 'joined' | 'left';
 

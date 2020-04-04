@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import 'mocha';
-import { formatTime } from '../../src/util/formatTime';
+import formatTime from '../../src/util/formatTime';
 
 describe('formatTime', () => {
 	it('Should format the time nicely', () => {

@@ -1,5 +1,5 @@
 import fetch from 'node-fetch';
-import { ImgurResponse } from '../../ImgurResponse';
+import ImgurResponse from '../../ImgurResponse';
 import selectRandom from '../../util/selectRandom';
 import Command from '../Command';
 import Message from '../Message';

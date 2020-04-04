@@ -1,5 +1,5 @@
 import Rcon from 'modern-rcon';
-import { RconChat } from '../../Rcon/RconChat';
+import RconChat from '../../Rcon/RconChat';
 import TextChannel from '../TextChannel';
 import MinecraftServer from './MinecraftServer';
 

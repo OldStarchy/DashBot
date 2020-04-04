@@ -6,7 +6,7 @@ import Identity from './Identity';
 import Message from './Message';
 import ChatServer from './Server';
 
-export class DashBot2 extends EventEmitter {
+export default class DashBot2 extends EventEmitter {
 	private _commands: Record<string, Command> = {};
 	private _startTime: number | null = null;
 	private _stopTime: number | null = null;

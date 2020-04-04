@@ -7,7 +7,7 @@ import Rcon from 'modern-rcon';
 import { dirname, join, resolve } from 'path';
 import winston from 'winston';
 import HaikuCommand from './DashBot2/Commands/HaikuCommand';
-import { HelpCommand } from './DashBot2/Commands/HelpCommand';
+import HelpCommand from './DashBot2/Commands/HelpCommand';
 import ImgurCommand, { ImgurClient } from './DashBot2/Commands/ImgurCommand';
 import JokeCommand, {
 	ICanHazDadJokeClient,
@@ -16,26 +16,26 @@ import PetCommand from './DashBot2/Commands/PetCommand';
 import PollCommand from './DashBot2/Commands/PollCommand';
 import StatisticsCommand from './DashBot2/Commands/StatisticsCommand';
 import VersionCommand from './DashBot2/Commands/VersionCommand';
-import { DashBot2 } from './DashBot2/DashBot2';
+import DashBot2 from './DashBot2/DashBot2';
 import DiscordServer from './DashBot2/Discord/DiscordServer';
 import IdentityService from './DashBot2/IdentityService';
-import { ABResponseInteraction } from './DashBot2/Interactions/ABResponseInteraction';
-import { DieInteraction } from './DashBot2/Interactions/DieInteraction';
-import { GreetInteraction } from './DashBot2/Interactions/GreetInteraction';
+import ABResponseInteraction from './DashBot2/Interactions/ABResponseInteraction';
+import DieInteraction from './DashBot2/Interactions/DieInteraction';
+import GreetInteraction from './DashBot2/Interactions/GreetInteraction';
 import MinecraftGreetInteraction from './DashBot2/Interactions/MinecraftGreetInteraction';
-import { NumberGameInteraction } from './DashBot2/Interactions/NumberGameInteraction';
+import NumberGameInteraction from './DashBot2/Interactions/NumberGameInteraction';
 import MinecraftServer from './DashBot2/Minecraft/MinecraftServer';
 import MinecraftRelayService from './DashBot2/Services/MinecraftRelayService';
 import UptimeTrackerStatistic from './DashBot2/Statistics/UptimeTrackerStatistic';
-import { getVersion } from './getVersion';
+import getVersion from './getVersion';
 import loadConfig from './loadConfig';
-import { MinecraftLogClient } from './MinecraftLogClient/MinecraftLogClient';
-import { MinecraftPumpLogClient } from './MinecraftLogClient/MinecraftPumpLogClient';
-import { MinecraftTailLogClient } from './MinecraftLogClient/MinecraftTailLogClient';
+import MinecraftLogClient from './MinecraftLogClient/MinecraftLogClient';
+import MinecraftPumpLogClient from './MinecraftLogClient/MinecraftPumpLogClient';
+import MinecraftTailLogClient from './MinecraftLogClient/MinecraftTailLogClient';
 import StatisticsTracker from './StatisticsTracker';
 import Storage from './Storage';
 import StorageRegister from './StorageRegister';
-import { formatTime } from './util/formatTime';
+import formatTime from './util/formatTime';
 
 const args = process.argv.slice(2);
 

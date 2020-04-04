@@ -1,9 +1,9 @@
-import { RconChat } from '../../Rcon/RconChat';
+import RconChat from '../../Rcon/RconChat';
 import StorageRegister, { PersistentData } from '../../StorageRegister';
-import { Tracery } from '../../tracery/Tracery';
+import Tracery from '../../tracery/Tracery';
 import selectRandom from '../../util/selectRandom';
 import Command from '../Command';
-import { DashBot2 } from '../DashBot2';
+import DashBot2 from '../DashBot2';
 import { Event } from '../Events';
 import IdentityService from '../IdentityService';
 import Message from '../Message';

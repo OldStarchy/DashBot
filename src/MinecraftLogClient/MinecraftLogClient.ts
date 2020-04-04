@@ -1,10 +1,10 @@
 import { EventEmitter } from 'events';
 import { Logger } from 'winston';
-import { ChatMessage } from './ChatMessage';
-import { LogInOutMessage } from './LogInOutMessage';
-import { LogMessageParser } from './LogMessageParser';
+import ChatMessage from './ChatMessage';
+import LogInOutMessage from './LogInOutMessage';
+import LogMessageParser from './LogMessageParser';
 
-export interface MinecraftLogClient {
+export default interface MinecraftLogClient {
 	on(event: 'chatMessage', listener: (message: ChatMessage) => void): this;
 	on(
 		event: 'logInOutMessage',
@@ -17,7 +17,7 @@ export interface MinecraftLogClientOptions {
 	logger: Logger;
 }
 
-export abstract class MinecraftLogClient extends EventEmitter {
+export default abstract class MinecraftLogClient extends EventEmitter {
 	protected readonly logger: Logger;
 
 	constructor(options: MinecraftLogClientOptions) {

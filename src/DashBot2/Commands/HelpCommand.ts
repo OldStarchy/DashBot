@@ -1,8 +1,8 @@
 import StorageRegister from '../../StorageRegister';
-import { Tracery } from '../../tracery/Tracery';
-import { lazy } from '../../util/lazy';
+import Tracery from '../../tracery/Tracery';
+import lazy from '../../util/lazy';
 import Command from '../Command';
-import { DashBot2 } from '../DashBot2';
+import DashBot2 from '../DashBot2';
 import { Event } from '../Events';
 import Interaction from '../Interaction';
 import Message from '../Message';
@@ -19,7 +19,6 @@ const HelpCommandGrammar = {
 	],
 	'ok-no': ['OK :)', 'No problem'],
 	'ok-yes': ['Will do', 'OK, 1 sec'],
-	//TODO: add grammar for using objects and dot notation instead of just strings.
 	'no-private-chat': [
 		"I couldn't find a private chat I could use to DM you.",
 	],
@@ -38,7 +37,7 @@ interface HelpCommandSession {
 /**
  * Placeholder help action supposed to give people hints as to what DashBot can do, however due to the "conversational"-like invocation phrases I feel like it doesn't really make sense to just list all the "commands" so not much work has been put in this.
  */
-export class HelpCommand implements Command, Interaction {
+export default class HelpCommand implements Command, Interaction {
 	private static readonly defaultSession: Readonly<HelpCommandSession> = {
 		pendingAnswer: false,
 		sentMessageTime: 0,

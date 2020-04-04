@@ -1,5 +1,5 @@
 import Rcon from 'modern-rcon';
-import { MinecraftLogClient } from '../../MinecraftLogClient/MinecraftLogClient';
+import MinecraftLogClient from '../../MinecraftLogClient/MinecraftLogClient';
 import StorageRegister from '../../StorageRegister';
 import IdentityService from '../IdentityService';
 import ChatServer, { ChatServerEvents } from '../Server';

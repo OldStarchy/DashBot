@@ -1,6 +1,6 @@
 import StorageRegister from '../../StorageRegister';
-import { Tracery } from '../../tracery/Tracery';
-import { DashBot2 } from '../DashBot2';
+import Tracery from '../../tracery/Tracery';
+import DashBot2 from '../DashBot2';
 import { Event } from '../Events';
 import Interaction from '../Interaction';
 import Message from '../Message';
@@ -24,7 +24,7 @@ const NumberGuessGrammar = {
 /**
  * Plays the "I'm thinking of a number" game, currently it only thinks of a number, but does not guess your number.
  */
-export class NumberGameInteraction implements Interaction {
+export default class NumberGameInteraction implements Interaction {
 	private static readonly defaultState: Readonly<NumberGameState> = {
 		playing: false,
 		number: 0,

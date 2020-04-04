@@ -1,4 +1,4 @@
-import { Tracery } from '../../tracery/Tracery';
+import Tracery from '../../tracery/Tracery';
 import Emoji from '../../util/emoji';
 import Command from '../Command';
 import Message from '../Message';

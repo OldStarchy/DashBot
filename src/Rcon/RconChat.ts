@@ -1,7 +1,7 @@
 import Rcon from 'modern-rcon';
-import { RichText } from './RichText';
+import RichText from './RichText';
 
-export class RconChat {
+export default class RconChat {
 	constructor(
 		private _client: Rcon,
 		private _from: string,

@@ -1,6 +1,6 @@
 import deepExtend from 'deep-extend';
 import { join } from 'path';
-import { getVersion } from './getVersion';
+import getVersion from './getVersion';
 
 export default function loadConfig(storageDir: string): DashBotConfig {
 	const configFileName = 'dashbot.config';

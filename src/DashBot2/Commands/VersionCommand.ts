@@ -1,4 +1,4 @@
-import { getVersion } from '../../getVersion';
+import getVersion from '../../getVersion';
 import Command from '../Command';
 import Message from '../Message';
 

@@ -1,9 +1,9 @@
 import selectRandom from '../util/selectRandom';
-import { DefaultModifiersEn } from './default/modifiers-en';
+import DefaultModifiersEn from './default/modifiers-en';
 
 export type Modifier = (string: string, ...args: string[]) => string;
 
-export class Tracery<T extends Grammar = Grammar> {
+export default class Tracery<T extends Grammar = Grammar> {
 	private readonly _rules: {
 		[ruleName: string]: Rule;
 	};

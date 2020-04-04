@@ -1,4 +1,4 @@
-import { DashBot2 } from '../DashBot2';
+import DashBot2 from '../DashBot2';
 import { Event } from '../Events';
 import Identity from '../Identity';
 import Interaction from '../Interaction';

@@ -1,6 +1,5 @@
 import { Tail } from 'tail';
-import {
-	MinecraftLogClient,
+import MinecraftLogClient, {
 	MinecraftLogClientOptions,
 } from './MinecraftLogClient';
 
@@ -8,7 +7,7 @@ interface MinecraftTailLogClientOptions extends MinecraftLogClientOptions {
 	logFilePath: string;
 }
 
-export class MinecraftTailLogClient extends MinecraftLogClient {
+export default class MinecraftTailLogClient extends MinecraftLogClient {
 	private readonly _logFilePath: string;
 	private _tail: Tail | null = null;
 

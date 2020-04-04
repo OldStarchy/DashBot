@@ -1,5 +1,5 @@
-import { Tracery } from '../../tracery/Tracery';
-import { DashBot2 } from '../DashBot2';
+import Tracery from '../../tracery/Tracery';
+import DashBot2 from '../DashBot2';
 import { Event } from '../Events';
 import Interaction from '../Interaction';
 import Message from '../Message';
@@ -17,7 +17,7 @@ type Response = string | string[];
  *
  * Eg. If the message is "a" it will respond with "b"
  */
-export class ABResponseInteraction implements Interaction {
+export default class ABResponseInteraction implements Interaction {
 	constructor(protected aBResponses: [Trigger, Response][]) {}
 
 	register(bot: DashBot2) {

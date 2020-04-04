@@ -1,4 +1,4 @@
-export function formatTable(rows: (string[] | '-' | '=')[]): string {
+export default function formatTable(rows: (string[] | '-' | '=')[]): string {
 	const widths: number[] = [];
 
 	rows.forEach(row =>

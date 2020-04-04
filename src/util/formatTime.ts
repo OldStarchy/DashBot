@@ -2,7 +2,7 @@ function pad(numb: number, length: number) {
 	return numb.toString().padStart(length, '0');
 }
 
-export function formatTime(date: Date): string {
+export default function formatTime(date: Date): string {
 	const year = pad(date.getFullYear(), 4);
 	const month = pad(date.getMonth(), 2);
 	const day = pad(date.getDate(), 2);

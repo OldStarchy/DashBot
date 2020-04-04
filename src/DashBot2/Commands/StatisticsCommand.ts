@@ -1,6 +1,6 @@
 import StatisticsTracker from '../../StatisticsTracker';
-import { formatTable } from '../../util/formatTable';
-import { sleep } from '../../util/sleep';
+import formatTable from '../../util/formatTable';
+import sleep from '../../util/sleep';
 import Command from '../Command';
 import Message from '../Message';
 

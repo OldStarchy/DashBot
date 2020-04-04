@@ -1,4 +1,4 @@
-export class LogMessage {
+export default class LogMessage {
 	public static readonly LINE_REGEX = /^\[(?<time>\d\d:\d\d:\d\d)\] \[(?<thread>[^\/]*)\/(?<logLevel>[^\]]*)\]: (?<content>.*)$/;
 
 	public static readonly CHAT_MESSAGE_REGEX = /^<(?<author>[a-zA-Z0-9_]*)> (?<message>.*)$/;
