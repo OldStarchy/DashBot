@@ -2,6 +2,7 @@ import { Logger } from 'winston';
 import parseArguments from '../util/parseArguments';
 import Command from './Command';
 import { Event, EventEmitter, EventHandler } from './Events';
+import Identity from './Identity';
 import Message from './Message';
 import ChatServer from './Server';
 
@@ -18,6 +19,14 @@ export class DashBot2 extends EventEmitter {
 	public addServer(chatServer: ChatServer) {
 		this._chatServers.push(chatServer);
 		chatServer.on('message', this.onMessage.bind(this));
+		chatServer.on('presenceUpdate', (identity, joined) => {
+			this.emit(
+				new Event('presenceUpdate', {
+					identity,
+					joined,
+				})
+			);
+		});
 	}
 
 	public async connect() {
@@ -97,6 +106,10 @@ export class DashBot2 extends EventEmitter {
 	}
 
 	on(event: 'message', handler: EventHandler<Message>): void;
+	on(
+		event: 'presenceUpdate',
+		handler: EventHandler<{ identity: Identity; joined: boolean }>
+	): void;
 	on(event: string, handler: EventHandler<any>): void {
 		return super.on(event, handler);
 	}

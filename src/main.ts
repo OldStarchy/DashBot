@@ -23,6 +23,7 @@ import IdentityService from './DashBot2/IdentityService';
 import { ABResponseInteraction } from './DashBot2/Interactions/ABResponseInteraction';
 import { DieInteraction } from './DashBot2/Interactions/DieInteraction';
 import { GreetInteraction } from './DashBot2/Interactions/GreetInteraction';
+import MinecraftGreetInteraction from './DashBot2/Interactions/MinecraftGreetInteraction';
 import { NumberGameInteraction } from './DashBot2/Interactions/NumberGameInteraction';
 import MinecraftServer from './DashBot2/Minecraft/MinecraftServer';
 import MinecraftRelayService from './DashBot2/Services/MinecraftRelayService';
@@ -219,7 +220,7 @@ new NumberGameInteraction(storage).register(bot);
 new GreetInteraction().register(bot);
 new DieInteraction().register(bot);
 helpCommand.register(bot);
-
+new MinecraftGreetInteraction().register(bot);
 new ABResponseInteraction([
 	[
 		/^compliment( please)?/i,

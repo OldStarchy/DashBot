@@ -3,10 +3,7 @@ import Rcon from 'modern-rcon';
 import { Logger } from 'winston';
 import { Action } from './Action';
 import { ActionResult } from './ActionResult';
-import { LogInOutMessage } from './MinecraftLogClient/LogInOutMessage';
 import { MinecraftLogClient } from './MinecraftLogClient/MinecraftLogClient';
-import { RconChat } from './Rcon/RconChat';
-import { sleep } from './util/sleep';
 
 export interface DashBotOptions {
 	client: Client;
@@ -63,12 +60,6 @@ export default class DashBot {
 			this.logger.info(`Logged in as ${this.client.user!.tag}!`);
 		});
 
-		if (this.minecraftClient) {
-			this.minecraftClient.on(
-				'logInOutMessage',
-				this.onMinecraftLogInOutMessage.bind(this)
-			);
-		}
 		this.client.on('message', this.onMessage.bind(this));
 	}
 
@@ -85,21 +76,6 @@ export default class DashBot {
 			this.logger.error(`Message "${message.content}" caused error`);
 			this.logger.error(e);
 			await message.reply('Something broke :poop:');
-		}
-	}
-
-	private async onMinecraftLogInOutMessage(message: LogInOutMessage) {
-		if (this.rcon) {
-			if (message.event === 'joined') {
-				await sleep(5);
-
-				const chat = new RconChat(this.rcon, 'DashBot');
-
-				await chat.whisper(
-					message.who,
-					`Welcome to the server ${message.who}`
-				);
-			}
 		}
 	}
 

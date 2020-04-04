@@ -2,7 +2,7 @@ import Rcon from 'modern-rcon';
 import { MinecraftLogClient } from '../../MinecraftLogClient/MinecraftLogClient';
 import StorageRegister from '../../StorageRegister';
 import IdentityService from '../IdentityService';
-import ChatServer from '../Server';
+import ChatServer, { ChatServerEvents } from '../Server';
 import MinecraftIdentity from './MinecraftIdentity';
 import MinecraftIdentityCache from './MinecraftIdentityCache';
 import MinecraftMessage from './MinecraftMessage';
@@ -47,20 +47,35 @@ export default class MinecraftServer
 		return this;
 	}
 
+	on<T extends keyof ChatServerEvents>(
+		event: T,
+		listener: (...args: ChatServerEvents[T]) => void
+	): void;
 	on(event: string, listener: (...args: any[]) => void) {
-		if (event === 'message') {
-			this._logReader.on('chatMessage', chatMessage => {
-				this._identityCache.add({ name: chatMessage.author });
+		switch (event) {
+			case 'message':
+				this._logReader.on('chatMessage', chatMessage => {
+					this._identityCache.add({ name: chatMessage.author });
 
-				listener(
-					new MinecraftMessage(
-						this._textChannel,
-						this._identityCache.getByName(chatMessage.author)!,
-						chatMessage.message
-					)
-				);
-			});
+					listener(
+						new MinecraftMessage(
+							this._textChannel,
+							this._identityCache.getByName(chatMessage.author)!,
+							chatMessage.message
+						)
+					);
+				});
+				return;
+
+			case 'presenceUpdate':
+				this._logReader.on('logInOutMessage', message => {
+					listener(
+						this._identityCache.getByName(message.who),
+						message.event === 'joined'
+					);
+				});
 		}
+
 		//TODO: other events
 	}
 

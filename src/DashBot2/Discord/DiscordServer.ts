@@ -3,7 +3,7 @@ import deferred from '../../util/deferred';
 import AudioChannel from '../AudioChannel';
 import Identity from '../Identity';
 import IdentityService from '../IdentityService';
-import ChatServer from '../Server';
+import ChatServer, { ChatServerEvents } from '../Server';
 import TextChannel from '../TextChannel';
 import DiscordIdentity from './DiscordIdentity';
 import DiscordMessage from './DiscordMessage';
@@ -40,6 +40,10 @@ export default class DiscordServer
 		return this._loggedIn;
 	}
 
+	on<T extends keyof ChatServerEvents>(
+		event: T,
+		listener: (...args: ChatServerEvents[T]) => void
+	): void;
 	on(event: string, listener: (...args: any[]) => void): this {
 		switch (event) {
 			case 'message':
@@ -53,6 +57,11 @@ export default class DiscordServer
 				);
 				break;
 
+			case 'presenceUpdate':
+			// TODO: this
+			// this._discordClient.on(event, presence => {
+			// 	presence?.status
+			// })
 			default:
 				// this._discordClient.on(event, listener);
 				break;
