@@ -6,7 +6,6 @@ import { existsSync } from 'fs';
 import Rcon from 'modern-rcon';
 import { dirname, join, resolve } from 'path';
 import winston from 'winston';
-import { DashBotOptions } from './DashBot';
 import HaikuCommand from './DashBot2/Commands/HaikuCommand';
 import { HelpCommand } from './DashBot2/Commands/HelpCommand';
 import ImgurCommand, { ImgurClient } from './DashBot2/Commands/ImgurCommand';
@@ -30,6 +29,7 @@ import MinecraftRelayService from './DashBot2/Services/MinecraftRelayService';
 import UptimeTrackerStatistic from './DashBot2/Statistics/UptimeTrackerStatistic';
 import { getVersion } from './getVersion';
 import loadConfig from './loadConfig';
+import { MinecraftLogClient } from './MinecraftLogClient/MinecraftLogClient';
 import { MinecraftPumpLogClient } from './MinecraftLogClient/MinecraftPumpLogClient';
 import { MinecraftTailLogClient } from './MinecraftLogClient/MinecraftTailLogClient';
 import StatisticsTracker from './StatisticsTracker';
@@ -96,18 +96,15 @@ const config = loadConfig(storageDir);
 
 Storage.rootDir = storageDir;
 
-const options: DashBotOptions = {
-	config,
-	client: new DiscordClient(),
-	logger,
-};
+let minecraftClient: MinecraftLogClient | null = null;
+let rcon: Rcon | null = null;
 
 if (config.minecraft) {
 	if (config.minecraft.logClient) {
 		switch (config.minecraft.logClient.type) {
 			case 'webhook':
 				if (config.tls) {
-					options.minecraftClient = new MinecraftPumpLogClient({
+					minecraftClient = new MinecraftPumpLogClient({
 						express,
 						greenlockConfig: {
 							maintainerEmail: config.tls.maintainerEmail,
@@ -125,7 +122,7 @@ if (config.minecraft) {
 					});
 				} else {
 					if (config.minecraft.logClient.allowInsecure) {
-						options.minecraftClient = new MinecraftPumpLogClient({
+						minecraftClient = new MinecraftPumpLogClient({
 							express,
 							logger,
 							whitelist: config.minecraft.logClient.whitelist,
@@ -139,7 +136,7 @@ if (config.minecraft) {
 				break;
 
 			case 'tail':
-				options.minecraftClient = new MinecraftTailLogClient({
+				minecraftClient = new MinecraftTailLogClient({
 					logFilePath: config.minecraft.logClient.logFilePath,
 					logger,
 				});
@@ -148,7 +145,7 @@ if (config.minecraft) {
 	}
 
 	if (config.minecraft.rcon) {
-		options.rcon = new Rcon(
+		rcon = new Rcon(
 			config.minecraft.rcon.host,
 			config.minecraft.rcon.port,
 			config.minecraft.rcon.password
@@ -160,12 +157,13 @@ const bot = new DashBot2(logger);
 const storage = new StorageRegister('storage.json', logger);
 const identityService = new IdentityService(storage);
 const statistics = new StatisticsTracker();
+const discordClient = new DiscordClient();
 storage.watch();
 
-if (options.minecraftClient) {
+if (minecraftClient) {
 	const mcServer = new MinecraftServer(
-		options.minecraftClient,
-		options.rcon || null,
+		minecraftClient,
+		rcon || null,
 		new StorageRegister('storage2.json', logger),
 		identityService
 	);
@@ -174,7 +172,7 @@ if (options.minecraftClient) {
 }
 
 const dcServer = new DiscordServer(
-	options.client,
+	discordClient,
 	{ botToken: config.discordBotToken },
 	identityService
 );
