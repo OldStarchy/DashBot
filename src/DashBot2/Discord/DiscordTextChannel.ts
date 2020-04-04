@@ -24,16 +24,16 @@ export default class DiscordTextChannel implements TextChannel {
 		}
 	}
 
-	getServer() {
+	get canSend() {
+		return true;
+	}
+
+	get canReceive() {
+		return true;
+	}
+
+	get server() {
 		return this._server;
-	}
-
-	canSend() {
-		return true;
-	}
-
-	canReceive() {
-		return true;
 	}
 
 	async sendText(message: string): Promise<DiscordMessage> {
@@ -41,7 +41,7 @@ export default class DiscordTextChannel implements TextChannel {
 		return new DiscordMessage(this, discordMessage);
 	}
 
-	getSupportsReactions() {
+	get supportsReactions() {
 		return true;
 	}
 }

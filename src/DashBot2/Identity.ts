@@ -5,8 +5,8 @@ import TextChannel from './TextChannel';
 export default interface Identity {
 	readonly id: string | undefined;
 	readonly username: string;
-	getIsBot(): boolean;
+	readonly isBot: boolean;
+	readonly server: ChatServer;
 	getPrivateTextChannel(): Promise<TextChannel | null>;
 	getPerson(): Person;
-	getServer(): ChatServer;
 }

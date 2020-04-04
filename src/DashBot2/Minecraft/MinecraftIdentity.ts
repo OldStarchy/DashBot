@@ -17,7 +17,11 @@ export default class MinecraftIdentity implements Identity {
 		return this._username;
 	}
 
-	getServer() {
+	get isBot() {
+		return false; //probably
+	}
+
+	get server() {
 		return this._server;
 	}
 
@@ -25,13 +29,9 @@ export default class MinecraftIdentity implements Identity {
 		return null;
 	}
 
-	getIsBot() {
-		return false; //probably
-	}
-
 	getPerson() {
-		return this.getServer()
+		return this.server
 			.getIdentityService()
-			.getById(this.getServer().id, this.id);
+			.getById(this.server.id, this.id);
 	}
 }

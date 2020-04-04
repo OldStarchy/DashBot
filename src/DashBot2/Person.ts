@@ -14,7 +14,7 @@ export default class Person {
 
 		for (const serverId of Object.keys(this._identities)) {
 			const identity = this._identities[serverId];
-			const server = identity.getServer();
+			const server = identity.server;
 
 			if (server.id !== preferredServer?.id) {
 				const channel = await server.getPrivateTextChannel(identity);

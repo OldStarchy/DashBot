@@ -59,7 +59,7 @@ export class DashBot2 extends EventEmitter {
 	}
 
 	private async onMessage(message: Message) {
-		if (message.author.getIsBot()) {
+		if (message.author.isBot) {
 			return;
 		}
 

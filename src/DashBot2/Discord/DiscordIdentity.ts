@@ -16,8 +16,12 @@ export default class DiscordIdentity implements Identity {
 		return this._person.username;
 	}
 
-	getIsBot() {
+	get isBot() {
 		return this._person.bot;
+	}
+
+	get server() {
+		return this._server;
 	}
 
 	getDiscordUser() {
@@ -25,16 +29,12 @@ export default class DiscordIdentity implements Identity {
 	}
 
 	getPerson() {
-		return this.getServer()
+		return this.server
 			.getIdentityService()
-			.getById(this.getServer().id, this.id);
+			.getById(this.server.id, this.id);
 	}
 
 	async getPrivateTextChannel() {
-		return this.getServer().getPrivateTextChannel(this);
-	}
-
-	getServer() {
-		return this._server;
+		return this.server.getPrivateTextChannel(this);
 	}
 }

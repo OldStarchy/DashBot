@@ -4,9 +4,9 @@ import ChatServer from './Server';
 export default interface TextChannel {
 	readonly id: string;
 	readonly name: string;
-	getServer(): ChatServer;
-	canSend(): boolean;
-	canReceive(): boolean;
-	getSupportsReactions(): boolean;
+	readonly canSend: boolean;
+	readonly canReceive: boolean;
+	readonly supportsReactions: boolean;
+	readonly server: ChatServer;
 	sendText(message: string): Promise<Message | void>;
 }

@@ -17,19 +17,19 @@ export default class MinecraftTextChannel implements TextChannel {
 		return 'In-game Chat';
 	}
 
-	getServer() {
-		return this._server;
-	}
-
-	canSend() {
-		return this._rcon !== null;
-	}
-
-	canReceive() {
+	get canSend() {
 		return true;
 	}
 
-	getSupportsReactions() {
+	get canReceive() {
+		return true;
+	}
+
+	get server() {
+		return this._server;
+	}
+
+	get supportsReactions() {
 		return false;
 	}
 

@@ -46,7 +46,7 @@ export default class PollCommand implements Command {
 			return;
 		}
 		const channel = message.channel;
-		if (!channel.getSupportsReactions()) {
+		if (!channel.supportsReactions) {
 			await channel.sendText("This chat does't support polls");
 			return;
 		}

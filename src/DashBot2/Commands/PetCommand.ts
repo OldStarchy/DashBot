@@ -146,7 +146,7 @@ export default class PetCommand implements Command, StatisticProvider {
 
 		this.pet(message.author.username);
 
-		if (channel.getSupportsReactions()) message.react('❤️');
+		if (channel.supportsReactions) message.react('❤️');
 
 		switch (this._timesPetToday) {
 			case 1: {

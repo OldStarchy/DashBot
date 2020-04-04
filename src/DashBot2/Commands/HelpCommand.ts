@@ -91,7 +91,7 @@ export class HelpCommand implements Command, Interaction {
 			if (regex.yes.test(content)) {
 				const dmChannel = await author
 					.getPerson()
-					.getPrivateTextChannel(author.getServer());
+					.getPrivateTextChannel(author.server);
 
 				if (dmChannel) {
 					await channel.sendText(tracery().generate('ok-yes'));

@@ -10,10 +10,7 @@ export default class DiscordMessage implements Message {
 	) {}
 
 	get author() {
-		return new DiscordIdentity(
-			this.channel.getServer(),
-			this._message.author
-		);
+		return new DiscordIdentity(this.channel.server, this._message.author);
 	}
 
 	get channel() {
