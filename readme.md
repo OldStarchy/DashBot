@@ -9,7 +9,7 @@ A chatbot that does whatever I feel like implementing at the time.
 
 Dashbot will listen for messages on all text channels it has access to and do some simple matching (usually a regex test) to figure out which `Interaction` or `Command` to run. Interactions and Commands are registered in the [main.ts](src/main.ts) file.
 
-See the documentation in each Action to see what it does, however, some notable ones are
+See the documentation in each Interaction to see what it does, however, some notable ones are
 
 -   [DieInteraction](src/Interactions/DieInteraction.ts)
 
@@ -17,7 +17,7 @@ See the documentation in each Action to see what it does, however, some notable 
 
 -   [ABResponseInteraction](src/Interactions/ABResponseInteraction.ts)
 
-    There are a few of these that have different responses. Eg. `compliment` will cause DashBot to give you a random compliment. `link` will post a random link to a picture of Link. This is the most simple type of Action, all responses need to be predefined, and it will pick one randomly.
+    There are a few of these that have different responses. Eg. `compliment` will cause DashBot to give you a random compliment. `link` will post a random link to a picture of Link. This is the most simple type of Interaction, all responses need to be predefined, and it will pick one randomly.
 
 -   [ImgurCommand](src/Commands/ImgurCommand.ts)
 
@@ -25,7 +25,7 @@ See the documentation in each Action to see what it does, however, some notable 
 
 -   [NumberGameInteraction](src/Interactions/NumberGameInteraction.ts)
 
-    This is one of 2 actions that deal with multiple messages and replies (see [OngoingAction](src/Interactions/OngoingAction.ts)). After invoking it with "I want to guess a number", it will prompt you to try to guess the number its thinking.
+    This is one of 2 actions that deal with multiple messages and replies (see [SessionStore](src/SessionStore.ts)). After invoking it with "I want to guess a number", it will prompt you to try to guess the number its thinking.
 
 -   [PollCommand](src/Commands/PollCommand.ts)
 
