@@ -1,22 +1,20 @@
 import Identity from '../Identity';
 import MinecraftServer from './MinecraftServer';
 
-export default class MinecraftIdentity extends Identity {
+export default class MinecraftIdentity implements Identity {
 	constructor(
 		private readonly server: MinecraftServer,
-		private readonly username: string,
-		private readonly id?: string
-	) {
-		super();
-	}
+		private readonly _username: string,
+		private readonly _id?: string
+	) {}
 
-	getId() {
+	get id() {
 		//TODO: Maybe don't use username as id? id's aren't always known though
-		return this.id ?? this.username;
+		return this._id ?? this._username;
 	}
 
-	getName() {
-		return this.username;
+	get username() {
+		return this._username;
 	}
 
 	getServer() {
@@ -34,6 +32,6 @@ export default class MinecraftIdentity extends Identity {
 	getPerson() {
 		return this.getServer()
 			.getIdentityService()
-			.getById(this.getServer().getId(), this.getId());
+			.getById(this.getServer().id, this.id);
 	}
 }

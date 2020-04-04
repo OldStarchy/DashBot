@@ -57,9 +57,9 @@ export class HelpCommand implements Command, Interaction {
 	): Promise<void> {
 		if (message == null) return;
 
-		const content = message.getTextContent();
-		const channel = message.getChannel();
-		const author = message.getAuthor();
+		const content = message.textContent;
+		const channel = message.channel;
+		const author = message.author;
 
 		const helpRegex = /^(\!?help)$/;
 		const sessionStore = this.session.getSession(message);
@@ -70,7 +70,7 @@ export class HelpCommand implements Command, Interaction {
 				new Tracery({
 					...HelpCommandGrammar,
 					target: {
-						username: author.getName(),
+						username: author.username,
 					},
 				})
 		);

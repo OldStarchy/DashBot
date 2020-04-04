@@ -59,11 +59,11 @@ export class DashBot2 extends EventEmitter {
 	}
 
 	private async onMessage(message: Message) {
-		if (message.getAuthor().getIsBot()) {
+		if (message.author.getIsBot()) {
 			return;
 		}
 
-		const text = message.getTextContent();
+		const text = message.textContent;
 		try {
 			if (text.startsWith('!')) {
 				const parameters = parseArguments(text);
@@ -81,12 +81,12 @@ export class DashBot2 extends EventEmitter {
 			// }
 		} catch (e) {
 			this.logger.error(
-				`Message "${message.getTextContent()}" caused an error`
+				`Message "${message.textContent}" caused an error`
 			);
 			if (e instanceof Error) {
 				this.logger.error(e.message);
 			}
-			await message.getChannel().sendText('Something broke :poop:');
+			await message.channel.sendText('Something broke :poop:');
 		}
 	}
 

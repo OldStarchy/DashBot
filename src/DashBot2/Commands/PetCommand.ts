@@ -142,9 +142,9 @@ export default class PetCommand implements Command, StatisticProvider {
 			return;
 		}
 
-		const channel = message.getChannel();
+		const channel = message.channel;
 
-		this.pet(message.getAuthor().getName());
+		this.pet(message.author.username);
 
 		if (channel.getSupportsReactions()) message.react('❤️');
 

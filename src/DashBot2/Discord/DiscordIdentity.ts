@@ -2,19 +2,17 @@ import Discord from 'discord.js';
 import Identity from '../Identity';
 import DiscordServer from './DiscordServer';
 
-export default class DiscordIdentity extends Identity {
+export default class DiscordIdentity implements Identity {
 	constructor(
 		private readonly server: DiscordServer,
 		private readonly person: Discord.User
-	) {
-		super();
-	}
+	) {}
 
-	getId() {
+	get id() {
 		return this.person.id;
 	}
 
-	getName() {
+	get username() {
 		return this.person.username;
 	}
 
@@ -29,7 +27,7 @@ export default class DiscordIdentity extends Identity {
 	getPerson() {
 		return this.getServer()
 			.getIdentityService()
-			.getById(this.getServer().getId(), this.getId());
+			.getById(this.getServer().id, this.id);
 	}
 
 	async getPrivateTextChannel() {

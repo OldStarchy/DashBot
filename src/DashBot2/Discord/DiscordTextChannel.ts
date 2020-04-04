@@ -12,11 +12,11 @@ export default class DiscordTextChannel implements TextChannel {
 			| Discord.GroupDMChannel
 	) {}
 
-	getId() {
+	get id() {
 		return this.channel.id;
 	}
 
-	getName() {
+	get name() {
 		if (this.channel instanceof Discord.DMChannel) {
 			return 'DM with ' + this.channel.recipient.username;
 		} else {

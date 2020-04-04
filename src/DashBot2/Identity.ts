@@ -2,11 +2,11 @@ import Person from './Person';
 import ChatServer from './Server';
 import TextChannel from './TextChannel';
 
-export default abstract class Identity {
-	abstract getId(): string | undefined;
-	abstract getName(): string;
-	abstract getIsBot(): boolean;
-	abstract async getPrivateTextChannel(): Promise<TextChannel | null>;
-	abstract getPerson(): Person;
-	abstract getServer(): ChatServer;
+export default interface Identity {
+	readonly id: string | undefined;
+	readonly username: string;
+	getIsBot(): boolean;
+	getPrivateTextChannel(): Promise<TextChannel | null>;
+	getPerson(): Person;
+	getServer(): ChatServer;
 }

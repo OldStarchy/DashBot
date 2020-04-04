@@ -20,7 +20,7 @@ export default class JokeCommand implements Command {
 				? response.joke
 				: "icanhazdadjoke.com doesn't like me right now sorry";
 
-		await message.getChannel().sendText(reply);
+		await message.channel.sendText(reply);
 	}
 }
 

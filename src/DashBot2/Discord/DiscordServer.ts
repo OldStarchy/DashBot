@@ -16,7 +16,7 @@ export default class DiscordServer
 		private identityService: IdentityService
 	) {}
 
-	getId() {
+	get id() {
 		return 'Discord';
 	}
 

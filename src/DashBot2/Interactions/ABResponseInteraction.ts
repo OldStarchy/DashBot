@@ -26,7 +26,7 @@ export class ABResponseInteraction implements Interaction {
 	async onMessage(event: Event<Message>) {
 		const message = event.data;
 
-		const content = message.getTextContent();
+		const content = message.textContent;
 
 		for (const response of this.aBResponses) {
 			const triggers =
@@ -35,12 +35,12 @@ export class ABResponseInteraction implements Interaction {
 			for (const trigger of triggers) {
 				if (typeof trigger === 'string') {
 					if (trigger === content) {
-						message.getChannel().sendText(
+						message.channel.sendText(
 							Tracery.generate(
 								{
 									origin: response[1],
 									author: {
-										username: message.getAuthor().getName(),
+										username: message.author.username,
 									},
 								},
 								'origin'
@@ -54,12 +54,12 @@ export class ABResponseInteraction implements Interaction {
 					const match = trigger.exec(content);
 
 					if (match) {
-						message.getChannel().sendText(
+						message.channel.sendText(
 							Tracery.generate(
 								{
 									origin: response[1],
 									target: {
-										username: message.getAuthor().getName(),
+										username: message.author.username,
 									},
 									match: {
 										...match.groups,

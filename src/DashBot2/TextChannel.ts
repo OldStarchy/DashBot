@@ -2,8 +2,8 @@ import Message from './Message';
 import ChatServer from './Server';
 
 export default interface TextChannel {
-	getId(): string;
-	getName(): string;
+	readonly id: string;
+	readonly name: string;
 	getServer(): ChatServer;
 	canSend(): boolean;
 	canReceive(): boolean;

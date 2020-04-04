@@ -45,13 +45,13 @@ export default class PollCommand implements Command {
 		if (message === null) {
 			return;
 		}
-		const channel = message.getChannel();
+		const channel = message.channel;
 		if (!channel.getSupportsReactions()) {
 			await channel.sendText("This chat does't support polls");
 			return;
 		}
 
-		const tracery = new Tracery({ ...grammar, author: message.getAuthor });
+		const tracery = new Tracery({ ...grammar, author: message.author });
 
 		if (args.length === 0) {
 			channel.sendText(tracery.generate('helpText'));

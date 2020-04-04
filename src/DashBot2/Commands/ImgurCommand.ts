@@ -15,7 +15,7 @@ export default class ImgurCommand implements Command {
 			return;
 		}
 
-		const channel = message.getChannel();
+		const channel = message.channel;
 		const searchResults = await this.imgur.search(query.join(' '));
 
 		if (searchResults.success) {

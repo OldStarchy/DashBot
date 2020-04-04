@@ -38,9 +38,9 @@ export class GreetInteraction implements Interaction {
 		const name = 'DashBot';
 		const regexString = `^(oh )?((hey|hi|hello),? )?(there )?(dash|${name})( ?bot)?!?`;
 		const message = event.data;
-		const author = message.getAuthor();
-		const content = message.getTextContent();
-		const channel = message.getChannel();
+		const author = message.author;
+		const content = message.textContent;
+		const channel = message.channel;
 
 		const regexObj = new RegExp(regexString, 'i');
 		if (regexObj.test(content)) {
@@ -49,7 +49,7 @@ export class GreetInteraction implements Interaction {
 				{
 					...GreetingGrammar,
 					target: {
-						username: author.getName(),
+						username: author.username,
 					},
 				},
 				'greeting'

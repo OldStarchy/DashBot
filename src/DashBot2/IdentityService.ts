@@ -39,7 +39,7 @@ export default class IdentityService {
 		if (person) {
 			for (const serverId of Object.keys(person.identities)) {
 				const identity = this.servers
-					.find(server => server.getId() == serverId)
+					.find(server => server.id == serverId)
 					?.getIdentityById(person.identities[serverId]);
 
 				if (identity) {
@@ -50,7 +50,7 @@ export default class IdentityService {
 			return new Person(identities);
 		}
 
-		const server = this.servers.find(server => server.getId() === serverId);
+		const server = this.servers.find(server => server.id === serverId);
 
 		if (server) {
 			const identity = server.getIdentityById(id);

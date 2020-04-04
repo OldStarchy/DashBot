@@ -1,31 +1,29 @@
-import Identity from '../Identity';
 import Message from '../Message';
 import NotSupportedException from '../NotSupportedException';
-import TextChannel from '../TextChannel';
 import MinecraftIdentity from './MinecraftIdentity';
 import MinecraftTextChannel from './MinecraftTextChannel';
 
 export default class MinecraftMessage implements Message {
 	constructor(
-		private channel: MinecraftTextChannel,
-		private author: MinecraftIdentity,
-		private message: string
+		private _channel: MinecraftTextChannel,
+		private _author: MinecraftIdentity,
+		private _content: string
 	) {}
 
-	getChannel(): TextChannel {
-		return this.channel;
+	get channel() {
+		return this._channel;
 	}
 
-	getAuthor(): Identity {
-		return this.author;
+	get author() {
+		return this._author;
 	}
 
-	getId(): string | undefined {
+	get id(): undefined {
 		return undefined;
 	}
 
-	getTextContent() {
-		return this.message;
+	get textContent() {
+		return this._content;
 	}
 
 	async react() {

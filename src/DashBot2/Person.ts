@@ -7,7 +7,7 @@ export default class Person {
 	async getPrivateTextChannel(preferredServer?: ChatServer) {
 		if (preferredServer) {
 			const channel = await preferredServer.getPrivateTextChannel(
-				this.identities[preferredServer.getId()]
+				this.identities[preferredServer.id]
 			);
 			if (channel) return channel;
 		}
@@ -16,7 +16,7 @@ export default class Person {
 			const identity = this.identities[serverId];
 			const server = identity.getServer();
 
-			if (server.getId() !== preferredServer?.getId()) {
+			if (server.id !== preferredServer?.id) {
 				const channel = await server.getPrivateTextChannel(identity);
 				if (channel) return channel;
 			}

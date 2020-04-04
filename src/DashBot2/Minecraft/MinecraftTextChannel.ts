@@ -9,11 +9,11 @@ export default class MinecraftTextChannel implements TextChannel {
 		private rcon: Rcon | null = null
 	) {}
 
-	getId() {
+	get id() {
 		return '0';
 	}
 
-	getName() {
+	get name() {
 		return 'In-game Chat';
 	}
 

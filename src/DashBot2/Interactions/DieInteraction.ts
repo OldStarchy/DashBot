@@ -22,9 +22,9 @@ export class DieInteraction implements Interaction {
 
 	async onMessage(event: Event<Message>) {
 		const message = event.data;
-		const content = message.getTextContent();
-		const author = message.getAuthor();
-		const channel = message.getChannel();
+		const content = message.textContent;
+		const author = message.author;
+		const channel = message.channel;
 
 		const match = /^roll (d(-?\d+)|dice)$/i.exec(content);
 
@@ -52,7 +52,7 @@ export class DieInteraction implements Interaction {
 				return;
 			}
 			// this.bot.stats.recordUserTriggeredEvent(
-			// 	author.getName(),
+			// 	author.username,
 			// 	`roll d${size}`
 			// );
 			if (size < 0) {
@@ -63,7 +63,7 @@ export class DieInteraction implements Interaction {
 
 			(async () => {
 				await channel.sendText(
-					`@${author.getName()}, rolling a D${(
+					`@${author.username}, rolling a D${(
 						size * (positive ? 1 : -1)
 					).toFixed(0)}...`
 				);
@@ -89,17 +89,17 @@ export class DieInteraction implements Interaction {
 			const size = 11;
 			const result = Math.floor(Math.random() * size) + 1;
 			// this.bot.stats.recordUserTriggeredEvent(
-			// 	author.getName(),
+			// 	author.username,
 			// 	`flip coin`
 			// );
 			channel
-				.sendText('@' + author.getName() + ', flipping...')
+				.sendText('@' + author.username + ', flipping...')
 				.then(() => sleep(1000))
 				.then(() => {
 					if (result === 11) {
 						channel.sendText('Oh no i dropped it :(');
 						// this.bot.stats.recordUserTriggeredEvent(
-						// 	author.getName(),
+						// 	author.username,
 						// 	`flip coin: coins dropped`
 						// );
 						return;
@@ -108,7 +108,7 @@ export class DieInteraction implements Interaction {
 						((result - 1) % 2) + 1 === 1 ? 'Heads!' : 'Tails!'
 					);
 					// this.bot.stats.recordUserTriggeredEvent(
-					// 	author.getName(),
+					// 	author.username,
 					// 	`flip coin: ${
 					// 		((result - 1) % 2) + 1 === 1 ? 'Heads!' : 'Tails!'
 					// 	}`

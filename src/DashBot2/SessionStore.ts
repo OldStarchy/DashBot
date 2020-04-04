@@ -8,8 +8,7 @@ export default class SessionStore<TState> {
 	constructor(protected readonly storage: StorageRegister) {}
 
 	public getSession(message: Message): PersistentData<TState> {
-		const id =
-			message.getChannel().getId() + '/' + message.getAuthor().getId();
+		const id = message.channel.id + '/' + message.author.id;
 
 		return this.storage.createStore<TState>(`Session-${id}`, false);
 	}

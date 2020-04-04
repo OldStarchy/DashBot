@@ -12,7 +12,7 @@ export default class StatisticsCommand implements Command {
 			return;
 		}
 
-		await message.getChannel().sendText('Gathering stats...');
+		await message.channel.sendText('Gathering stats...');
 		await sleep(1000);
 
 		const stats = await this.stats.getStatistics();
@@ -24,6 +24,6 @@ export default class StatisticsCommand implements Command {
 			r.push([stat.name, stat.statistic.toString()]);
 		});
 
-		message.getChannel().sendText(formatTable(r));
+		message.channel.sendText(formatTable(r));
 	}
 }

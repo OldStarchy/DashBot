@@ -8,7 +8,7 @@ export default interface ChatServer<
 	TIdentity extends Identity = Identity,
 	TTextChannel extends TextChannel = TextChannel
 > {
-	getId(): string;
+	readonly id: string;
 	connect(): Promise<void>;
 	disconnect(): Promise<void>;
 	getAudioChannels(): Promise<AudioChannel[]>;

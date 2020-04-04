@@ -5,30 +5,30 @@ import DiscordTextChannel from './DiscordTextChannel';
 
 export default class DiscordMessage implements Message {
 	constructor(
-		private channel: DiscordTextChannel,
-		private message: Discord.Message
+		private _channel: DiscordTextChannel,
+		private _message: Discord.Message
 	) {}
 
-	getAuthor() {
+	get author() {
 		return new DiscordIdentity(
 			this.channel.getServer(),
-			this.message.author
+			this._message.author
 		);
 	}
 
-	getChannel() {
-		return this.channel;
+	get channel() {
+		return this._channel;
 	}
 
-	getId() {
-		return this.message.id;
+	get id() {
+		return this._message.id;
 	}
 
-	getTextContent() {
-		return this.message.cleanContent;
+	get textContent() {
+		return this._message.cleanContent;
 	}
 
 	async react(emoji: string) {
-		this.message.react(emoji);
+		this._message.react(emoji);
 	}
 }

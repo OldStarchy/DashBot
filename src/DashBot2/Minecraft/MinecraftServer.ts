@@ -52,7 +52,7 @@ export default class MinecraftServer
 		return null;
 	}
 
-	getId() {
+	get id() {
 		return 'Minecraft';
 	}
 

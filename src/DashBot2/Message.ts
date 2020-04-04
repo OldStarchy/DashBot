@@ -2,10 +2,10 @@ import Identity from './Identity';
 import TextChannel from './TextChannel';
 
 export default interface Message {
-	getChannel(): TextChannel;
-	getAuthor(): Identity;
-	getId(): string | undefined;
-	getTextContent(): string;
+	readonly channel: TextChannel;
+	readonly author: Identity;
+	readonly id: string | undefined;
+	readonly textContent: string;
 
 	react(emoji: string): Promise<void>;
 }

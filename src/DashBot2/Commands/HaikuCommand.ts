@@ -10,6 +10,6 @@ export default class HaikuCommand implements Command {
 
 		const haiku = getHaiku('shell');
 
-		await message.getChannel().sendText(haiku);
+		await message.channel.sendText(haiku);
 	}
 }

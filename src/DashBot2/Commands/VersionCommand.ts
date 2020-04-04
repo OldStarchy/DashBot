@@ -6,6 +6,6 @@ export default class VersionCommand implements Command {
 	async run(message: Message | null) {
 		if (message === null) return;
 
-		message.getChannel().sendText(getVersion());
+		message.channel.sendText(getVersion());
 	}
 }

@@ -47,9 +47,9 @@ export class NumberGameInteraction implements Interaction {
 			return;
 		}
 
-		const content = message.getTextContent();
-		const channel = message.getChannel();
-		const author = message.getAuthor();
+		const content = message.textContent;
+		const channel = message.channel;
+		const author = message.author;
 
 		const session = this.sessionStore.getSession(message);
 		const sessionData = session.getData(
@@ -63,7 +63,7 @@ export class NumberGameInteraction implements Interaction {
 				const number = Math.floor(Math.random() * 99) + 1;
 				//TODO: something like channel.getTag(author) for <!@id> tags in discord
 				channel.sendText(
-					`OK, @${author.getName()}, I'm thinking of a number between 1 and 100, inclusive`
+					`OK, @${author.username}, I'm thinking of a number between 1 and 100, inclusive`
 				);
 				sessionData.playing = true;
 				sessionData.number = number;
@@ -76,7 +76,7 @@ export class NumberGameInteraction implements Interaction {
 				const tracery = new Tracery({
 					...NumberGuessGrammar,
 					target: {
-						username: author.getName(),
+						username: author.username,
 					},
 				});
 
