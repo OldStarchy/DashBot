@@ -1,8 +1,6 @@
-import { Client, Message } from 'discord.js';
+import { Client } from 'discord.js';
 import Rcon from 'modern-rcon';
 import { Logger } from 'winston';
-import { Action } from './Action';
-import { ActionResult } from './ActionResult';
 import { MinecraftLogClient } from './MinecraftLogClient/MinecraftLogClient';
 
 export interface DashBotOptions {
@@ -20,8 +18,6 @@ export default class DashBot {
 	public readonly minecraftClient?: MinecraftLogClient;
 	public readonly rcon?: Rcon;
 
-	private _actions: Action[] = [];
-
 	constructor({
 		client,
 		config,
@@ -36,7 +32,6 @@ export default class DashBot {
 		this.rcon = rcon;
 
 		this.bindEvents();
-		this.initActions();
 	}
 
 	public async login(): Promise<string> {
@@ -59,38 +54,5 @@ export default class DashBot {
 		this.client.on('ready', () => {
 			this.logger.info(`Logged in as ${this.client.user!.tag}!`);
 		});
-
-		this.client.on('message', this.onMessage.bind(this));
-	}
-
-	private async onMessage(message: Message): Promise<void> {
-		if (message.author.bot) return;
-
-		try {
-			for (const action of this._actions) {
-				const result = await action.handle(message);
-
-				if (ActionResult.isHandled(result)) return;
-			}
-		} catch (e) {
-			this.logger.error(`Message "${message.content}" caused error`);
-			this.logger.error(e);
-			await message.reply('Something broke :poop:');
-		}
-	}
-
-	private initActions(): void {
-		this._actions.push(
-			new (class extends Action {
-				async handle(message: Message) {
-					//TODO: Maybe check to see who's triggered a disconnect so not anyone can do it
-					if (message.content === '__disconnect') {
-						this.bot.destroy();
-						return true;
-					}
-					return false;
-				}
-			})(this)
-		);
 	}
 }

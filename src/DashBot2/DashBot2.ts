@@ -14,6 +14,17 @@ export class DashBot2 extends EventEmitter {
 
 	constructor(private _logger: Logger) {
 		super();
+
+		// eslint-disable-next-line @typescript-eslint/no-this-alias
+		const bot = this;
+		class DisconnectCommand implements Command {
+			async run() {
+				//TODO: Check for admin or something
+				await bot.disconnect();
+				process.exit(0);
+			}
+		}
+		this.registerCommand('disconnect', new DisconnectCommand());
 	}
 
 	public addServer(chatServer: ChatServer) {
