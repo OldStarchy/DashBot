@@ -36,7 +36,7 @@ export default class MinecraftTextChannel implements TextChannel {
 	async sendText(message: string) {
 		if (this._rcon) {
 			//TODO: "DashBot" magic variable
-			const chat = new RconChat(this._rcon, 'DashBot');
+			const chat = new RconChat(this._rcon, this._server.me.username);
 			await chat.broadcast(message);
 		}
 	}

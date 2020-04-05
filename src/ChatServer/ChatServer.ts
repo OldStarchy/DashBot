@@ -13,6 +13,7 @@ export default interface ChatServer<
 	TTextChannel extends TextChannel = TextChannel
 > {
 	readonly id: string;
+	readonly me: Readonly<TIdentity>;
 	connect(): Promise<void>;
 	disconnect(): Promise<void>;
 	getAudioChannels(): Promise<AudioChannel[]>;

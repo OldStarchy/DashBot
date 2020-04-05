@@ -9,16 +9,13 @@ export default function loadConfig(storageDir: string): DashBotConfig {
 	// eslint-disable-next-line @typescript-eslint/no-var-requires
 	const loadedConfig = require(path) as DashBotConfig;
 
-	const defaultConfig: Omit<DashBotConfig, 'discordBotToken'> = {
+	const defaultConfig: DashBotConfig = {
 		botName: 'DashBot',
 		debug: false,
+		servers: [],
 	};
 
 	const config = deepExtend(defaultConfig, loadedConfig);
-
-	if (!config.discordBotToken) {
-		throw new Error('Missing config.discordBotToken');
-	}
 
 	if (config.tls) {
 		if (!config.tls.maintainerEmail) {

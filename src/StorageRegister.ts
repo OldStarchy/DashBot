@@ -61,10 +61,11 @@ export default class StorageRegister {
 	private _fileWatcher: fs.FSWatcher | null = null;
 	private _changeTimeout: NodeJS.Timeout | null = null;
 
-	constructor(file: string, private readonly _logger: Logger) {
+	constructor(file: string, private readonly _logger: Logger, watch = false) {
 		this._storage = new Storage(file, () => ({}));
 
 		this.load();
+		if (watch) this.watch();
 	}
 
 	watch() {

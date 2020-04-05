@@ -13,14 +13,19 @@ export default class MinecraftServer
 	private _textChannel: MinecraftTextChannel;
 	private _identityCache: MinecraftIdentityCache;
 
+	public readonly me: Readonly<MinecraftIdentity>;
+
 	constructor(
+		private _id: string,
 		private _logReader: MinecraftLogClient,
 		private _rcon: Rcon | null,
 		storage: StorageRegister,
-		private _identityService: IdentityService
+		private _identityService: IdentityService,
+		botName: string
 	) {
 		this._textChannel = new MinecraftTextChannel(this, this._rcon);
 		this._identityCache = new MinecraftIdentityCache(this, storage);
+		this.me = new MinecraftIdentity(this, botName);
 	}
 
 	async getTextChannels() {
@@ -84,7 +89,7 @@ export default class MinecraftServer
 	}
 
 	get id() {
-		return 'Minecraft';
+		return this._id;
 	}
 
 	async connect() {

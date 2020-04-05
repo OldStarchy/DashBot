@@ -7,7 +7,7 @@ A chatbot that does whatever I feel like implementing at the time.
 
 ## What can it do
 
-Dashbot will listen for messages on all text channels it has access to and do some simple matching (usually a regex test) to figure out which `Interaction` or `Command` to run. Interactions and Commands are registered in the [main.ts](src/main.ts) file.
+Dashbot will listen for messages on all text channels it has access to and do some simple matching (usually a regex test) to figure out which `Interaction` or `Command` to run. Interactions and Commands are registered in the [startup/registerAllComponents.ts](src/startup/registerAllComponents.ts) file.
 
 See the documentation in each Interaction to see what it does, however, some notable ones are
 

@@ -16,7 +16,9 @@ export default class DiscordServer
 	implements ChatServer<DiscordIdentity, DiscordTextChannel> {
 	private _channelCache: Record<string, DiscordTextChannel> = {};
 	private _loggedIn = deferred<this>();
+
 	constructor(
+		private _id: string,
 		private _discordClient: Discord.Client,
 		private _config: { botToken: string },
 		private _identityService: IdentityService,
@@ -29,7 +31,11 @@ export default class DiscordServer
 	}
 
 	get id() {
-		return 'Discord';
+		return this._id;
+	}
+
+	get me() {
+		return new DiscordIdentity(this, this._discordClient.user!);
 	}
 
 	async connect() {

@@ -33,13 +33,16 @@ interface MinecraftRconConfig {
 	password: string;
 }
 
+interface ChatServerConfig {
+	type: string;
+	id?: string;
+}
+
 interface DashBotConfig {
 	/**
 	 * Default: 'DashBot'
 	 */
 	botName?: string;
-
-	discordBotToken: string;
 
 	/**
 	 * Default: null
@@ -54,22 +57,9 @@ interface DashBotConfig {
 	debug?: boolean;
 
 	/**
-	 * Default: null
-	 * Enables communication with a Minecraft server
+	 * Connection information for the services the bot should connect to
 	 */
-	minecraft?: {
-		/**
-		 * Default: null
-		 * Configuring this allows dashbot to relay messages from a Minecraft server to a channel in discord
-		 */
-		logClient?: MinecraftLogTailConfig | MinecraftLogPumpConfig;
-
-		/**
-		 * Default: null
-		 * Configuring this allows dashbot to relay messages from a channel in discord to a Minecraft server
-		 */
-		rcon?: MinecraftRconConfig;
-	};
+	servers: ChatServerConfig[];
 
 	/**
 	 * Default: null
