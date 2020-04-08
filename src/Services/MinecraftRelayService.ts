@@ -5,7 +5,6 @@ import TextChannel from '../ChatServer/TextChannel';
 import Command from '../Command';
 import DashBot from '../DashBot';
 import { Event } from '../Events';
-import RconChat from '../Rcon/RconChat';
 import Service from '../Service';
 import StorageRegister, { PersistentData } from '../StorageRegister';
 import Tracery from '../tracery/Tracery';
@@ -265,13 +264,11 @@ export default class MinecraftRelayService implements Service {
 			return;
 		}
 
-		const chat = new RconChat(
-			rcon,
+		await rcon.broadcast(
+			message.textContent,
 			message.author.username.replace(/[^a-zA-Z0-9 _-]+/g, ''),
 			'discord'
 		);
-
-		await chat.broadcast(message.textContent);
 	}
 
 	public getEnableCommand() {

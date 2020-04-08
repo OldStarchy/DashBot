@@ -1,12 +1,11 @@
-import Rcon from 'modern-rcon';
-import RconChat from '../../Rcon/RconChat';
+import RconClient from '../../Rcon/RconClient';
 import TextChannel from '../TextChannel';
 import MinecraftServer from './MinecraftServer';
 
 export default class MinecraftTextChannel implements TextChannel {
 	constructor(
 		private _server: MinecraftServer,
-		private _rcon: Rcon | null = null
+		private _rcon: RconClient | null = null
 	) {}
 
 	get id() {
@@ -35,9 +34,7 @@ export default class MinecraftTextChannel implements TextChannel {
 
 	async sendText(message: string) {
 		if (this._rcon) {
-			//TODO: "DashBot" magic variable
-			const chat = new RconChat(this._rcon, this._server.me.username);
-			await chat.broadcast(message);
+			await this._rcon.broadcast(message, this._server.me.username);
 		}
 	}
 }

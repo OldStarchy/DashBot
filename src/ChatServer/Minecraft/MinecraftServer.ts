@@ -1,5 +1,5 @@
-import Rcon from 'modern-rcon';
 import MinecraftLogClient from '../../MinecraftLogClient/MinecraftLogClient';
+import RconClient from '../../Rcon/RconClient';
 import StorageRegister from '../../StorageRegister';
 import ChatServer, { ChatServerEvents } from '../ChatServer';
 import IdentityService from '../IdentityService';
@@ -14,11 +14,12 @@ export default class MinecraftServer
 	private _identityCache: MinecraftIdentityCache;
 
 	public readonly me: Readonly<MinecraftIdentity>;
+	private _rconAvailable = false;
 
 	constructor(
 		private _id: string,
 		private _logReader: MinecraftLogClient,
-		private _rcon: Rcon | null,
+		private _rcon: RconClient | null,
 		storage: StorageRegister,
 		private _identityService: IdentityService,
 		botName: string
@@ -94,12 +95,16 @@ export default class MinecraftServer
 
 	async connect() {
 		this._logReader.start();
-		await this._rcon?.connect();
+		if (this._rcon) {
+			await this._rcon.connect();
+			this._rconAvailable = true;
+			await this._rcon.disconnect();
+		}
 	}
 
 	async disconnect() {
 		this._logReader.stop();
-		await this._rcon?.disconnect();
+		if (this._rcon) await this._rcon.disconnect();
 	}
 
 	async getIdentityById(id: string) {

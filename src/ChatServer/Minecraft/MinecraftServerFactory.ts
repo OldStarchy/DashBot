@@ -1,10 +1,11 @@
 import express from 'express';
-import Rcon from 'modern-rcon';
 import { Logger } from 'winston';
 import getVersion from '../../getVersion';
 import MinecraftLogClient from '../../MinecraftLogClient/MinecraftLogClient';
 import MinecraftPumpLogClient from '../../MinecraftLogClient/MinecraftPumpLogClient';
 import MinecraftTailLogClient from '../../MinecraftLogClient/MinecraftTailLogClient';
+import RconClient from '../../Rcon/RconClient';
+import RconSocket from '../../Rcon/RconSocket';
 import StorageRegister from '../../StorageRegister';
 import IdentityService from '../IdentityService';
 import MinecraftServer from './MinecraftServer';
@@ -39,7 +40,7 @@ export default class MinecraftServerFactory {
 		logger: Logger
 	): MinecraftServer {
 		let minecraftClient: MinecraftLogClient | null = null;
-		let rcon: Rcon | null = null;
+		let rcon: RconClient | null = null;
 
 		if (serverConfig.logClient) {
 			switch (serverConfig.logClient.type) {
@@ -89,10 +90,12 @@ export default class MinecraftServerFactory {
 		}
 
 		if (serverConfig.rcon) {
-			rcon = new Rcon(
-				serverConfig.rcon.host,
-				serverConfig.rcon.port,
-				serverConfig.rcon.password
+			rcon = new RconClient(
+				new RconSocket(
+					serverConfig.rcon.host,
+					serverConfig.rcon.port,
+					serverConfig.rcon.password
+				)
 			);
 		}
 
