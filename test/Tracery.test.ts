@@ -326,4 +326,16 @@ describe('Tracery3', () => {
 
 		expect(result).to.equal('foo');
 	});
+
+	it('Should escape things properly', () => {
+		const input = 'This #is# a tes[st:#of#] escaping \\#things#';
+		const result = Tracery.generate(
+			{
+				origin: Tracery.escape(input),
+			},
+			'origin'
+		);
+
+		expect(result).to.equal(input);
+	});
 });

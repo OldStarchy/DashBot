@@ -44,6 +44,10 @@ export default class Tracery<T extends Grammar = Grammar> {
 		return tracery.generate(entry);
 	}
 
+	static escape(str: string) {
+		return str.replace(/([#\[])/g, match => `\\${match}`);
+	}
+
 	generate(entry: keyof T & string): string {
 		return this.evaluate(`#${entry}#`);
 	}
