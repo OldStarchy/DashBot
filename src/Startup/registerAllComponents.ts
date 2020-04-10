@@ -15,6 +15,7 @@ import DieInteraction from '../Interactions/DieInteraction';
 import GreetInteraction from '../Interactions/GreetInteraction';
 import MinecraftGreetInteraction from '../Interactions/MinecraftGreetInteraction';
 import NumberGameInteraction from '../Interactions/NumberGameInteraction';
+import TraceryInteraction from '../Interactions/TraceryInteraction';
 import MinecraftRelayService from '../Services/MinecraftRelayService';
 import UptimeTrackerStatistic from '../Statistics/UptimeTrackerStatistic';
 import StatisticsTracker from '../StatisticsTracker';
@@ -67,6 +68,7 @@ export default function registerAllComponents(
 		);
 	}
 
+	new TraceryInteraction().register(bot);
 	new NumberGameInteraction(storage).register(bot);
 	new GreetInteraction().register(bot);
 	new DieInteraction().register(bot);
