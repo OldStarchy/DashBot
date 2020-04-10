@@ -4,6 +4,7 @@ import HelpCommand from '../Commands/HelpCommand';
 import ImgurCommand, { ImgurClient } from '../Commands/ImgurCommand';
 import JokeCommand, { ICanHazDadJokeClient } from '../Commands/JokeCommand';
 import PetCommand from '../Commands/PetCommand';
+import PickCommand from '../Commands/PickCommand';
 import PollCommand from '../Commands/PollCommand';
 import StatisticsCommand from '../Commands/StatisticsCommand';
 import VersionCommand from '../Commands/VersionCommand';
@@ -53,6 +54,7 @@ export default function registerAllComponents(
 	bot.registerCommand('joke', new JokeCommand(new ICanHazDadJokeClient()));
 	bot.registerCommand('haiku', new HaikuCommand());
 	bot.registerCommand('poll', new PollCommand());
+	bot.registerCommand('pick', new PickCommand());
 	bot.registerCommand('pet', petCommand);
 	bot.registerCommand('help', helpCommand);
 	bot.registerCommand('version', new VersionCommand());
