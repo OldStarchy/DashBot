@@ -5,7 +5,7 @@ import Emoji from '../util/emoji';
 
 const grammar = {
 	errTooManyArgs: [
-		`Sorry <@!#author.getId#> I can only do polls with up to #maxAnswers# choices at the moment`,
+		`Sorry <@!#author.id#> I can only do polls with up to #maxAnswers# choices at the moment`,
 	],
 	maxAnswers: () => PollCommand.answersEmoji.length,
 	helpText: [
