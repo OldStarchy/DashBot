@@ -40,6 +40,7 @@ export default class DiscordServer
 
 	async connect() {
 		await this._discordClient.login(this._config.botToken);
+		await this._loggedIn;
 	}
 
 	async disconnect() {
