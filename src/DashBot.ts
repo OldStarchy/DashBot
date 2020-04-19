@@ -41,16 +41,21 @@ export default class DashBot extends EventEmitter {
 	}
 
 	public async connect() {
+		let connections = 0;
 		await Promise.all(
 			this._chatServers.map(async server => {
 				try {
 					await server.connect();
+					connections++;
 				} catch (e) {
 					this._logger.error("Couldn't connect to server");
 				}
 			})
 		);
 		this._startTime = Date.now();
+		if (connections > 0) {
+			this.emit(new Event('connected', undefined, false));
+		}
 	}
 
 	public async disconnect() {
@@ -64,6 +69,7 @@ export default class DashBot extends EventEmitter {
 				}
 			})
 		);
+		this.emit(new Event('disconnected', undefined, false));
 	}
 
 	public getUptime() {
@@ -115,6 +121,8 @@ export default class DashBot extends EventEmitter {
 		}
 	}
 
+	on(event: 'disconnected', handler: EventHandler<undefined>): void;
+	on(event: 'connected', handler: EventHandler<undefined>): void;
 	on(event: 'message', handler: EventHandler<Message>): void;
 	on(
 		event: 'presenceUpdate',

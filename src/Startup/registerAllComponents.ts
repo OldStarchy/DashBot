@@ -21,6 +21,7 @@ import NumberGameInteraction from '../Interactions/NumberGameInteraction';
 import TraceryInteraction from '../Interactions/TraceryInteraction';
 import Permissions from '../Permissions';
 import MinecraftRelayService from '../Services/MinecraftRelayService';
+import UpdateAnnouncerService from '../Services/UpdateAnnouncerService';
 import UptimeTrackerStatistic from '../Statistics/UptimeTrackerStatistic';
 import StatisticsTracker from '../StatisticsTracker';
 import StorageRegister from '../StorageRegister';
@@ -51,10 +52,19 @@ export default function registerAllComponents(
 		identityService,
 		storage
 	);
+	const updateAnnouncerService = new UpdateAnnouncerService(
+		storage,
+		identityService,
+		permissions
+	);
 
 	statistics.register(petCommand);
 
 	minecraftRelayService.register(bot);
+	updateAnnouncerService.register(bot);
+
+	bot.registerCommand('minecraft', minecraftRelayService.getEnableCommand());
+	bot.registerCommand('announce', updateAnnouncerService.getCommand());
 
 	bot.registerCommand('stats', new StatisticsCommand(statistics));
 	bot.registerCommand('joke', new JokeCommand(new ICanHazDadJokeClient()));
@@ -64,7 +74,6 @@ export default function registerAllComponents(
 	bot.registerCommand('pet', petCommand);
 	bot.registerCommand('help', helpCommand);
 	bot.registerCommand('version', new VersionCommand());
-	bot.registerCommand('minecraft', minecraftRelayService.getEnableCommand());
 	bot.registerCommand('echo', new EchoCommand(permissions));
 	bot.registerCommand('echoraw', new EchoCommand(permissions));
 	bot.registerCommand('id', new IdCommand(permissions));
