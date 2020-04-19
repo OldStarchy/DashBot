@@ -1,4 +1,5 @@
 import { Event, EventEmitter, EventHandler } from '../../Events';
+import MojangApiClient from '../../MojangApiClient';
 import StorageRegister, { PersistentData } from '../../StorageRegister';
 import MinecraftIdentity from './MinecraftIdentity';
 import MinecraftServer from './MinecraftServer';
@@ -6,7 +7,7 @@ import MinecraftServer from './MinecraftServer';
 export default class MinecraftIdentityCache extends EventEmitter {
 	private _cache: {
 		name: string;
-		id?: string;
+		id: string;
 	}[] = [];
 	private _store: PersistentData<MinecraftIdentityCache['_cache']>;
 	constructor(private server: MinecraftServer, storage: StorageRegister) {
@@ -38,7 +39,7 @@ export default class MinecraftIdentityCache extends EventEmitter {
 	private write() {
 		this._store.setData(this._cache);
 	}
-	public add({ name, id }: { name: string; id?: string }) {
+	public add({ name, id }: { name: string; id: string }) {
 		if (id === undefined) {
 			if (this.internalGetByName(name) === undefined) {
 				this._cache.push({ name, id });
@@ -64,6 +65,16 @@ export default class MinecraftIdentityCache extends EventEmitter {
 		this._cache.push({ name, id });
 		this.write();
 		return;
+	}
+
+	public async addByName(name: string) {
+		if (this.getByName(name) === null) {
+			const mojang = new MojangApiClient();
+			const userData = await mojang.getUuidFromUsername(name);
+			if (userData) {
+				this.add(userData);
+			}
+		}
 	}
 	private internalGetById(id: string) {
 		return this._cache.find(item => item.id === id);

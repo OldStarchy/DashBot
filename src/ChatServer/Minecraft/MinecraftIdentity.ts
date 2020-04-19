@@ -5,12 +5,11 @@ export default class MinecraftIdentity implements Identity {
 	constructor(
 		private readonly _server: MinecraftServer,
 		private readonly _username: string,
-		private readonly _id?: string
+		private readonly _id: string
 	) {}
 
 	get id() {
-		//TODO: Maybe don't use username as id? id's aren't always known though
-		return this._id ?? this._username;
+		return this._id;
 	}
 
 	get username() {
@@ -25,6 +24,9 @@ export default class MinecraftIdentity implements Identity {
 		return this._server;
 	}
 
+	get tag() {
+		return this.username;
+	}
 	async getPrivateTextChannel() {
 		return null;
 	}

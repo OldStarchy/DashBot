@@ -6,6 +6,7 @@ export default interface Message {
 	readonly author: Identity;
 	readonly id: string | undefined;
 	readonly textContent: string;
+	readonly rawContent: string;
 
 	react(emoji: string): Promise<void>;
 }

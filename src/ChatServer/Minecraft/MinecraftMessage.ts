@@ -26,6 +26,10 @@ export default class MinecraftMessage implements Message {
 		return this._content;
 	}
 
+	get rawContent() {
+		return this._content;
+	}
+
 	async react() {
 		throw new NotSupportedException();
 	}

@@ -1,8 +1,11 @@
 import IdentityService from '../ChatServer/IdentityService';
+import EchoCommand from '../Commands/EchoCommand';
 import HaikuCommand from '../Commands/HaikuCommand';
 import HelpCommand from '../Commands/HelpCommand';
+import IdCommand from '../Commands/IdCommand';
 import ImgurCommand, { ImgurClient } from '../Commands/ImgurCommand';
 import JokeCommand, { ICanHazDadJokeClient } from '../Commands/JokeCommand';
+import PermissionCommand from '../Commands/PermissionCommand';
 import PetCommand from '../Commands/PetCommand';
 import PickCommand from '../Commands/PickCommand';
 import PollCommand from '../Commands/PollCommand';
@@ -16,6 +19,7 @@ import GreetInteraction from '../Interactions/GreetInteraction';
 import MinecraftGreetInteraction from '../Interactions/MinecraftGreetInteraction';
 import NumberGameInteraction from '../Interactions/NumberGameInteraction';
 import TraceryInteraction from '../Interactions/TraceryInteraction';
+import Permissions from '../Permissions';
 import MinecraftRelayService from '../Services/MinecraftRelayService';
 import UptimeTrackerStatistic from '../Statistics/UptimeTrackerStatistic';
 import StatisticsTracker from '../StatisticsTracker';
@@ -26,7 +30,8 @@ export default function registerAllComponents(
 	storage: StorageRegister,
 	identityService: IdentityService,
 	statistics: StatisticsTracker,
-	config: DashBotConfig
+	config: DashBotConfig,
+	permissions: Permissions
 ) {
 	statistics.register(new UptimeTrackerStatistic(bot));
 	statistics.register({
@@ -60,6 +65,10 @@ export default function registerAllComponents(
 	bot.registerCommand('help', helpCommand);
 	bot.registerCommand('version', new VersionCommand());
 	bot.registerCommand('minecraft', minecraftRelayService.getEnableCommand());
+	bot.registerCommand('echo', new EchoCommand(permissions));
+	bot.registerCommand('echoraw', new EchoCommand(permissions));
+	bot.registerCommand('id', new IdCommand(permissions));
+	bot.registerCommand('permissions', new PermissionCommand(permissions));
 
 	if (config.imgurClientId) {
 		bot.registerCommand(

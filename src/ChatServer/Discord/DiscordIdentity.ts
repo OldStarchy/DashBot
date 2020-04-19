@@ -24,6 +24,10 @@ export default class DiscordIdentity implements Identity {
 		return this._server;
 	}
 
+	get tag() {
+		return `<@!${this._person.id}>`;
+	}
+
 	getDiscordUser() {
 		return this._person;
 	}

@@ -26,7 +26,7 @@ export default class MinecraftServer
 	) {
 		this._textChannel = new MinecraftTextChannel(this, this._rcon);
 		this._identityCache = new MinecraftIdentityCache(this, storage);
-		this.me = new MinecraftIdentity(this, botName);
+		this.me = new MinecraftIdentity(this, botName, '');
 	}
 
 	async getTextChannels() {
@@ -60,8 +60,8 @@ export default class MinecraftServer
 	on(event: string, listener: (...args: any[]) => void) {
 		switch (event) {
 			case 'message':
-				this._logReader.on('chatMessage', chatMessage => {
-					this._identityCache.add({ name: chatMessage.author });
+				this._logReader.on('chatMessage', async chatMessage => {
+					await this._identityCache.addByName(chatMessage.author);
 
 					listener(
 						new MinecraftMessage(

@@ -10,6 +10,7 @@ import MinecraftServerFactory, {
 } from './ChatServer/Minecraft/MinecraftServerFactory';
 import DashBot from './DashBot';
 import loadConfig from './loadConfig';
+import Permissions from './Permissions';
 import createLogger from './Startup/createLogger';
 import handleCli from './Startup/handleCli';
 import registerAllComponents from './Startup/registerAllComponents';
@@ -34,6 +35,7 @@ const storageFile = path.join(storageDir, 'storage.json');
 const storage = new StorageRegister(storageFile, logger, true);
 const identityService = new IdentityService(storage);
 const statistics = new StatisticsTracker();
+const permissions = new Permissions(storage);
 
 function createServerFromConfig(serverConfig: ChatServerConfig) {
 	switch (serverConfig.type) {
@@ -69,7 +71,14 @@ for (const serverConfig of config.servers) {
 	}
 }
 
-registerAllComponents(bot, storage, identityService, statistics, config);
+registerAllComponents(
+	bot,
+	storage,
+	identityService,
+	statistics,
+	config,
+	permissions
+);
 
 bot.connect();
 

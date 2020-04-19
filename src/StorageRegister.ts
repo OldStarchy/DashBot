@@ -41,7 +41,7 @@ export class PersistentData<TData> extends EventEmitter
 		return data;
 	}
 
-	on(event: 'dataLoaded', handler: EventHandler<TData>): void {
+	on(event: 'dataLoaded', handler: EventHandler<TData | undefined>): void {
 		super.on(event, handler);
 		const current = this._register.getData(this._name) as TData | undefined;
 		if (current) {

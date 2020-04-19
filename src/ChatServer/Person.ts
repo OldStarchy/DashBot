@@ -24,4 +24,18 @@ export default class Person {
 
 		return null;
 	}
+
+	getIds() {
+		const ids: Record<string, string> = {};
+
+		for (const serverId in this._identities) {
+			if (this._identities.hasOwnProperty(serverId)) {
+				const identity = this._identities[serverId];
+
+				ids[serverId] = identity.id;
+			}
+		}
+
+		return ids;
+	}
 }
