@@ -12,7 +12,11 @@ export class Event<TData> {
 	}
 
 	cancel() {
-		this._cancelled = this.cancellable;
+		if (!this.cancellable) {
+			throw new Error('Cannot cancel a non-cancellable event');
+		}
+
+		this._cancelled = true;
 	}
 }
 
