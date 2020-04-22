@@ -27,7 +27,7 @@ export class EventEmitter {
 		[eventName: string]: EventHandler<any>[];
 	} = {};
 
-	emit(event: Event<unknown>) {
+	emit<T = unknown>(event: Event<T>) {
 		if (!this.eventHandlers[event.event]) {
 			return event;
 		}
@@ -39,6 +39,7 @@ export class EventEmitter {
 				return event;
 			}
 		}
+		return event;
 	}
 
 	on(event: string, handler: EventHandler<any>) {
