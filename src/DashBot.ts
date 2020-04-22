@@ -6,6 +6,12 @@ import Command from './Command';
 import { Event, EventEmitter, EventHandler } from './Events';
 import parseArguments from './util/parseArguments';
 
+export interface BeforeRunCommandData {
+	message: Message | null;
+	name: string;
+	args: string[];
+}
+
 export default class DashBot extends EventEmitter {
 	private _commands: Record<string, Command> = {};
 	private _startTime: number | null = null;
@@ -117,10 +123,26 @@ export default class DashBot extends EventEmitter {
 
 	async runCommand(message: Message | null, name: string, ...args: string[]) {
 		if (this._commands[name]) {
+			const event = this.emit(
+				new Event<BeforeRunCommandData>('beforeRunCommand', {
+					message,
+					name,
+					args,
+				})
+			);
+
+			if (event.isCancelled()) {
+				return;
+			}
+
 			await this._commands[name].run(message, name, ...args);
 		}
 	}
 
+	on(
+		event: 'beforeRunCommand',
+		handler: EventHandler<BeforeRunCommandData>
+	): void;
 	on(event: 'disconnected', handler: EventHandler<undefined>): void;
 	on(event: 'connected', handler: EventHandler<undefined>): void;
 	on(event: 'message', handler: EventHandler<Message>): void;
