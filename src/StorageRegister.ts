@@ -49,8 +49,9 @@ export class PersistentData<TData> extends EventEmitter
 		}
 	}
 
-	emit(event: Event<TData | undefined>): Event<TData | undefined> {
-		return super.emit(event) as Event<TData | undefined>;
+	emit<T>(event: Event<T>): Event<T>;
+	emit(event: Event<TData>): Event<TData> {
+		return super.emit<TData>(event);
 	}
 }
 

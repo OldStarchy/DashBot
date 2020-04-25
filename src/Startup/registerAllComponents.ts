@@ -22,6 +22,7 @@ import TraceryInteraction from '../Interactions/TraceryInteraction';
 import Permissions from '../Permissions';
 import MinecraftRelayService from '../Services/MinecraftRelayService';
 import UpdateAnnouncerService from '../Services/UpdateAnnouncerService';
+import CommandStatistic from '../Statistics/CommandStatistic';
 import UptimeTrackerStatistic from '../Statistics/UptimeTrackerStatistic';
 import StatisticsTracker from '../StatisticsTracker';
 import StorageRegister from '../StorageRegister';
@@ -35,6 +36,7 @@ export default function registerAllComponents(
 	permissions: Permissions
 ) {
 	statistics.register(new UptimeTrackerStatistic(bot));
+	statistics.register(new CommandStatistic(storage, bot));
 	statistics.register({
 		getStatistics: async () => {
 			return [
