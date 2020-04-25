@@ -6,9 +6,9 @@
   "license": "Apache-2.0",
   "scripts": {
     "injectVersion": "node scripts/injectVersion.js",
-    "build": "yarn injectVersion && tsc",
-    "build:prod": "yarn injectVersion && tsc -p tsconfig.prod.json",
-    "watch": "yarn injectVersion && tsc -w",
+    "build": "yarn injectVersion --dev && tsc",
+    "build:prod": "yarn injectVersion --prod && tsc -p tsconfig.prod.json",
+    "watch": "yarn injectVersion --dev && tsc -w",
     "run": "node dist/main.js",
     "build:docker": "docker build -t oldstarchy/dashbot .",
     "publish": "yarn build:docker && docker push oldstarchy/dashbot",
