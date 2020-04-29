@@ -1,30 +1,23 @@
-import { Permissions } from 'discord.js';
+import { Logger } from 'winston';
 import IdentityService from './ChatServer/IdentityService';
 import DashBot from './DashBot';
+import Permissions from './Permissions';
 import StatisticsTracker from './StatisticsTracker';
 import StorageRegister from './StorageRegister';
 
-interface DashBotPlugin {
-	register(context: DashBotContext): void;
+export default abstract class DashBotPlugin {
+	abstract register(context: DashBotContext): void;
+	static thing: string;
 }
 
-class DashBotContext {
-	get bot(): DashBot {
-		throw new Error('todo');
-	}
-	get storageFile(): string {
-		throw new Error('todo');
-	}
-	get storage(): StorageRegister {
-		throw new Error('todo');
-	}
-	get identityService(): IdentityService {
-		throw new Error('todo');
-	}
-	get statistics(): StatisticsTracker {
-		throw new Error('todo');
-	}
-	get permissions(): Permissions {
-		throw new Error('todo');
-	}
+export class DashBotContext {
+	constructor(
+		public readonly bot: DashBot,
+		public readonly storage: StorageRegister,
+		public readonly identityService: IdentityService,
+		public readonly statistics: StatisticsTracker,
+		public readonly permissions: Permissions,
+		public readonly config: DashBotConfig,
+		public readonly logger: Logger
+	) {}
 }

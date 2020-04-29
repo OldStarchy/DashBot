@@ -1,5 +1,6 @@
 //@ts-check
 
+import fs from 'fs';
 import path from 'path';
 import DiscordServerFactory, {
 	DiscordServerConfig,
@@ -9,6 +10,7 @@ import MinecraftServerFactory, {
 	MinecraftServerConfig,
 } from './ChatServer/Minecraft/MinecraftServerFactory';
 import DashBot from './DashBot';
+import DashBotPlugin, { DashBotContext } from './DashBotPlugin';
 import loadConfig from './loadConfig';
 import Permissions from './Permissions';
 import createLogger from './Startup/createLogger';
@@ -36,6 +38,48 @@ const storage = new StorageRegister(storageFile, logger, true);
 const identityService = new IdentityService(storage);
 const statistics = new StatisticsTracker();
 const permissions = new Permissions(storage);
+
+const context = new DashBotContext(
+	bot,
+	storage,
+	identityService,
+	statistics,
+	permissions,
+	config,
+	logger
+);
+
+// TODO: Move to config, allow multiple plugin locations (builtin + custom)
+const pluginsDir = './Plugins';
+
+const plugins: DashBotPlugin[] = [];
+
+fs.readdirSync(pluginsDir)
+	.filter(file => file !== '.' && file !== '..')
+	.filter(file => file.endsWith('Plugin.js'))
+	.map(file => pluginsDir + '/' + file)
+	.forEach(file => {
+		try {
+			// eslint-disable-next-line @typescript-eslint/no-var-requires
+			const _import = require(file);
+			if (!_import.default) {
+				return;
+			}
+			const plugin = _import.default;
+
+			if (plugin.prototype instanceof DashBotPlugin) {
+				plugins.push(new plugin());
+			} else {
+				throw new Error("File didn't return an instance of a plugin");
+			}
+		} catch (e) {
+			logger.error(e);
+		}
+	});
+
+plugins.forEach(plugin => {
+	plugin.register(context);
+});
 
 function createServerFromConfig(serverConfig: ChatServerConfig) {
 	switch (serverConfig.type) {
