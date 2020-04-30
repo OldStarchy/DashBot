@@ -1,9 +1,9 @@
 import { Logger } from 'winston';
-import ChatServer from './ChatServer/ChatServer';
-import Identity from './ChatServer/Identity';
+import ChatServer, { PresenceUpdateEventData } from './ChatServer/ChatServer';
 import Message from './ChatServer/Message';
 import Command from './Command';
 import { Event, EventEmitter, EventHandler } from './Events';
+import DeathMessage from './MinecraftLogClient/PlayerDeathMessage';
 import parseArguments from './util/parseArguments';
 
 export interface BeforeRunCommandData {
@@ -36,14 +36,7 @@ export default class DashBot extends EventEmitter {
 	public addServer(chatServer: ChatServer) {
 		this._chatServers.push(chatServer);
 		chatServer.on('message', this.onMessage.bind(this));
-		chatServer.on('presenceUpdate', (identity, joined) => {
-			this.emit(
-				new Event('presenceUpdate', {
-					identity,
-					joined,
-				})
-			);
-		});
+		chatServer.on('presenceUpdate', this.emit.bind(this));
 	}
 
 	public async connect() {
@@ -94,7 +87,8 @@ export default class DashBot extends EventEmitter {
 		this._commands[key] = command;
 	}
 
-	private async onMessage(message: Message) {
+	private async onMessage(event: Event<Message>) {
+		const message = event.data;
 		if (message.author.isBot) {
 			return;
 		}
@@ -108,7 +102,7 @@ export default class DashBot extends EventEmitter {
 
 				await this.runCommand(message, name, ...parameters);
 			} else {
-				this.emit(new Event('message', message));
+				this.emit(event);
 			}
 		} catch (e) {
 			this._logger.error(
@@ -148,8 +142,9 @@ export default class DashBot extends EventEmitter {
 	on(event: 'message', handler: EventHandler<Message>): void;
 	on(
 		event: 'presenceUpdate',
-		handler: EventHandler<{ identity: Identity; joined: boolean }>
+		handler: EventHandler<PresenceUpdateEventData>
 	): void;
+	on(event: 'game.death', handler: EventHandler<DeathMessage>): void;
 	on(event: string, handler: EventHandler<any>): void {
 		return super.on(event, handler);
 	}

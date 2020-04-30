@@ -1,16 +1,14 @@
-import { EventEmitter } from 'events';
 import { Logger } from 'winston';
+import { Event, EventEmitter, EventHandler } from '../Events';
 import ChatMessage from './ChatMessage';
 import LogInOutMessage from './LogInOutMessage';
 import LogMessageParser from './LogMessageParser';
+import DeathMessage from './PlayerDeathMessage';
 
 export default interface MinecraftLogClient {
-	on(event: 'chatMessage', listener: (message: ChatMessage) => void): this;
-	on(
-		event: 'logInOutMessage',
-		listener: (message: LogInOutMessage) => void
-	): this;
-	on(event: string, listener: (...args: any[]) => void): this;
+	on(event: 'chatMessage', handler: EventHandler<ChatMessage>): this;
+	on(event: 'logInOutMessage', handler: EventHandler<LogInOutMessage>): this;
+	on(event: 'deathMessage', handler: EventHandler<DeathMessage>): this;
 }
 
 export interface MinecraftLogClientOptions {
@@ -34,9 +32,11 @@ export default abstract class MinecraftLogClient extends EventEmitter {
 
 		if (message !== null) {
 			if (message instanceof ChatMessage) {
-				this.emit('chatMessage', message);
+				this.emit(new Event('chatMessage', message));
 			} else if (message instanceof LogInOutMessage) {
-				this.emit('logInOutMessage', message);
+				this.emit(new Event('logInOutMessage', message));
+			} else if (message instanceof DeathMessage) {
+				this.emit(new Event('deathMessage', message));
 			}
 		}
 	}

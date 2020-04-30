@@ -1,8 +1,11 @@
+import { Event, EventHandler } from '../../Events';
 import MinecraftLogClient from '../../MinecraftLogClient/MinecraftLogClient';
+import DeathMessage from '../../MinecraftLogClient/PlayerDeathMessage';
 import RconClient from '../../Rcon/RconClient';
 import StorageRegister from '../../StorageRegister';
-import ChatServer, { ChatServerEvents } from '../ChatServer';
+import ChatServer, { PresenceUpdateEventData } from '../ChatServer';
 import IdentityService from '../IdentityService';
+import Message from '../Message';
 import MinecraftIdentity from './MinecraftIdentity';
 import MinecraftIdentityCache from './MinecraftIdentityCache';
 import MinecraftMessage from './MinecraftMessage';
@@ -53,33 +56,63 @@ export default class MinecraftServer
 		return this;
 	}
 
-	on<T extends keyof ChatServerEvents>(
-		event: T,
-		listener: (...args: ChatServerEvents[T]) => void
-	): void;
-	on(event: string, listener: (...args: any[]) => void) {
+	on(event: string, handler: EventHandler<any>): void {
 		switch (event) {
 			case 'message':
-				this._logReader.on('chatMessage', async chatMessage => {
+				this._logReader.on('chatMessage', async event => {
+					const chatMessage = event.data;
 					await this._identityCache.addByName(chatMessage.author);
 
-					listener(
-						new MinecraftMessage(
-							this._textChannel,
-							this._identityCache.getByName(chatMessage.author)!,
-							chatMessage.message
+					handler(
+						new Event<Message>(
+							'message',
+							new MinecraftMessage(
+								this._textChannel,
+								this._identityCache.getByName(
+									chatMessage.author
+								)!,
+								chatMessage.message
+							),
+							false
 						)
 					);
 				});
 				return;
 
 			case 'presenceUpdate':
-				this._logReader.on('logInOutMessage', message => {
-					listener(
-						this._identityCache.getByName(message.who),
-						message.event === 'joined'
+				this._logReader.on('logInOutMessage', async event => {
+					const message = event.data;
+					await this._identityCache.addByName(message.who);
+
+					handler(
+						new Event<PresenceUpdateEventData>(
+							'presenceUpdate',
+							{
+								identity: this._identityCache.getByName(
+									message.who
+								)!,
+								joined: message.event === 'joined',
+							},
+							false
+						)
 					);
 				});
+
+				return;
+			case 'deathMessage':
+				this._logReader.on('deathMessage', async event => {
+					const message = event.data;
+
+					if (!message.player) return; //Intentional game design
+
+					await this._identityCache.addByName(message.player!);
+
+					handler(
+						new Event<DeathMessage>('game.death', message, false)
+					);
+				});
+
+				return;
 		}
 
 		//TODO: other events
