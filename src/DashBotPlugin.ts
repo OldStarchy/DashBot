@@ -7,7 +7,7 @@ import StorageRegister from './StorageRegister';
 
 export default abstract class DashBotPlugin {
 	abstract register(context: DashBotContext): void;
-	static thing: string;
+	abstract get name(): string;
 }
 
 export class DashBotContext {

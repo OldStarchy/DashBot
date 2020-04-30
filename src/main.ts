@@ -63,6 +63,11 @@ fs.readdirSync(pluginsDir)
 			// eslint-disable-next-line @typescript-eslint/no-var-requires
 			const _import = require(file);
 			if (!_import.default) {
+				logger.warn(
+					`Plugin file "${require.resolve(
+						file
+					)}" is missing a default export.`
+				);
 				return;
 			}
 			const plugin = _import.default;
@@ -78,8 +83,13 @@ fs.readdirSync(pluginsDir)
 	});
 
 plugins.forEach(plugin => {
+	logger.info(`Adding plugin "${plugin.name}".`);
 	plugin.register(context);
 });
+
+logger.info(
+	`${plugins.length} plugin${plugins.length !== 1 ? 's' : ''} loaded.`
+);
 
 function createServerFromConfig(serverConfig: ChatServerConfig) {
 	switch (serverConfig.type) {
