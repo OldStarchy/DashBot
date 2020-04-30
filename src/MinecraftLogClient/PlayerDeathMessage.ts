@@ -1,4 +1,6 @@
-const player = '(?<who>[a-zA-Z0-9_]*)';
+import LogMessage from './LogMessage';
+
+const player = '(?<player>[a-zA-Z0-9_]*)';
 const enemy = '(?<enemy>[a-zA-Z0-9_ ]*)';
 const weapon = '(?<weapon>[a-zA-Z0-9_ ]*)';
 
@@ -118,9 +120,37 @@ const deathMessages = {
 	'death.attack.sting.player': player + ' was stung to death by ' + enemy,
 };
 
-const deathMessageRegex = (Object.keys(
+export const deathMessageRegex = (Object.keys(
 	deathMessages
 ) as (keyof typeof deathMessages)[]).map((id: keyof typeof deathMessages) => ({
 	id,
 	regex: new RegExp(deathMessages[id]),
 }));
+
+export default class DeathMessage extends LogMessage {
+	public readonly messageTypeId: string;
+	public readonly player?: string;
+	public readonly enemy?: string;
+	public readonly weapon?: string;
+	constructor(
+		time: string,
+		thread: string,
+		logLevel: string,
+		content: string
+	) {
+		super(time, thread, logLevel, content);
+
+		const type = deathMessageRegex.find(({ regex }) => regex.test(content));
+
+		if (!type) {
+			throw new Error('Message is not a death message');
+		}
+
+		const match = type.regex.exec(this.content)!;
+
+		this.messageTypeId = type.id;
+		this.player = match?.groups!.player;
+		this.enemy = match?.groups!.enemy;
+		this.weapon = match?.groups!.weapon;
+	}
+}
