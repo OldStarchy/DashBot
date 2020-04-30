@@ -26,8 +26,6 @@ export default abstract class MinecraftLogClient extends EventEmitter {
 	public abstract stop(): void;
 
 	public onLineReceived(line: string) {
-		this.logger.info(`Minecraft Log: ${line}`);
-
 		const message = LogMessageParser.parse(line);
 
 		if (message !== null) {

@@ -99,7 +99,7 @@ export default class MinecraftServer
 				});
 
 				return;
-			case 'deathMessage':
+			case 'game.death':
 				this._logReader.on('deathMessage', async event => {
 					const message = event.data;
 
@@ -108,7 +108,14 @@ export default class MinecraftServer
 					await this._identityCache.addByName(message.player!);
 
 					handler(
-						new Event<DeathMessage>('game.death', message, false)
+						new Event<{
+							message: DeathMessage;
+							server: ChatServer;
+						}>(
+							'game.death',
+							{ message: message, server: this },
+							false
+						)
 					);
 				});
 

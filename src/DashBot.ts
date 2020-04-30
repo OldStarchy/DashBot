@@ -35,8 +35,11 @@ export default class DashBot extends EventEmitter {
 
 	public addServer(chatServer: ChatServer) {
 		this._chatServers.push(chatServer);
+
+		// TODO: Make this better
 		chatServer.on('message', this.onMessage.bind(this));
 		chatServer.on('presenceUpdate', this.emit.bind(this));
+		chatServer.on('game.death', this.emit.bind(this));
 	}
 
 	public async connect() {
@@ -144,7 +147,10 @@ export default class DashBot extends EventEmitter {
 		event: 'presenceUpdate',
 		handler: EventHandler<PresenceUpdateEventData>
 	): void;
-	on(event: 'game.death', handler: EventHandler<DeathMessage>): void;
+	on(
+		event: 'game.death',
+		handler: EventHandler<{ message: DeathMessage; server: ChatServer }>
+	): void;
 	on(event: string, handler: EventHandler<any>): void {
 		return super.on(event, handler);
 	}

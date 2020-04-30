@@ -77,7 +77,8 @@ registerAllComponents(
 	identityService,
 	statistics,
 	config,
-	permissions
+	permissions,
+	logger
 );
 
 bot.connect();

@@ -1,8 +1,8 @@
 import LogMessage from './LogMessage';
 
-const player = '(?<player>[a-zA-Z0-9_]*)';
-const enemy = '(?<enemy>[a-zA-Z0-9_ ]*)';
-const weapon = '(?<weapon>[a-zA-Z0-9_ ]*)';
+const player = '(?<player>[a-zA-Z0-9_]+)';
+const enemy = '(?<enemy>[a-zA-Z0-9_ ]+?)';
+const weapon = '\\[(?<weapon>[a-zA-Z0-9_ ]+)\\]';
 
 const deathMessages = {
 	'death.fell.accident.ladder': player + ' fell off a ladder',
@@ -124,7 +124,7 @@ export const deathMessageRegex = (Object.keys(
 	deathMessages
 ) as (keyof typeof deathMessages)[]).map((id: keyof typeof deathMessages) => ({
 	id,
-	regex: new RegExp(deathMessages[id]),
+	regex: new RegExp('^' + deathMessages[id] + '$'),
 }));
 
 export default class DeathMessage extends LogMessage {

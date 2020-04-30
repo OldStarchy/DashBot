@@ -1,3 +1,4 @@
+import { Logger } from 'winston';
 import RconSocket from './RconSocket';
 import RichText from './RichText';
 
@@ -5,7 +6,7 @@ export default class RconClient {
 	private _disconnectTimeout: NodeJS.Timeout | null = null;
 	private _connected = false;
 
-	constructor(private _client: RconSocket) {}
+	constructor(private _client: RconSocket, private _logger: Logger) {}
 
 	async connect(disconnectTimeout = 1000 * 10) {
 		await this._client.connect();
@@ -179,17 +180,22 @@ export default class RconClient {
 		await this._send(`title @a title ${JSON.stringify(title)}`);
 	}
 
+	async give(player: string, item: string, count = 1, data = '') {
+		const command = `give ${player} ${item}${data} ${count}`;
+
+		return await this._send(command);
+	}
 	private async _send(data: string) {
 		if (!this._connected) {
 			await this.connect();
 		}
 
+		this._logger.info(`running rcon """${data}"""`);
 		const result = await this._client.send(data);
-
-		await this.disconnect();
 
 		return result;
 	}
+
 	static validatePlayerName(name: string) {
 		name = name.trim();
 
