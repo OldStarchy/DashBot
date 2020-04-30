@@ -45,12 +45,6 @@ interface DashBotConfig {
 	botName?: string;
 
 	/**
-	 * Default: null
-	 * If set, enables the `!imgur <search>` command to return random Imgur image search results.
-	 */
-	imgurClientId?: string;
-
-	/**
 	 * Default: false
 	 * Log extra debug messages
 	 */

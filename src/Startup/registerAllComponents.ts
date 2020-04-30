@@ -5,7 +5,6 @@ import EchoCommand from '../Commands/EchoCommand';
 import HaikuCommand from '../Commands/HaikuCommand';
 import HelpCommand from '../Commands/HelpCommand';
 import IdCommand from '../Commands/IdCommand';
-import ImgurCommand, { ImgurClient } from '../Commands/ImgurCommand';
 import JokeCommand, { ICanHazDadJokeClient } from '../Commands/JokeCommand';
 import PermissionCommand from '../Commands/PermissionCommand';
 import PetCommand from '../Commands/PetCommand';
@@ -88,14 +87,6 @@ export default function registerAllComponents(
 	bot.registerCommand('permissions', new PermissionCommand(permissions));
 	bot.registerCommand('brewing', new BrewingCommand());
 
-	if (config.imgurClientId) {
-		bot.registerCommand(
-			'imgur',
-			new ImgurCommand(new ImgurClient(config.imgurClientId))
-		);
-	}
-
-	new QuizGameService().register(bot);
 	new TraceryInteraction().register(bot);
 	new NumberGameInteraction(storage).register(bot);
 	new GreetInteraction().register(bot);
