@@ -1,3 +1,4 @@
+import changeLog from '../changeLog';
 import IdentityService from '../ChatServer/IdentityService';
 import Message from '../ChatServer/Message';
 import TextChannel from '../ChatServer/TextChannel';
@@ -30,24 +31,6 @@ interface UpdateAnnouncerServiceData {
 		channelId: string;
 	} | null;
 }
-
-type ChangeLog = {
-	[version: string]: {
-		Added?: string[];
-		Updated?: string[];
-		Removed?: string[];
-		Fixed?: string[];
-	};
-};
-
-const changeLog: ChangeLog = {
-	'0.2.5': {
-		Added: [
-			'Murderers in MineCraft now get ahead of the competition',
-			'Super basic change log',
-		],
-	},
-};
 
 export default class UpdateAnnouncerService implements Service {
 	private _store: PersistentData<UpdateAnnouncerServiceData>;
