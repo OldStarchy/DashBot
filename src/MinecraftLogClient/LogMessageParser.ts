@@ -1,6 +1,7 @@
 import ChatMessage from './ChatMessage';
 import LogInOutMessage from './LogInOutMessage';
 import LogMessage from './LogMessage';
+import DeathMessage from './PlayerDeathMessage';
 
 export default class LogMessageParser {
 	static parse(rawMessage: string): LogMessage | null {
@@ -18,6 +19,10 @@ export default class LogMessageParser {
 		if (LogMessage.LOG_IN_OUT_REGEX.test(content)) {
 			return new LogInOutMessage(time, thread, logLevel, content);
 		}
+
+		try {
+			return new DeathMessage(time, thread, logLevel, content);
+		} catch {}
 
 		return new LogMessage(time, thread, logLevel, content);
 	}

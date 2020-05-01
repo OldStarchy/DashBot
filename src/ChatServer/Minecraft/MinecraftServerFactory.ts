@@ -95,7 +95,8 @@ export default class MinecraftServerFactory {
 					serverConfig.rcon.host,
 					serverConfig.rcon.port,
 					serverConfig.rcon.password
-				)
+				),
+				logger
 			);
 		}
 

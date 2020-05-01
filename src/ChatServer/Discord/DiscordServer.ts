@@ -1,8 +1,9 @@
 import Discord from 'discord.js';
 import { Logger } from 'winston';
+import { Event, EventHandler } from '../../Events';
 import deferred from '../../util/deferred';
 import AudioChannel from '../AudioChannel';
-import ChatServer, { ChatServerEvents } from '../ChatServer';
+import ChatServer from '../ChatServer';
 import Identity from '../Identity';
 import IdentityService from '../IdentityService';
 import TextChannel from '../TextChannel';
@@ -52,18 +53,18 @@ export default class DiscordServer
 		return this._loggedIn;
 	}
 
-	on<T extends keyof ChatServerEvents>(
-		event: T,
-		listener: (...args: ChatServerEvents[T]) => void
-	): void;
-	on(event: string, listener: (...args: any[]) => void): this {
+	on(event: string, handler: EventHandler<any>): void {
 		switch (event) {
 			case 'message':
 				this._discordClient.on(event, message =>
-					listener(
-						new DiscordMessage(
-							this.getChannel(message.channel),
-							message
+					handler(
+						new Event(
+							'message',
+							new DiscordMessage(
+								this.getChannel(message.channel),
+								message
+							),
+							false
 						)
 					)
 				);
@@ -75,11 +76,9 @@ export default class DiscordServer
 			// 	presence?.status
 			// })
 			default:
-				// this._discordClient.on(event, listener);
+				// this._discordClient.on(event, handler);
 				break;
 		}
-
-		return this;
 	}
 
 	private getChannel(internalChannel: TDiscordTextChannel) {
