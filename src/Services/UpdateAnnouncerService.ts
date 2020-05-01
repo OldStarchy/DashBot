@@ -31,6 +31,24 @@ interface UpdateAnnouncerServiceData {
 	} | null;
 }
 
+type ChangeLog = {
+	[version: string]: {
+		Added?: string[];
+		Updated?: string[];
+		Removed?: string[];
+		Fixed?: string[];
+	};
+};
+
+const changeLog: ChangeLog = {
+	'0.2.5': {
+		Added: [
+			'Murderers in MineCraft now get ahead of the competition',
+			'Super basic change log',
+		],
+	},
+};
+
 export default class UpdateAnnouncerService implements Service {
 	private _store: PersistentData<UpdateAnnouncerServiceData>;
 
@@ -93,7 +111,7 @@ export default class UpdateAnnouncerService implements Service {
 
 	private async announceUpdate(channel: TextChannel, newVersion: string) {
 		if (channel) {
-			channel.sendText(
+			await channel.sendText(
 				Tracery.generate(
 					{
 						...grammar,
@@ -102,6 +120,27 @@ export default class UpdateAnnouncerService implements Service {
 					'new-version'
 				)
 			);
+
+			const newVersionNoDev = newVersion.replace(/(^v|@dev$)/g, '');
+			if (changeLog[newVersionNoDev]) {
+				const changes = changeLog[newVersionNoDev];
+				let updates = '';
+
+				(Object.keys(changes) as (keyof typeof changes)[]).forEach(
+					header => {
+						if (changes[header]!.length > 0) {
+							updates += [
+								header + ':',
+								...changes[header]!.map(
+									change => ' * ' + change
+								),
+							].join('\n');
+						}
+					}
+				);
+
+				await channel.sendText(updates);
+			}
 		}
 	}
 
