@@ -1,6 +1,6 @@
 {
   "name": "dashbot",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "main": "index.js",
   "author": "Nicholas Sorokin <nicholas.sorokin@hotmail.com>",
   "license": "Apache-2.0",
