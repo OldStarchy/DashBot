@@ -209,15 +209,16 @@ describe('Tracery3', () => {
 	it('Should modify reduced objects', () => {
 		const result = Tracery.generate(
 			{
-				origin: 'This is #user.name#, and this is #user.name.s# cat',
-				user: {
-					name: 'Ned',
+				origin:
+					'This is a #thing.type#, it is one of many #thing.type.s#',
+				thing: {
+					type: 'bed',
 				},
 			},
 			'origin'
 		);
 
-		expect(result).to.equal('This is Ned, and this is Neds cat');
+		expect(result).to.equal('This is a bed, it is one of many beds');
 	});
 
 	it('Should not work with unclosed #', () => {
