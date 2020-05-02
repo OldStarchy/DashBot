@@ -46,17 +46,25 @@ This project uses Yarn, information on how to install and use yarn can be found 
 
     /** @type DashBotConfig */
     const Config = {
-    	discordBotToken: '',
-    	minecraft: {
-    		logClient: {
-    			type: 'webhook',
-    			whitelist: ['your server ip']
-    		}
-    		rcon: {
-    			host: 'my-minecraft-server.com'
-    			password: 'example password'
-    		}
-    	},
+    	imgurClientId: '',
+    	servers: [
+    		{
+    			type: 'discord',
+    			botToken: '',
+    		},
+    		{
+    			type: 'minecraft',
+    			logClient: {
+    				type: 'tail',
+    				logFilePath: '/path/to/minecraft/logs/latest.log',
+    			},
+    			rcon: {
+    				host: '127.0.0.1',
+    				port: 1234,
+    				password: 'example password',
+    			},
+    		},
+    	],
     	tls: {
     		maintainerEmail: 'your.email@exmaple.com',
     		packageAgent: 'dashbot/1.0.0',
@@ -88,7 +96,3 @@ This project uses Yarn, information on how to install and use yarn can be found 
     The storage flag tells dashbot where to load the config from, as well as where to store its statistics, and log files. By default it will be a directory named "storage".
 
 8. If everything worked correctly, you can go have a look in discord, your bot should be online. Now say something like `roll d20` or `joke` to activate one of its responses.
-
-## Known Bugs
-
-This is a WIP so there's lots of things wrong with it, but the main one is sometimes it just stops / crashes. Not sure why, maybe discord is kicking the bot or there's some crash happening, or maybe my raspberry pi is just running out of ram. Whatever the cause, its not leaving any trace in the error log /shrug
