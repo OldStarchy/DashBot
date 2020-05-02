@@ -8,7 +8,9 @@ type ChangeLog = {
 };
 
 const changeLog: ChangeLog = {
-	'0.2.6': {},
+	'0.2.6': {
+		Updated: ['EventEmitter is better and covered by tests.'],
+	},
 	'0.2.5': {
 		Added: [
 			'Murderers in MineCraft now get ahead of the competition',
