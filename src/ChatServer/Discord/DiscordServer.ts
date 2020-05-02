@@ -1,6 +1,6 @@
 import Discord from 'discord.js';
 import { Logger } from 'winston';
-import { Event, EventHandler } from '../../Events';
+import { CancellableEvent, EventHandler } from '../../Events';
 import deferred from '../../util/deferred';
 import AudioChannel from '../AudioChannel';
 import ChatServer from '../ChatServer';
@@ -58,13 +58,12 @@ export default class DiscordServer
 			case 'message':
 				this._discordClient.on(event, message =>
 					handler(
-						new Event(
+						new CancellableEvent(
 							'message',
 							new DiscordMessage(
 								this.getChannel(message.channel),
 								message
-							),
-							false
+							)
 						)
 					)
 				);

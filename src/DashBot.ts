@@ -2,7 +2,7 @@ import { Logger } from 'winston';
 import ChatServer, { PresenceUpdateEventData } from './ChatServer/ChatServer';
 import Message from './ChatServer/Message';
 import Command from './Command';
-import { Event, EventEmitter, EventHandler } from './Events';
+import { CancellableEvent, Event, EventEmitter, EventHandler } from './Events';
 import DeathMessage from './MinecraftLogClient/PlayerDeathMessage';
 import parseArguments from './util/parseArguments';
 
@@ -56,7 +56,7 @@ export default class DashBot extends EventEmitter {
 		);
 		this._startTime = Date.now();
 		if (connections > 0) {
-			this.emit(new Event('connected', undefined, false));
+			this.emit(new CancellableEvent('connected', undefined));
 		}
 	}
 
@@ -71,7 +71,7 @@ export default class DashBot extends EventEmitter {
 				}
 			})
 		);
-		this.emit(new Event('disconnected', undefined, false));
+		this.emit(new CancellableEvent('disconnected', undefined));
 	}
 
 	public getUptime() {

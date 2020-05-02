@@ -1,4 +1,4 @@
-import { Event, EventHandler } from '../../Events';
+import { CancellableEvent, EventHandler } from '../../Events';
 import MinecraftLogClient from '../../MinecraftLogClient/MinecraftLogClient';
 import DeathMessage from '../../MinecraftLogClient/PlayerDeathMessage';
 import RconClient from '../../Rcon/RconClient';
@@ -64,7 +64,7 @@ export default class MinecraftServer
 					await this._identityCache.addByName(chatMessage.author);
 
 					handler(
-						new Event<Message>(
+						new CancellableEvent<Message>(
 							'message',
 							new MinecraftMessage(
 								this._textChannel,
@@ -72,8 +72,7 @@ export default class MinecraftServer
 									chatMessage.author
 								)!,
 								chatMessage.message
-							),
-							false
+							)
 						)
 					);
 				});
@@ -85,15 +84,14 @@ export default class MinecraftServer
 					await this._identityCache.addByName(message.who);
 
 					handler(
-						new Event<PresenceUpdateEventData>(
+						new CancellableEvent<PresenceUpdateEventData>(
 							'presenceUpdate',
 							{
 								identity: this._identityCache.getByName(
 									message.who
 								)!,
 								joined: message.event === 'joined',
-							},
-							false
+							}
 						)
 					);
 				});
@@ -108,14 +106,10 @@ export default class MinecraftServer
 					await this._identityCache.addByName(message.player!);
 
 					handler(
-						new Event<{
+						new CancellableEvent<{
 							message: DeathMessage;
 							server: ChatServer;
-						}>(
-							'game.death',
-							{ message: message, server: this },
-							false
-						)
+						}>('game.death', { message: message, server: this })
 					);
 				});
 
