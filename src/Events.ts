@@ -22,7 +22,9 @@ export class CancellableEvent<TData> extends Event<TData> {
 	}
 }
 
-export type EventHandler<TData = unknown> = (event: Event<TData>) => void;
+export type EventHandler<TData = unknown> = (
+	event: Event<TData>
+) => void | Promise<void>;
 
 export class EventEmitter {
 	private eventHandlers: {
@@ -58,7 +60,6 @@ export class EventEmitter {
 
 		return event;
 	}
-
 	private internalEmit<T = unknown>(
 		event: Event<T>,
 		handlers: EventHandler<any>[]
@@ -74,6 +75,48 @@ export class EventEmitter {
 		} else {
 			for (const handler of handlers) {
 				handler(event);
+			}
+		}
+	}
+
+	async emitAsync<T = unknown>(event: Event<T>) {
+		const events = EventEmitter.extractEventTypes(event.event);
+
+		const handlerss = events
+			.map(eventName => this.eventHandlers[eventName])
+			.filter(handlers => handlers && handlers.length > 0)
+			.map(handlers => handlers.map(handler => handler.handler));
+
+		for (const handlers of handlerss) {
+			await this.internalEmitAsync(event, handlers);
+		}
+
+		return event;
+	}
+
+	private async internalEmitAsync<T = unknown>(
+		event: Event<T>,
+		handlers: EventHandler<any>[]
+	) {
+		if (event instanceof CancellableEvent) {
+			for (const handler of handlers) {
+				const result = handler(event);
+
+				if (result instanceof Promise) {
+					await result;
+				}
+
+				if (event.isCancelled()) {
+					return;
+				}
+			}
+		} else {
+			for (const handler of handlers) {
+				const result = handler(event);
+
+				if (result instanceof Promise) {
+					await result;
+				}
 			}
 		}
 	}
