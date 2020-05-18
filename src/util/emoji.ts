@@ -1,6 +1,7 @@
 const Emoji = {
 	THUMBS_UP: '👍',
 	THUMBS_DOWN: '👎',
+	NO_ENTRY: '🚫',
 	ZERO: '0️⃣',
 	ONE: '1️⃣',
 	TWO: '2️⃣',
@@ -12,6 +13,8 @@ const Emoji = {
 	EIGHT: '8️⃣',
 	NINE: '9️⃣',
 	TEN: '🔟',
+	OK: '🆗',
+	ALARM_CLOCK: '⏰',
 };
 
 export default Emoji as Readonly<typeof Emoji>;

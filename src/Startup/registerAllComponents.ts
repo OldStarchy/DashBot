@@ -19,6 +19,7 @@ import DieInteraction from '../Interactions/DieInteraction';
 import GreetInteraction from '../Interactions/GreetInteraction';
 import MinecraftGreetInteraction from '../Interactions/MinecraftGreetInteraction';
 import NumberGameInteraction from '../Interactions/NumberGameInteraction';
+import QuizGameService from '../Interactions/QuizGame';
 import TraceryInteraction from '../Interactions/TraceryInteraction';
 import Permissions from '../Permissions';
 import MinecraftRelayService from '../Services/MinecraftRelayService';
@@ -90,6 +91,7 @@ export default function registerAllComponents(
 		);
 	}
 
+	new QuizGameService().register(bot);
 	new TraceryInteraction().register(bot);
 	new NumberGameInteraction(storage).register(bot);
 	new GreetInteraction().register(bot);

@@ -38,8 +38,12 @@ export default class DashBot extends EventEmitter {
 
 		// TODO: Make this better
 		chatServer.on('message', this.onMessage.bind(this));
-		chatServer.on('presenceUpdate', this.emit.bind(this));
-		chatServer.on('game.death', this.emit.bind(this));
+		chatServer.on('presenceUpdate', e => {
+			this.emit(e);
+		});
+		chatServer.on('game.death', e => {
+			this.emit(e);
+		});
 	}
 
 	public async connect() {
@@ -105,7 +109,7 @@ export default class DashBot extends EventEmitter {
 
 				await this.runCommand(message, name, ...parameters);
 			} else {
-				this.emit(event);
+				await this.emitAsync(event);
 			}
 		} catch (e) {
 			this._logger.error(

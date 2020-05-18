@@ -30,6 +30,10 @@ export default class DiscordMessage implements Message {
 	}
 
 	async react(emoji: string) {
-		this._message.react(emoji);
+		await this._message.react(emoji);
+	}
+
+	get discordMessage() {
+		return this._message;
 	}
 }
