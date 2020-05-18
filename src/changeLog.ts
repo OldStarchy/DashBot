@@ -8,7 +8,9 @@ type ChangeLog = {
 };
 
 const changeLog: ChangeLog = {
-	'0.2.7': {},
+	'0.2.7': {
+		Fixed: ['Formatting issue in the update announcer'],
+	},
 	'0.2.6': {
 		Added: ['Quiz game (WIP) start playing with "play quiz"'],
 		Updated: [

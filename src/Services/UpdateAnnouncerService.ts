@@ -112,17 +112,18 @@ export default class UpdateAnnouncerService implements Service {
 				(Object.keys(changes) as (keyof typeof changes)[]).forEach(
 					header => {
 						if (changes[header]!.length > 0) {
-							updates += [
-								header + ':',
-								...changes[header]!.map(
-									change => ' * ' + change
-								),
-							].join('\n');
+							updates +=
+								[
+									header + ':',
+									...changes[header]!.map(
+										change => ' * ' + change
+									),
+								].join('\n') + '\n';
 						}
 					}
 				);
 
-				await channel.sendText(updates);
+				await channel.sendText(updates.trimEnd());
 			}
 		}
 	}
