@@ -8,8 +8,13 @@ type ChangeLog = {
 };
 
 const changeLog: ChangeLog = {
+	'0.2.7': {},
 	'0.2.6': {
-		Updated: ['EventEmitter is better and covered by tests.'],
+		Added: ['Quiz game (WIP) start playing with "play quiz"'],
+		Updated: [
+			'EventEmitter is better and covered by tests.',
+			'EventEmitter now has a emitAsync function',
+		],
 	},
 	'0.2.5': {
 		Added: [
