@@ -8,6 +8,9 @@ type ChangeLog = {
 };
 
 const changeLog: ChangeLog = {
+	'0.3.3': {
+		Fixed: ['Fix update announcer printing things twice'],
+	},
 	'0.3.2': {
 		Updated: [
 			'Update announcer should announce all new updates not just the latest one',
