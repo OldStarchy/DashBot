@@ -8,8 +8,12 @@ type ChangeLog = {
 };
 
 const changeLog: ChangeLog = {
-	'0.2.7': {
+	'0.3.0': {
 		Fixed: ['Formatting issue in the update announcer'],
+		Added: [
+			'Schedule Service for scheduling long term events',
+			'!remind command, usage `!remind in 5 minutes its been five minutes`',
+		],
 	},
 	'0.2.6': {
 		Added: ['Quiz game (WIP) start playing with "play quiz"'],

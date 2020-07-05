@@ -23,6 +23,7 @@ import QuizGameService from '../Interactions/QuizGame';
 import TraceryInteraction from '../Interactions/TraceryInteraction';
 import Permissions from '../Permissions';
 import MinecraftRelayService from '../Services/MinecraftRelayService';
+import ScheduleService from '../Services/ScheduleService';
 import UpdateAnnouncerService from '../Services/UpdateAnnouncerService';
 import CommandStatistic from '../Statistics/CommandStatistic';
 import UptimeTrackerStatistic from '../Statistics/UptimeTrackerStatistic';
@@ -67,6 +68,7 @@ export default function registerAllComponents(
 
 	minecraftRelayService.register(bot);
 	updateAnnouncerService.register(bot);
+	new ScheduleService({ storage, identityService }).register(bot);
 
 	bot.registerCommand('minecraft', minecraftRelayService.getEnableCommand());
 	bot.registerCommand('announce', updateAnnouncerService.getCommand());
