@@ -9,6 +9,7 @@ import Permissions from '../Permissions';
 import Service from '../Service';
 import StorageRegister, { PersistentData } from '../StorageRegister';
 import Tracery from '../tracery/Tracery';
+import compareSemVer from '../util/compareSemVer';
 
 const grammar = {
 	'new-version': [
@@ -59,7 +60,7 @@ export default class UpdateAnnouncerService implements Service {
 		if (previousVersion !== getVersion()) {
 			const channel = await this.getChannel();
 			if (channel) {
-				this.announceUpdate(channel, getVersion());
+				this.announceUpdate(channel, getVersion(), previousVersion);
 			}
 
 			this._store.setData({
@@ -92,40 +93,66 @@ export default class UpdateAnnouncerService implements Service {
 		return channel;
 	}
 
-	private async announceUpdate(channel: TextChannel, newVersion: string) {
+	private async announceUpdate(
+		channel: TextChannel,
+		newVersion: string,
+		previousVersion?: string
+	) {
 		if (channel) {
-			await channel.sendText(
-				Tracery.generate(
-					{
-						...grammar,
-						version: newVersion,
-					},
-					'new-version'
-				)
-			);
+			if (previousVersion) {
+				const versionHistory = Object.keys(changeLog);
+				versionHistory.sort(compareSemVer);
 
+				for (const version of versionHistory) {
+					if (compareSemVer(version, previousVersion) > 0) {
+						await this.printVersionDetails(
+							channel,
+							version,
+							changeLog[version]
+						);
+					}
+				}
+			}
 			const newVersionNoDev = newVersion.replace(/(^v|@dev$)/g, '');
 			if (changeLog[newVersionNoDev]) {
 				const changes = changeLog[newVersionNoDev];
-				let updates = '';
-
-				(Object.keys(changes) as (keyof typeof changes)[]).forEach(
-					header => {
-						if (changes[header]!.length > 0) {
-							updates +=
-								[
-									header + ':',
-									...changes[header]!.map(
-										change => ' * ' + change
-									),
-								].join('\n') + '\n';
-						}
-					}
-				);
-
-				await channel.sendText(updates.trimEnd());
+				await this.printVersionDetails(channel, newVersion, changes);
 			}
 		}
+	}
+
+	private async printVersionDetails(
+		channel: TextChannel,
+		newVersion: string,
+		changes: {
+			Added?: string[] | undefined;
+			Updated?: string[] | undefined;
+			Removed?: string[] | undefined;
+			Fixed?: string[] | undefined;
+		}
+	) {
+		let updates = '';
+
+		await channel.sendText(
+			Tracery.generate(
+				{
+					...grammar,
+					version: newVersion,
+				},
+				'new-version'
+			)
+		);
+		(Object.keys(changes) as (keyof typeof changes)[]).forEach(header => {
+			if (changes[header]!.length > 0) {
+				updates +=
+					[
+						header + ':',
+						...changes[header]!.map(change => ' * ' + change),
+					].join('\n') + '\n';
+			}
+		});
+
+		await channel.sendText(updates.trimEnd());
 	}
 
 	getCommand() {
