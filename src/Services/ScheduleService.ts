@@ -123,12 +123,18 @@ export default class ScheduleService extends EventEmitter implements Service {
 
 		const now = Date.now();
 
+		let any = false;
+
 		while (events.length > 0 && events[0].timestamp < now) {
 			const event = events.shift()!;
-
-			this.emit(event.event);
-			//TODO: try/catch log
+			any = true;
+			try {
+				this.emit(event.event);
+				//TODO: try/catch log
+			} catch {}
 		}
+
+		this._store.setData({ events });
 	}
 
 	queueEvent<T>(timestamp: number, event: Event<T>) {
