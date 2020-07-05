@@ -16,9 +16,11 @@ interface Options {
 	interval: number;
 	storage: StorageRegister;
 	identityService: IdentityService;
+	maxTimersPerPerson: number;
 }
 const defaultOptions = {
 	interval: 5000,
+	maxTimersPerPerson: 5,
 };
 
 export type ScheduleServiceOptions = PartialDefaults<
@@ -27,13 +29,14 @@ export type ScheduleServiceOptions = PartialDefaults<
 >;
 
 interface ScheduleServiceData {
-	events: { timestamp: number; event: Event<unknown> }[];
+	events: { timestamp: number; event: Event<unknown>; owner: string }[];
 }
 export default class ScheduleService extends EventEmitter implements Service {
 	private _interval: number;
 	private _intervalId: NodeJS.Timeout | null = null;
 	private _store: DataStore<ScheduleServiceData>;
 	private _identityService: IdentityService;
+	private _maxTimersPerPerson: number;
 
 	private _remindCommand: Command;
 
@@ -41,9 +44,16 @@ export default class ScheduleService extends EventEmitter implements Service {
 		super();
 		const compiledOptions = shallowMerge(defaultOptions, options);
 
-		const { interval, storage, identityService } = compiledOptions;
+		const {
+			interval,
+			storage,
+			identityService,
+			maxTimersPerPerson,
+		} = compiledOptions;
+
 		this._interval = interval;
 		this._identityService = identityService;
+		this._maxTimersPerPerson = maxTimersPerPerson;
 
 		this._store = storage.createStore<ScheduleServiceData>(
 			'ScheduleService',
@@ -84,22 +94,29 @@ export default class ScheduleService extends EventEmitter implements Service {
 					return;
 				}
 
-				await message.channel.sendText(
-					`"${reminder}" at ${new Date(
-						time
-					).toString()} (${DateStringParser.getTimeDiffString(
-						time - Date.now()
-					)})`
-				);
-
-				service.queueEvent(
+				const success = service.queueEvent(
 					time,
 					new Event('reminder', {
 						reminder,
 						serverId: message.channel.server.id,
 						channelId: message.channel.id,
-					})
+					}),
+					message.author.id
 				);
+
+				if (success) {
+					await message.channel.sendText(
+						`"${reminder}" at ${new Date(
+							time
+						).toString()} (${DateStringParser.getTimeDiffString(
+							time - Date.now()
+						)})`
+					);
+				} else {
+					await message.channel.sendText(
+						`Could not set a reminder, you probably have 5 set already`
+					);
+				}
 			}
 		})();
 	}
@@ -137,16 +154,23 @@ export default class ScheduleService extends EventEmitter implements Service {
 		this._store.setData({ events });
 	}
 
-	queueEvent<T>(timestamp: number, event: Event<T>) {
+	queueEvent<T>(timestamp: number, event: Event<T>, owner: string) {
 		const events = this._store.getData()?.events || [];
 
+		if (this._maxTimersPerPerson > 0) {
+			const existing = events.filter(e => e.owner === owner).length;
+			if (existing > this._maxTimersPerPerson) {
+				return false;
+			}
+		}
 		const index = events.findIndex(e => e.timestamp > timestamp);
-		if (index === -1) events.push({ timestamp, event });
+		if (index === -1) events.push({ timestamp, event, owner });
 		else {
-			events.splice(index, 0, { timestamp, event });
+			events.splice(index, 0, { timestamp, event, owner });
 		}
 
 		this._store.setData({ events });
+		return;
 	}
 
 	start() {

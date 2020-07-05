@@ -15,6 +15,7 @@ const changeLog: ChangeLog = {
 		Fixed: [
 			'Date string parser tests not considering the following day when parsing times before right now (eg. 2am probably means tomorrow since 2am today is in the past)',
 		],
+		Added: ['Set a limit on how many timers a person can set at once'],
 	},
 	'0.3.1': {
 		Fixed: ['Past events not getting cleared from queue'],
