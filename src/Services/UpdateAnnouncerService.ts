@@ -112,6 +112,7 @@ export default class UpdateAnnouncerService implements Service {
 						);
 					}
 				}
+				return;
 			}
 			const newVersionNoDev = newVersion.replace(/(^v|@dev$)/g, '');
 			if (changeLog[newVersionNoDev]) {
