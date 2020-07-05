@@ -89,6 +89,9 @@ export default class ScheduleService extends EventEmitter implements Service {
 					return;
 				}
 
+				// +9:30 for adelaide time
+				time -= 9 * 60 * 60 * 1000 + 30 * 60 * 1000;
+
 				if (reminder === '') {
 					await message.channel.sendText('Missing reminder');
 					return;
@@ -151,7 +154,7 @@ export default class ScheduleService extends EventEmitter implements Service {
 			} catch {}
 		}
 
-		this._store.setData({ events });
+		if (any) this._store.setData({ events });
 	}
 
 	queueEvent<T>(timestamp: number, event: Event<T>, owner: string) {
