@@ -8,6 +8,14 @@ type ChangeLog = {
 };
 
 const changeLog: ChangeLog = {
+	patch: {
+		Updated: [
+			'Update announcer should announce all new updates not just the latest one',
+		],
+	},
+	'0.3.1': {
+		Fixed: ['Past events not getting cleared from queue'],
+	},
 	'0.3.0': {
 		Fixed: ['Formatting issue in the update announcer'],
 		Added: [
