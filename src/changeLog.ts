@@ -8,12 +8,13 @@ type ChangeLog = {
 };
 
 const changeLog: ChangeLog = {
-	patch: {
+	'0.3.2': {
 		Updated: [
 			'Update announcer should announce all new updates not just the latest one',
 		],
 		Fixed: [
 			'Date string parser tests not considering the following day when parsing times before right now (eg. 2am probably means tomorrow since 2am today is in the past)',
+			'Attempted fix at timezone problem with remineders',
 		],
 		Added: ['Set a limit on how many timers a person can set at once'],
 	},
