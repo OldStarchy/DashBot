@@ -63,7 +63,7 @@ export default class DateStringParser {
 				(s ? Number.parseInt(s) * DateStringParser.secondMs : 0);
 
 			if (date === null) {
-				if (time < _now) {
+				if (time < _time) {
 					date = _today + DateStringParser.dayMs;
 				}
 			}

@@ -42,7 +42,7 @@ describe('DateStringParser', () => {
 	it('parse standard 12hr time am', () => {
 		const result = DateStringParser.tryParse('6:20am').time;
 
-		expect(result).to.equal(new Date(2020, 10 - 1, 23, 6, 20, 0).getTime());
+		expect(result).to.equal(new Date(2020, 10 - 1, 24, 6, 20, 0).getTime());
 	});
 
 	it('parse standard 12hr time pm', () => {
@@ -53,16 +53,16 @@ describe('DateStringParser', () => {
 		);
 	});
 
-	it('parse standard very short iso times', () => {
+	it('parse standard very short iso times am', () => {
 		const result = DateStringParser.tryParse('6am').time;
 
-		expect(result).to.equal(new Date(2020, 10 - 1, 23, 6, 0, 0).getTime());
+		expect(result).to.equal(new Date(2020, 10 - 1, 24, 6, 0, 0).getTime());
 	});
 
-	it('parse standard very short iso times', () => {
+	it('parse standard very short iso times pm', () => {
 		const result = DateStringParser.tryParse('12pm').time;
 
-		expect(result).to.equal(new Date(2020, 10 - 1, 23, 12, 0, 0).getTime());
+		expect(result).to.equal(new Date(2020, 10 - 1, 24, 12, 0, 0).getTime());
 	});
 
 	it('parse standard iso datetime', () => {

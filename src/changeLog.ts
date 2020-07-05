@@ -12,6 +12,9 @@ const changeLog: ChangeLog = {
 		Updated: [
 			'Update announcer should announce all new updates not just the latest one',
 		],
+		Fixed: [
+			'Date string parser tests not considering the following day when parsing times before right now (eg. 2am probably means tomorrow since 2am today is in the past)',
+		],
 	},
 	'0.3.1': {
 		Fixed: ['Past events not getting cleared from queue'],
