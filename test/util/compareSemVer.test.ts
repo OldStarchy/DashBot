@@ -3,20 +3,30 @@ import 'mocha';
 import compareSemVer from '../../src/util/compareSemVer';
 
 describe('compareSemVer', () => {
-	it('should work', () => {
-		const result = compareSemVer('1.0.0', '0.1.0');
-
-		expect(result).greaterThan(0);
+	it('should return zero when versions are the same', () => {
+		expect(compareSemVer('0.0.0', '0.0.0')).to.eq(0);
+		expect(compareSemVer('0.0.5', '0.0.5')).to.eq(0);
+		expect(compareSemVer('0.1.0', '0.1.0')).to.eq(0);
+		expect(compareSemVer('3.0.0', '3.0.0')).to.eq(0);
+		expect(compareSemVer('1.4.0', '1.4.0')).to.eq(0);
+		expect(compareSemVer('15.5.3', '15.5.3')).to.eq(0);
+		expect(compareSemVer('5.1.3@dev', '5.1.3@dev')).to.eq(0);
 	});
-	it('should work the other way too', () => {
-		const result = compareSemVer('1.0.0', '2.0.0');
-
-		expect(result).lessThan(0);
+	it('should return > 0 when the first arg is higher', () => {
+		expect(compareSemVer('0.0.2', '0.0.1')).greaterThan(0);
+		expect(compareSemVer('0.2.0', '0.1.0')).greaterThan(0);
+		expect(compareSemVer('2.0.0', '1.0.0')).greaterThan(0);
+		expect(compareSemVer('0.1.0', '0.0.2')).greaterThan(0);
+		expect(compareSemVer('1.0.0', '0.2.0')).greaterThan(0);
+		expect(compareSemVer('0.0.0@dev', '0.0.0')).greaterThan(0);
 	});
-	it('should work this way too', () => {
-		const result = compareSemVer('1.0.0', '1.0.0@dev');
-
-		expect(result).lessThan(0);
+	it('should return < 0 when the first arg is lower', () => {
+		expect(compareSemVer('0.0.1', '0.0.2')).lessThan(0);
+		expect(compareSemVer('0.1.0', '0.2.0')).lessThan(0);
+		expect(compareSemVer('1.0.0', '2.0.0')).lessThan(0);
+		expect(compareSemVer('0.0.2', '0.1.0')).lessThan(0);
+		expect(compareSemVer('0.2.0', '1.0.0')).lessThan(0);
+		expect(compareSemVer('0.0.0', '0.0.0@dev')).lessThan(0);
 	});
 	it('should work with sorting', () => {
 		const versions = [
