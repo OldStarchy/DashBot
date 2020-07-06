@@ -8,6 +8,11 @@ type ChangeLog = {
 };
 
 const changeLog: ChangeLog = {
+	'0.3.4': {
+		Fixed: [
+			'Timezones again, temporary "fix" till we start using a proper time module',
+		],
+	},
 	'0.3.3': {
 		Fixed: ['Fix update announcer printing things twice'],
 	},
