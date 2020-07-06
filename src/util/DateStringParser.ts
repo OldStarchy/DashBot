@@ -21,7 +21,8 @@ export default class DateStringParser {
 	 */
 	static tryParse(
 		str: string,
-		now?: number
+		now?: number,
+		timezoneOffset = 0
 	): { time: number | null; remainingStr: string } {
 		const _now = now || Date.now();
 		const _today = new Date(_now).setHours(0, 0, 0, 0);
@@ -156,9 +157,14 @@ export default class DateStringParser {
 			break;
 		}
 
-		if (date === null && time === null)
+		if (date === null && time === null) {
 			return { time: null, remainingStr: str };
-		return { time: (date ?? _today)! + (time ?? 0)!, remainingStr: str };
+		}
+
+		return {
+			time: (date ?? _today)! + (time ?? 0)! - timezoneOffset,
+			remainingStr: str,
+		};
 	}
 
 	private static parseHmsText(str: string) {

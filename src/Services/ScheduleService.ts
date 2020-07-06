@@ -79,7 +79,10 @@ export default class ScheduleService extends EventEmitter implements Service {
 				let time: number | null = null;
 				let reminder = '';
 				const { time: t, remainingStr } = DateStringParser.tryParse(
-					args.join(' ')
+					args.join(' '),
+					Date.now(),
+					// +9:30 for adelaide time
+					9 * 60 * 60 * 1000 + 30 * 60 * 1000
 				);
 				time = t;
 				reminder = remainingStr;
@@ -88,9 +91,6 @@ export default class ScheduleService extends EventEmitter implements Service {
 					await message.channel.sendText("Couldn't parse time");
 					return;
 				}
-
-				// +9:30 for adelaide time
-				time -= 9 * 60 * 60 * 1000 + 30 * 60 * 1000;
 
 				if (reminder === '') {
 					await message.channel.sendText('Missing reminder');
@@ -108,10 +108,14 @@ export default class ScheduleService extends EventEmitter implements Service {
 				);
 
 				if (success) {
+					//TODO: get timezone for person, or fallback to channel/server default
 					await message.channel.sendText(
-						`"${reminder}" at ${new Date(
-							time
-						).toString()} (${DateStringParser.getTimeDiffString(
+						`"${reminder}" at ${new Date(time).toLocaleString(
+							'en-AU',
+							{
+								timeZone: 'Australia/Adelaide',
+							}
+						)} (${DateStringParser.getTimeDiffString(
 							time - Date.now()
 						)})`
 					);
@@ -173,7 +177,7 @@ export default class ScheduleService extends EventEmitter implements Service {
 		}
 
 		this._store.setData({ events });
-		return;
+		return true;
 	}
 
 	start() {

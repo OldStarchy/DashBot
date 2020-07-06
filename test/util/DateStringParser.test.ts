@@ -156,4 +156,17 @@ describe('DateStringParser', () => {
 			)
 		);
 	});
+
+	it('offset for timezones', () => {
+		const result = DateStringParser.tryParse(
+			'today at 10:00',
+			undefined,
+			9 * hourMs + 30 * minuteMs
+		).time;
+
+		//TODO: Built in `Date` isn't capable of handling timezones properly, need to use a package (eg. https://moment.github.io/luxon/docs/manual/install.html)
+		expect(result).to.equal(
+			new Date('2020-10-23T00:00:00.000+00:00').setHours(0, 30, 0)
+		);
+	});
 });
