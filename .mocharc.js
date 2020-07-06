@@ -20,7 +20,7 @@ const options = {
 	slow: 75,
 	timeout: 2000,
 	ui: 'bdd',
-	'watch-files': ['src/**/*.ts', 'test/**.*.ts'],
+	'watch-files': ['src/**/*.ts', 'test/**/*.test.ts'],
 	'watch-ignore': ['node_modules', '.git'],
 };
 
