@@ -10,6 +10,7 @@
     "build:prod": "yarn injectVersion --prod && tsc -p tsconfig.prod.json",
     "watch": "yarn injectVersion --dev && tsc -w",
     "run": "node dist/main.js",
+    "run:web": "node dist/WebUi.main.js",
     "build:docker": "docker build -t oldstarchy/dashbot .",
     "publish": "yarn build:docker && docker push oldstarchy/dashbot",
     "lint": "eslint src/**/*.ts",
