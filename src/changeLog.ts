@@ -8,6 +8,9 @@ type ChangeLog = {
 };
 
 const changeLog: ChangeLog = {
+	'0.3.5': {
+		Added: ['!brewing command to show potion recipes in Minecraft'],
+	},
 	'0.3.4': {
 		Fixed: [
 			'Timezones again, temporary "fix" till we start using a proper time module',
