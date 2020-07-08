@@ -87,7 +87,7 @@ makePotion('Splash', Items.Gunpowder);
 makePotion('Lingering', [Items.Gunpowder, Items.DragonsBreath]);
 
 const potionToExplination = (potion: Potion): RichText => {
-	const text: RichTextObj[] = [{ text: potion.name + ':\n' }];
+	const text: RichTextObj[] = [{ text: `Potion of ${potion.name}:\n` }];
 
 	for (const recipe of potion.items) {
 		for (let i = 0; i < recipe.length; i++) {
@@ -97,7 +97,7 @@ const potionToExplination = (potion: Potion): RichText => {
 			});
 
 			text.push({
-				text: `Potion of ${item}`,
+				text: `${item}`,
 				color: 'dark_green',
 			});
 		}
@@ -137,8 +137,9 @@ export default class BrewingCommand implements Command {
 
 		//TODO: Search / filter potions by given args
 
-		const msg: RichTextObj[] = [];
+		let msg: RichTextObj[] = [];
 
+		const itemsPerMessage = 3;
 		for (let i = 0; i < potions.length; i++) {
 			const potion = potions[i];
 			const potionBtn: RichTextObj = {
@@ -152,13 +153,18 @@ export default class BrewingCommand implements Command {
 				},
 			};
 
-			if (i > 0)
+			if (i % itemsPerMessage > 0)
 				msg.push({
 					text: ', ',
 				});
 			msg.push(potionBtn);
+
+			if (i % itemsPerMessage === 0) {
+				await rcon.tellraw('@a', msg);
+				msg = [];
+			}
 		}
 
-		await rcon.tellraw('@a', msg);
+		if (msg.length > 0) await rcon.tellraw('@a', msg);
 	}
 }
