@@ -180,6 +180,10 @@ export default class RconClient {
 		await this._send(`title @a title ${JSON.stringify(title)}`);
 	}
 
+	async tellraw(target: string, text: RichText) {
+		await this._send(`tellraw ${target} ${JSON.stringify(text)}`);
+	}
+
 	async give(player: string, item: string, count = 1, data = '') {
 		const command = `give ${player} ${item}${data} ${count}`;
 

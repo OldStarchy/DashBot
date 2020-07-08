@@ -1,5 +1,6 @@
 import { Logger } from 'winston';
 import IdentityService from '../ChatServer/IdentityService';
+import BrewingCommand from '../Commands/BrewingCommand';
 import EchoCommand from '../Commands/EchoCommand';
 import HaikuCommand from '../Commands/HaikuCommand';
 import HelpCommand from '../Commands/HelpCommand';
@@ -85,6 +86,7 @@ export default function registerAllComponents(
 	bot.registerCommand('echoraw', new EchoCommand(permissions));
 	bot.registerCommand('id', new IdCommand(permissions));
 	bot.registerCommand('permissions', new PermissionCommand(permissions));
+	bot.registerCommand('brewing', new BrewingCommand());
 
 	if (config.imgurClientId) {
 		bot.registerCommand(
