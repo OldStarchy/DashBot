@@ -25,7 +25,7 @@ enum Items {
 
 interface Potion {
 	name: string;
-	items: string[][];
+	recipes: string[][];
 	canExtend: boolean;
 	canEnhance: boolean;
 }
@@ -40,7 +40,7 @@ const makePotion = (
 ) => {
 	potions.push({
 		name,
-		items: (items instanceof Array
+		recipes: (items instanceof Array
 			? items[0] instanceof Array
 				? (items as Items[][])
 				: [items as Items[]]
@@ -87,36 +87,23 @@ makePotion('Splash', Items.Gunpowder);
 makePotion('Lingering', [Items.Gunpowder, Items.DragonsBreath]);
 
 const potionToExplination = (potion: Potion): RichText => {
-	const text: RichTextObj[] = [{ text: `Potion of ${potion.name}:\n` }];
+	const textParts = [`Potion of ${potion.name}:\n`];
 
-	for (const recipe of potion.items) {
-		for (let i = 0; i < recipe.length; i++) {
-			const item = recipe[i];
-			text.push({
-				text: i === 0 ? '  ' : '\n  OR\n  ',
-			});
+	for (let j = 0; j < potion.recipes.length; j++) {
+		const recipe = potion.recipes[j];
 
-			text.push({
-				text: `${item}`,
-				color: 'dark_green',
-			});
-		}
-
-		text.push({
-			text: '\n',
-		});
-
-		if (potion.canExtend)
-			text.push({
-				text: `Can be extended with ${Items.RedstoneDust}\n`,
-			});
-		if (potion.canEnhance)
-			text.push({
-				text: `Can be enhanced with ${Items.GlowstoneDust}\n`,
-			});
+		textParts.push(
+			`  ${recipe.join(', ')}\n` +
+				`  ${j < potion.recipes.length - 1 ? 'OR\n  ' : ''}`
+		);
 	}
 
-	return text;
+	if (potion.canExtend)
+		textParts.push(`Can be extended with ${Items.RedstoneDust}\n`);
+	if (potion.canEnhance)
+		textParts.push(`Can be enhanced with ${Items.GlowstoneDust}\n`);
+
+	return { text: textParts.join('') };
 };
 
 export default class BrewingCommand implements Command {
@@ -159,7 +146,7 @@ export default class BrewingCommand implements Command {
 				});
 			msg.push(potionBtn);
 
-			if (i % itemsPerMessage === 0) {
+			if (i % itemsPerMessage === itemsPerMessage - 1) {
 				await rcon.tellraw('@a', msg);
 				msg = [];
 			}
