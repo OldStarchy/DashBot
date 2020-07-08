@@ -3,9 +3,14 @@
 		"DashBot",
 		"Emoji",
 		"Extendable",
+		"Ghast",
+		"Glowstone",
 		"Greenlock",
 		"Minecraft's",
-		"rcon"
+		"Pufferfish",
+		"Redstone",
+		"rcon",
+		"tellraw"
 	],
 	"prettier.configPath": ".prettierrc",
 	"eslint.validate": ["javascript", "typescript"],

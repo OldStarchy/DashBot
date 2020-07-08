@@ -1,6 +1,7 @@
 import Message from '../ChatServer/Message';
 import MinecraftServer from '../ChatServer/Minecraft/MinecraftServer';
 import Command from '../Command';
+import RconClient from '../Rcon/RconClient';
 import RichText, { RichTextObj } from '../Rcon/RichText';
 
 enum Items {
@@ -10,7 +11,7 @@ enum Items {
 	NetherWart = 'Nether Wart',
 	Gunpowder = 'Gunpowder',
 	Sugar = 'Sugar',
-	RabbitsFoot = 'Rabbits Foot',
+	RabbitsFoot = "Rabbit's Foot",
 	BlazePowder = 'Blaze Powder',
 	GlisteringMelon = 'Glistering Melon',
 	SpiderEye = 'Spider Eye',
@@ -20,7 +21,7 @@ enum Items {
 	GoldenCarrot = 'Golden Carrot',
 	TurtleShell = 'Turtle Shell',
 	PhantomMembrane = 'Phantom Membrane',
-	DragonsBreath = 'Dragons Breath',
+	DragonsBreath = "Dragon's Breath",
 }
 
 interface Potion {
@@ -86,15 +87,28 @@ makePotion('Turtle Master', Items.TurtleShell);
 makePotion('Splash', Items.Gunpowder);
 makePotion('Lingering', [Items.Gunpowder, Items.DragonsBreath]);
 
-const potionToExplination = (potion: Potion): RichText => {
-	const textParts = [`Potion of ${potion.name}:\n`];
+const potionToExplanation = (potion: Potion): RichText => {
+	const textParts: (string | RichTextObj)[] = [
+		{
+			text: '\nPotion of ',
+			color: 'reset',
+		},
+		{
+			text: potion.name,
+			color: 'green',
+		},
+		{
+			text: `:\n`,
+			color: 'reset',
+		},
+	];
 
 	for (let j = 0; j < potion.recipes.length; j++) {
 		const recipe = potion.recipes[j];
 
 		textParts.push(
 			`  ${recipe.join(', ')}\n` +
-				`  ${j < potion.recipes.length - 1 ? 'OR\n  ' : ''}`
+				`${j < potion.recipes.length - 1 ? '  OR\n' : '\n'}`
 		);
 	}
 
@@ -103,8 +117,15 @@ const potionToExplination = (potion: Potion): RichText => {
 	if (potion.canEnhance)
 		textParts.push(`Can be enhanced with ${Items.GlowstoneDust}\n`);
 
-	return { text: textParts.join('') };
+	return textParts;
 };
+
+const stripRichContent = (content: RichText) =>
+	(content instanceof Array ? content : [content])
+		.map(part => (typeof part === 'string' ? part : part.text))
+		.filter(part => part)
+		.map(part => part!.toString())
+		.join('');
 
 export default class BrewingCommand implements Command {
 	async run(message: Message | null, name: string, ...args: string[]) {
@@ -113,16 +134,29 @@ export default class BrewingCommand implements Command {
 		const channel = message.channel;
 		const server = channel.server;
 
-		if (!(server instanceof MinecraftServer)) {
-			return;
+		let rcon: RconClient | null = null;
+		if (server instanceof MinecraftServer) {
+			rcon = server.getRcon();
 		}
 
-		const rcon = server.getRcon();
-		if (!rcon) {
-			return;
-		}
+		if (args.length > 0) {
+			const search = args.join(' ');
 
-		//TODO: Search / filter potions by given args
+			//TODO: Fuzzy text search
+			const potion = potions.find(p => p.name === search);
+
+			if (!potion) {
+				await channel.sendText(`No potion named \"${search}\".`);
+				return;
+			} else {
+				if (rcon) await rcon.tellraw('@a', potionToExplanation(potion));
+				else
+					await channel.sendText(
+						stripRichContent(potionToExplanation(potion))
+					);
+				return;
+			}
+		}
 
 		let msg: RichTextObj[] = [];
 
@@ -134,24 +168,27 @@ export default class BrewingCommand implements Command {
 				color: 'green',
 				clickEvent: {
 					action: 'run_command',
-					value:
-						'/tellraw @p ' +
-						JSON.stringify(potionToExplination(potion)),
+					value: `!brewing ${potion.name}`,
 				},
 			};
 
 			if (i % itemsPerMessage > 0)
 				msg.push({
 					text: ', ',
+					color: 'reset',
 				});
 			msg.push(potionBtn);
 
 			if (i % itemsPerMessage === itemsPerMessage - 1) {
-				await rcon.tellraw('@a', msg);
+				if (rcon) await rcon.tellraw('@a', msg);
+				else await channel.sendText(stripRichContent(msg));
 				msg = [];
 			}
 		}
 
-		if (msg.length > 0) await rcon.tellraw('@a', msg);
+		if (msg.length > 0) {
+			if (rcon) await rcon.tellraw('@a', msg);
+			else await channel.sendText(stripRichContent(msg));
+		}
 	}
 }
