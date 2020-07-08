@@ -8,6 +8,11 @@ type ChangeLog = {
 };
 
 const changeLog: ChangeLog = {
+	'0.3.6': {
+		Updated: [
+			"!brewing command works consistently, doesn't require players to be op, and is formatted better",
+		],
+	},
 	'0.3.5': {
 		Added: ['!brewing command to show potion recipes in Minecraft'],
 	},
