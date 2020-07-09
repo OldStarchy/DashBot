@@ -2,7 +2,12 @@ import Message from '../ChatServer/Message';
 import MinecraftServer from '../ChatServer/Minecraft/MinecraftServer';
 import Command from '../Command';
 import RconClient from '../Rcon/RconClient';
-import RichText, { RichTextObj } from '../Rcon/RichText';
+import RichText, {
+	ClickEventAction,
+	Color,
+	RichTextArray,
+	RichTextObj,
+} from '../Rcon/RichText';
 
 enum Items {
 	FermentedSpiderEye = 'Fermented Spider Eye',
@@ -91,15 +96,15 @@ const potionToExplanation = (potion: Potion): RichText => {
 	const textParts: (string | RichTextObj)[] = [
 		{
 			text: '\nPotion of ',
-			color: 'reset',
+			color: Color.Reset,
 		},
 		{
 			text: potion.name,
-			color: 'green',
+			color: Color.Green,
 		},
 		{
 			text: `:\n`,
-			color: 'reset',
+			color: Color.Reset,
 		},
 	];
 
@@ -158,16 +163,16 @@ export default class BrewingCommand implements Command {
 			}
 		}
 
-		let msg: RichTextObj[] = [];
+		let msg: RichTextArray = [];
 
 		const itemsPerMessage = 3;
 		for (let i = 0; i < potions.length; i++) {
 			const potion = potions[i];
 			const potionBtn: RichTextObj = {
 				text: `[${potion.name}]`,
-				color: 'green',
+				color: Color.Green,
 				clickEvent: {
-					action: 'run_command',
+					action: ClickEventAction.RunCommand,
 					value: `!brewing ${potion.name}`,
 				},
 			};
@@ -175,7 +180,7 @@ export default class BrewingCommand implements Command {
 			if (i % itemsPerMessage > 0)
 				msg.push({
 					text: ', ',
-					color: 'reset',
+					color: Color.Reset,
 				});
 			msg.push(potionBtn);
 

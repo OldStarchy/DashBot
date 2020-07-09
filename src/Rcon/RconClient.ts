@@ -1,6 +1,6 @@
 import { Logger } from 'winston';
 import RconSocket from './RconSocket';
-import RichText from './RichText';
+import RichText, { Color, RichTextArray } from './RichText';
 
 export default class RconClient {
 	private _disconnectTimeout: NodeJS.Timeout | null = null;
@@ -33,21 +33,21 @@ export default class RconClient {
 	}
 
 	async broadcast(message: string, from: string, via?: string) {
-		const cmdJson: RichText = [
+		const cmdJson: RichTextArray = [
 			{ text: '<' },
-			{ text: from, color: 'dark_green' },
+			{ text: from, color: Color.DarkGreen },
 		];
 
 		if (via) {
 			cmdJson.push(
 				{ text: ' ' },
 				{ text: '(' },
-				{ text: via, color: 'aqua' },
+				{ text: via, color: Color.Aqua },
 				{ text: ')' }
 			);
 		}
 
-		cmdJson.push({ text: '>: ' }, { text: message });
+		cmdJson.push({ text: '> ' }, { text: message });
 
 		await this._send(`tellraw @a ${JSON.stringify(cmdJson)}`);
 	}
@@ -57,10 +57,10 @@ export default class RconClient {
 			throw Error('invalid to');
 		}
 
-		const cmdJson: RichText = [
+		const cmdJson: RichTextArray = [
 			{
 				text: from,
-				color: 'gray',
+				color: Color.Gray,
 			},
 			{
 				text: ' ',
@@ -73,22 +73,22 @@ export default class RconClient {
 				},
 				{
 					text: via,
-					color: 'aqua',
+					color: Color.Aqua,
 				},
 				{
 					text: ')',
-					color: 'gray',
+					color: Color.Gray,
 				}
 			);
 		}
 		cmdJson.push(
 			{
 				text: ' whispers to you: ',
-				color: 'gray',
+				color: Color.Gray,
 			},
 			{
 				text: message,
-				color: 'gray',
+				color: Color.Gray,
 			}
 		);
 		const result = await this._send(
