@@ -80,9 +80,8 @@ export default class ScheduleService extends EventEmitter implements Service {
 				let reminder = '';
 				const { time: t, remainingStr } = DateStringParser.tryParse(
 					args.join(' '),
-					Date.now(),
-					// +9:30 for adelaide time
-					9 * 60 * 60 * 1000 + 30 * 60 * 1000
+					undefined,
+					'Australia/Adelaide'
 				);
 				time = t;
 				reminder = remainingStr;

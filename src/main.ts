@@ -26,7 +26,7 @@ process.on('uncaughtException', e => {
 	logger.error(e.message);
 	process.exit(1);
 });
-
+//TODO: Set default timezone for luxon
 const config = loadConfig(storageDir);
 const packageRoot = path.dirname(__dirname);
 

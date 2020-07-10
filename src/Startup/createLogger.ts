@@ -1,13 +1,15 @@
+import { DateTime } from 'luxon';
 import path from 'path';
 import winston from 'winston';
-import formatTime from '../util/formatTime';
 
 export default function createLogger(storageDir: string) {
 	const logger = winston.createLogger({
 		level: 'info',
 		format: winston.format.printf(
 			({ service, level, message }) =>
-				`${formatTime(new Date())} [${service}] ${level}: ${message}`
+				`${DateTime.utc()
+					.setZone('Australia/Adelaide')
+					.toISO()} [${service}] ${level}: ${message}`
 		),
 		defaultMeta: { service: 'dashbot' },
 		transports: [
