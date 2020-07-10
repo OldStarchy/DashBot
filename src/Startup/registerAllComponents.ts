@@ -1,6 +1,5 @@
 import { Logger } from 'winston';
 import IdentityService from '../ChatServer/IdentityService';
-import BrewingCommand from '../Commands/BrewingCommand';
 import EchoCommand from '../Commands/EchoCommand';
 import HaikuCommand from '../Commands/HaikuCommand';
 import HelpCommand from '../Commands/HelpCommand';
@@ -17,12 +16,9 @@ import getVersion from '../getVersion';
 import ABResponseInteraction from '../Interactions/ABResponseInteraction';
 import DieInteraction from '../Interactions/DieInteraction';
 import GreetInteraction from '../Interactions/GreetInteraction';
-import MinecraftGreetInteraction from '../Interactions/MinecraftGreetInteraction';
 import NumberGameInteraction from '../Interactions/NumberGameInteraction';
-import QuizGameService from '../Interactions/QuizGame';
 import TraceryInteraction from '../Interactions/TraceryInteraction';
 import Permissions from '../Permissions';
-import MinecraftRelayService from '../Services/MinecraftRelayService';
 import ScheduleService from '../Services/ScheduleService';
 import UpdateAnnouncerService from '../Services/UpdateAnnouncerService';
 import CommandStatistic from '../Statistics/CommandStatistic';
@@ -54,10 +50,6 @@ export default function registerAllComponents(
 	const helpCommand = new HelpCommand(storage);
 	const petCommand = new PetCommand(storage);
 
-	const minecraftRelayService = new MinecraftRelayService(
-		identityService,
-		storage
-	);
 	const updateAnnouncerService = new UpdateAnnouncerService(
 		storage,
 		identityService,
@@ -66,11 +58,9 @@ export default function registerAllComponents(
 
 	statistics.register(petCommand);
 
-	minecraftRelayService.register(bot);
 	updateAnnouncerService.register(bot);
 	new ScheduleService({ storage, identityService }).register(bot);
 
-	bot.registerCommand('minecraft', minecraftRelayService.getEnableCommand());
 	bot.registerCommand('announce', updateAnnouncerService.getCommand());
 
 	bot.registerCommand('stats', new StatisticsCommand(statistics));
@@ -85,14 +75,12 @@ export default function registerAllComponents(
 	bot.registerCommand('echoraw', new EchoCommand(permissions));
 	bot.registerCommand('id', new IdCommand(permissions));
 	bot.registerCommand('permissions', new PermissionCommand(permissions));
-	bot.registerCommand('brewing', new BrewingCommand());
 
 	new TraceryInteraction().register(bot);
 	new NumberGameInteraction(storage).register(bot);
 	new GreetInteraction().register(bot);
 	new DieInteraction().register(bot);
 	helpCommand.register(bot);
-	new MinecraftGreetInteraction(logger).register(bot);
 	new ABResponseInteraction([
 		[
 			/^compliment( please)?/i,

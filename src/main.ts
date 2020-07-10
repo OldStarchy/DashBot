@@ -6,9 +6,6 @@ import DiscordServerFactory, {
 	DiscordServerConfig,
 } from './ChatServer/Discord/DiscordServerFactory';
 import IdentityService from './ChatServer/IdentityService';
-import MinecraftServerFactory, {
-	MinecraftServerConfig,
-} from './ChatServer/Minecraft/MinecraftServerFactory';
 import DashBot from './DashBot';
 import DashBotPlugin, { DashBotContext } from './DashBotPlugin';
 import loadConfig from './loadConfig';
@@ -46,7 +43,9 @@ const context = new DashBotContext(
 	statistics,
 	permissions,
 	config,
-	logger
+	logger,
+	storageDir,
+	packageRoot
 );
 
 // TODO: Move to config, allow multiple plugin locations (builtin + custom)
@@ -56,12 +55,20 @@ const plugins: DashBotPlugin[] = [];
 
 fs.readdirSync(pluginsDir)
 	.filter(file => file !== '.' && file !== '..')
+	.map(file => {
+		const fullPath = path.join('.', pluginsDir, file);
+		if (fs.statSync(fullPath).isDirectory())
+			return path.join(file, 'Plugin.js');
+
+		return file;
+	})
 	.filter(file => file.endsWith('Plugin.js'))
-	.map(file => pluginsDir + '/' + file)
+	.sort()
+	.map(file => path.join(pluginsDir, file))
 	.forEach(file => {
 		try {
 			// eslint-disable-next-line @typescript-eslint/no-var-requires
-			const _import = require(file);
+			const _import = require('./' + file);
 			if (!_import.default) {
 				logger.warn(
 					`Plugin file "${require.resolve(
@@ -93,25 +100,18 @@ logger.info(
 
 function createServerFromConfig(serverConfig: ChatServerConfig) {
 	switch (serverConfig.type) {
-		case 'minecraft':
-			return new MinecraftServerFactory().make(
-				serverConfig as MinecraftServerConfig,
-				storage,
-				identityService,
-				config,
-				storageDir,
-				packageRoot,
-				logger
-			);
-
 		case 'discord':
 			return new DiscordServerFactory().make(
 				serverConfig as DiscordServerConfig,
 				identityService,
 				logger
 			);
-
 		default:
+			if (context.chatServerFactories[serverConfig.type])
+				return context.chatServerFactories[serverConfig.type](
+					serverConfig
+				);
+
 			throw new Error('Unrecognized server type');
 	}
 }

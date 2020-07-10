@@ -1,13 +1,13 @@
-import Message from '../ChatServer/Message';
-import MinecraftServer from '../ChatServer/Minecraft/MinecraftServer';
-import Command from '../Command';
-import RconClient from '../Rcon/RconClient';
+import Message from '../../../ChatServer/Message';
+import Command from '../../../Command';
+import RconClient from '../../../Rcon/RconClient';
 import RichText, {
 	ClickEventAction,
 	Color,
 	RichTextArray,
 	RichTextObj,
-} from '../Rcon/RichText';
+} from '../../../Rcon/RichText';
+import MinecraftServer from '../ChatServer/MinecraftServer';
 
 enum Items {
 	FermentedSpiderEye = 'Fermented Spider Eye',

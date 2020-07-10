@@ -1,11 +1,13 @@
-import { CancellableEvent, EventHandler } from '../../Events';
-import MinecraftLogClient from '../../MinecraftLogClient/MinecraftLogClient';
-import DeathMessage from '../../MinecraftLogClient/PlayerDeathMessage';
-import RconClient from '../../Rcon/RconClient';
-import StorageRegister from '../../StorageRegister';
-import ChatServer, { PresenceUpdateEventData } from '../ChatServer';
-import IdentityService from '../IdentityService';
-import Message from '../Message';
+import ChatServer, {
+	PresenceUpdateEventData,
+} from '../../../ChatServer/ChatServer';
+import IdentityService from '../../../ChatServer/IdentityService';
+import Message from '../../../ChatServer/Message';
+import { CancellableEvent, EventHandler } from '../../../Events';
+import MinecraftLogClient from '../../../MinecraftLogClient/MinecraftLogClient';
+import DeathMessage from '../../../MinecraftLogClient/PlayerDeathMessage';
+import RconClient from '../../../Rcon/RconClient';
+import StorageRegister from '../../../StorageRegister';
 import MinecraftIdentity from './MinecraftIdentity';
 import MinecraftIdentityCache from './MinecraftIdentityCache';
 import MinecraftMessage from './MinecraftMessage';

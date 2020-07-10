@@ -1,32 +1,34 @@
 import express from 'express';
 import { Logger } from 'winston';
-import getVersion from '../../getVersion';
-import MinecraftLogClient from '../../MinecraftLogClient/MinecraftLogClient';
-import MinecraftPumpLogClient from '../../MinecraftLogClient/MinecraftPumpLogClient';
-import MinecraftTailLogClient from '../../MinecraftLogClient/MinecraftTailLogClient';
-import RconClient from '../../Rcon/RconClient';
-import RconSocket from '../../Rcon/RconSocket';
-import StorageRegister from '../../StorageRegister';
-import IdentityService from '../IdentityService';
+import IdentityService from '../../../ChatServer/IdentityService';
+import getVersion from '../../../getVersion';
+import MinecraftLogClient from '../../../MinecraftLogClient/MinecraftLogClient';
+import MinecraftPumpLogClient from '../../../MinecraftLogClient/MinecraftPumpLogClient';
+import MinecraftTailLogClient from '../../../MinecraftLogClient/MinecraftTailLogClient';
+import RconClient from '../../../Rcon/RconClient';
+import RconSocket from '../../../Rcon/RconSocket';
+import StorageRegister from '../../../StorageRegister';
 import MinecraftServer from './MinecraftServer';
 
-export interface MinecraftServerConfig extends ChatServerConfig {
-	/**
-	 * Default: null
-	 * Enables communication with a Minecraft server
-	 */
-	type: 'minecraft';
+declare global {
+	interface MinecraftServerConfig extends ChatServerConfig {
+		/**
+		 * Default: null
+		 * Enables communication with a Minecraft server
+		 */
+		type: 'minecraft';
 
-	/**
-	 * Default: null
-	 * Configuring this allows dashbot to relay messages from a Minecraft server to a channel in discord
-	 */
-	logClient?: MinecraftLogTailConfig | MinecraftLogPumpConfig;
-	/**
-	 * Default: null
-	 * Configuring this allows dashbot to relay messages from a channel in discord to a Minecraft server
-	 */
-	rcon?: MinecraftRconConfig;
+		/**
+		 * Default: null
+		 * Configuring this allows dashbot to relay messages from a Minecraft server to a channel in discord
+		 */
+		logClient?: MinecraftLogTailConfig | MinecraftLogPumpConfig;
+		/**
+		 * Default: null
+		 * Configuring this allows dashbot to relay messages from a channel in discord to a Minecraft server
+		 */
+		rcon?: MinecraftRconConfig;
+	}
 }
 
 export default class MinecraftServerFactory {

@@ -1,4 +1,4 @@
-import Identity from '../Identity';
+import Identity from '../../../ChatServer/Identity';
 import MinecraftServer from './MinecraftServer';
 
 export default class MinecraftIdentity implements Identity {
