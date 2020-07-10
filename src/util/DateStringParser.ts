@@ -1,3 +1,5 @@
+import { DateTime, DurationObjectUnits } from 'luxon';
+
 export default class DateStringParser {
 	private static readonly timeOfDay: Record<string, string> = {
 		'': '09:00',
@@ -10,6 +12,7 @@ export default class DateStringParser {
 		midnight: '23:59:59',
 	};
 
+	// private static readonly TIMEZONE = 'Australia/Adelaide';
 	private static readonly secondMs = 1000;
 	private static readonly minuteMs = 60 * DateStringParser.secondMs;
 	private static readonly hourMs = 60 * DateStringParser.minuteMs;
@@ -21,53 +24,59 @@ export default class DateStringParser {
 	 */
 	static tryParse(
 		str: string,
-		now?: number,
-		timezoneOffset = 0
+		now?: DateTime,
+		timezone?: string
 	): { time: number | null; remainingStr: string } {
-		const _now = now || Date.now();
-		const _today = new Date(_now).setHours(0, 0, 0, 0);
-		const _time = _now - _today;
+		const _now = now || DateTime.utc().setZone(timezone ?? 'utc');
+		let targetTime = DateTime.utc().setZone(timezone ?? 'utc');
 
-		let date: number | null = null;
-		let time: number | null = null;
+		let dateFound = false;
+		let timeFound = false;
 
 		const ymdParser = ({
 			year: y,
 			month: m,
 			date: d,
-		}: Record<string, string>) =>
-			(date = new Date(
-				Number.parseInt(y),
-				Number.parseInt(m) - 1,
-				Number.parseInt(d)
-			).getTime());
+		}: Record<string, string>) => {
+			targetTime = targetTime
+				.set({
+					year: Number.parseInt(y),
+					month: Number.parseInt(m),
+					day: Number.parseInt(d),
+				})
+				.startOf('day');
+			dateFound = true;
+		};
 
 		const hmspParser = ({
 			hours: h,
 			minutes: i,
 			seconds: s,
-			ampm,
+			amPm,
 		}: Record<string, string>) => {
 			let hr = Number.parseInt(h);
-			if (ampm !== undefined) {
+			if (amPm !== undefined) {
 				if (hr === 0 || hr > 12) throw new Error('Invalid hour');
-				if (ampm === 'am') {
+				if (amPm === 'am') {
 					if (hr === 12) hr = 0;
 				} else {
 					if (hr === 12) hr = 0;
 					hr += 12;
 				}
 			}
-			time =
-				hr * DateStringParser.hourMs +
-				(i ? Number.parseInt(i) * DateStringParser.minuteMs : 0) +
-				(s ? Number.parseInt(s) * DateStringParser.secondMs : 0);
+			targetTime = targetTime.set({
+				hour: hr,
+				minute: i ? Number.parseInt(i) : 0,
+				second: s ? Number.parseInt(s) : 0,
+			});
 
-			if (date === null) {
-				if (time < _time) {
-					date = _today + DateStringParser.dayMs;
+			if (!dateFound) {
+				if (targetTime < _now) {
+					targetTime = targetTime.plus({ days: 1 });
 				}
 			}
+
+			timeFound = true;
 		};
 
 		const dateFormats = [
@@ -81,15 +90,24 @@ export default class DateStringParser {
 			},
 			{
 				regex: /^today/,
-				parser: () => (date = _today),
+				parser: () => {
+					targetTime = targetTime.startOf('day');
+					dateFound = true;
+				},
 			},
 			{
 				regex: /^tomorrow/,
-				parser: () => (date = _today + DateStringParser.dayMs),
+				parser: () => {
+					targetTime = targetTime.startOf('day').plus({ days: 1 });
+					dateFound = true;
+				},
 			},
 			{
 				regex: /^yesterday/,
-				parser: () => (date = _today - DateStringParser.dayMs),
+				parser: () => {
+					targetTime = targetTime.startOf('day').minus({ days: 1 });
+					dateFound = true;
+				},
 			},
 			{
 				regex: /^(?<nOrL>next|last) (?<period>week|month|fortnight|year)/,
@@ -98,48 +116,48 @@ export default class DateStringParser {
 
 					switch (period.toLowerCase()) {
 						case 'year':
-							date = new Date(_today).setFullYear(
-								new Date(_today).getFullYear() + scale
-							);
-							return;
+							targetTime = targetTime.plus({ years: scale });
+							break;
 						case 'month':
-							date = new Date(_today).setMonth(
-								new Date(_today).getMonth() + scale
-							);
-							return;
+							targetTime = targetTime.plus({ months: scale });
+							break;
 						case 'fortnight':
-							date = _today + DateStringParser.weekMs * 2 * scale;
-							return;
+							targetTime = targetTime.plus({ weeks: 2 * scale });
+							break;
 						case 'week':
-							date = _today + DateStringParser.weekMs * scale;
-							return;
+							targetTime = targetTime.plus({ weeks: scale });
+							break;
 					}
+
+					targetTime = targetTime.startOf('day');
+
+					dateFound = true;
 				},
 			},
 			{
 				regex: /^now/,
-				parser: () => ((date = _today), (time = _time)),
+				parser: () => {
+					timeFound = true;
+				},
 			},
 			{
 				regex: /^in(?<offsets>(?: (?:\d+) (?:hour|minute|second)s?(?: (?:and|,))?)+)/,
 				parser: ({ offsets }: Record<string | number, string>) => {
-					if (date !== null)
-						throw new Error('Relative time used with date');
+					targetTime = targetTime.plus(this.parseHmsText(offsets));
 
-					time = _time + this.parseHmsText(offsets);
+					timeFound = true;
 				},
 			},
 			{
 				regex: /^(?<offsets>(?:(?:\d+) (?:hour|minute|second)s?(?: (?:and|,))?)+) ago/,
 				parser: ({ offsets }: Record<string | number, string>) => {
-					if (date !== null)
-						throw new Error('Relative time used with date');
+					targetTime = targetTime.minus(this.parseHmsText(offsets));
 
-					time = _time - this.parseHmsText(offsets);
+					timeFound = true;
 				},
 			},
 			{
-				regex: /^(?:at )?(?<hours>\d+)(?::(?<minutes>\d+)(?::(?<seconds>\d+))?)?(?<ampm>am|pm)?/,
+				regex: /^(?:at )?(?<hours>\d+)(?::(?<minutes>\d+)(?::(?<seconds>\d+))?)?(?<amPm>am|pm)?/,
 				parser: hmspParser,
 			},
 		];
@@ -157,12 +175,13 @@ export default class DateStringParser {
 			break;
 		}
 
-		if (date === null && time === null) {
-			return { time: null, remainingStr: str };
-		}
-
+		if (dateFound || timeFound)
+			return {
+				time: targetTime.valueOf(),
+				remainingStr: str,
+			};
 		return {
-			time: (date ?? _today)! + (time ?? 0)! - timezoneOffset,
+			time: null,
 			remainingStr: str,
 		};
 	}
@@ -171,24 +190,25 @@ export default class DateStringParser {
 		const regex = /(?<amount>\d+) (?<unit>hour|minute|second)s?(?: (?:and|,))?/g;
 
 		let match = null;
-		let total = 0;
+		const totals: DurationObjectUnits = {};
 		while ((match = regex.exec(str)) !== null) {
 			const { amount, unit } = match.groups!;
 			switch (unit) {
 				case 'hour':
-					total += Number.parseInt(amount) * DateStringParser.hourMs;
+					totals.hours =
+						(totals.hours || 0) + Number.parseInt(amount);
 					break;
 				case 'minute':
-					total +=
-						Number.parseInt(amount) * DateStringParser.minuteMs;
+					totals.minutes =
+						(totals.minutes || 0) + Number.parseInt(amount);
 					break;
 				case 'second':
-					total +=
-						Number.parseInt(amount) * DateStringParser.secondMs;
+					totals.seconds =
+						(totals.seconds || 0) + Number.parseInt(amount);
 					break;
 			}
 		}
-		return total;
+		return totals;
 	}
 	public static getTimeDiffString(diff: number) {
 		diff /= 1000;

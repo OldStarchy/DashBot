@@ -1,12 +1,9 @@
+import { DateTime } from 'luxon';
 import Message from '../ChatServer/Message';
 import Command from '../Command';
 import { Event } from '../Events';
 import { Statistic, StatisticProvider } from '../StatisticsTracker';
 import StorageRegister, { PersistentData } from '../StorageRegister';
-
-function getDayString(date: Date) {
-	return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
-}
 
 interface PetActionStorage {
 	timesPet: number;
@@ -19,7 +16,7 @@ interface PetActionStorage {
 export default class PetCommand implements Command, StatisticProvider {
 	private _timesPet = 0;
 	private _timesPetToday = 0;
-	private _timesPetTodayDate = getDayString(new Date());
+	private _timesPetTodayDate = PetCommand.getDateKey();
 	private _mostPetsPerDay = 0;
 	private _petsPerPerson: Record<string, number> = {};
 	private _store: PersistentData<PetActionStorage>;
@@ -27,6 +24,12 @@ export default class PetCommand implements Command, StatisticProvider {
 	constructor(storage: StorageRegister) {
 		this._store = storage.createStore('PetAction');
 		this._store.on('dataLoaded', this.onReadData.bind(this));
+	}
+
+	private static getDateKey() {
+		return DateTime.utc()
+			.setZone('Australia/Adelaide')
+			.toISODate();
 	}
 
 	async getStatistics() {
@@ -113,7 +116,7 @@ export default class PetCommand implements Command, StatisticProvider {
 	}
 
 	private rolloverDateCount() {
-		const today = getDayString(new Date());
+		const today = PetCommand.getDateKey();
 		if (today !== this._timesPetTodayDate) {
 			this._timesPetToday = 0;
 			this._timesPetTodayDate = today;

@@ -1,33 +1,34 @@
 import { expect } from 'chai';
+import { DateTime, Settings } from 'luxon';
 import 'mocha';
 import DateStringParser from '../../src/util/DateStringParser';
 
-const now = new Date(2020, 10 - 1, 23, 16, 56, 23);
-const today = new Date(new Date(now).setHours(0, 0, 0, 0));
-const nowMs = now.getTime();
-const todayMs = today.getTime();
+const now = DateTime.utc(2020, 10, 23, 16, 56, 23);
+const today = now.startOf('day');
+const nowMs = now.valueOf();
+const todayMs = today.valueOf();
 const secondMs = 1000;
 const minuteMs = 60 * secondMs;
 const hourMs = 60 * minuteMs;
 const dayMs = 24 * hourMs;
 const weekMs = 7 * dayMs;
 
-const oldNow = Date.now;
-before(() => (Date.now = () => nowMs));
-after(() => (Date.now = oldNow));
+const oldNow = Settings.now;
+before(() => (Settings.now = () => now.valueOf()));
+after(() => (Settings.now = oldNow));
 
 describe('DateStringParser', () => {
 	it('parse standard iso dates', () => {
 		const result = DateStringParser.tryParse('2020-10-23').time;
 
-		expect(result).to.equal(new Date(2020, 10 - 1, 23).getTime());
+		expect(result).to.equal(DateTime.utc(2020, 10, 23).valueOf());
 	});
 
 	it('parse standard iso times', () => {
 		const result = DateStringParser.tryParse('22:20:09').time;
 
 		expect(result).to.equal(
-			new Date(2020, 10 - 1, 23, 22, 20, 9).getTime()
+			DateTime.utc(2020, 10, 23, 22, 20, 9).valueOf()
 		);
 	});
 
@@ -35,41 +36,41 @@ describe('DateStringParser', () => {
 		const result = DateStringParser.tryParse('22:20').time;
 
 		expect(result).to.equal(
-			new Date(2020, 10 - 1, 23, 22, 20, 0).getTime()
+			DateTime.utc(2020, 10, 23, 22, 20, 0).valueOf()
 		);
 	});
 
 	it('parse standard 12hr time am', () => {
 		const result = DateStringParser.tryParse('6:20am').time;
 
-		expect(result).to.equal(new Date(2020, 10 - 1, 24, 6, 20, 0).getTime());
+		expect(result).to.equal(DateTime.utc(2020, 10, 24, 6, 20, 0).valueOf());
 	});
 
 	it('parse standard 12hr time pm', () => {
 		const result = DateStringParser.tryParse('6:20pm').time;
 
 		expect(result).to.equal(
-			new Date(2020, 10 - 1, 23, 18, 20, 0).getTime()
+			DateTime.utc(2020, 10, 23, 18, 20, 0).valueOf()
 		);
 	});
 
 	it('parse standard very short iso times am', () => {
 		const result = DateStringParser.tryParse('6am').time;
 
-		expect(result).to.equal(new Date(2020, 10 - 1, 24, 6, 0, 0).getTime());
+		expect(result).to.equal(DateTime.utc(2020, 10, 24, 6, 0, 0).valueOf());
 	});
 
 	it('parse standard very short iso times pm', () => {
 		const result = DateStringParser.tryParse('12pm').time;
 
-		expect(result).to.equal(new Date(2020, 10 - 1, 24, 12, 0, 0).getTime());
+		expect(result).to.equal(DateTime.utc(2020, 10, 24, 12, 0, 0).valueOf());
 	});
 
 	it('parse standard iso datetime', () => {
 		const result = DateStringParser.tryParse('2020-10-23 22:20:09').time;
 
 		expect(result).to.equal(
-			new Date(2020, 10 - 1, 23, 22, 20, 9).getTime()
+			DateTime.utc(2020, 10, 23, 22, 20, 9).valueOf()
 		);
 	});
 
@@ -98,12 +99,18 @@ describe('DateStringParser', () => {
 	});
 	it('next month', () => {
 		expect(DateStringParser.tryParse('next month').time).to.equal(
-			new Date(today).setMonth(today.getMonth() + 1)
+			now
+				.plus({ months: 1 })
+				.startOf('day')
+				.valueOf()
 		);
 	});
 	it('last month', () => {
 		expect(DateStringParser.tryParse('last month').time).to.equal(
-			new Date(today).setMonth(today.getMonth() - 1)
+			now
+				.minus({ months: 1 })
+				.startOf('day')
+				.valueOf()
 		);
 	});
 
@@ -149,24 +156,22 @@ describe('DateStringParser', () => {
 
 	it('tomorrow at 8:00', () => {
 		expect(DateStringParser.tryParse('tomorrow at 8:00').time).to.equal(
-			new Date(new Date(todayMs).setDate(today.getDate() + 1)).setHours(
-				8,
-				0,
-				0
-			)
+			now
+				.plus({ days: 1 })
+				.startOf('day')
+				.set({ hour: 8 })
+				.valueOf()
 		);
 	});
 
 	it('offset for timezones', () => {
-		const result = DateStringParser.tryParse(
-			'today at 10:00',
-			undefined,
-			9 * hourMs + 30 * minuteMs
-		).time;
+		const result = DateStringParser.tryParse('today at 10:00').time;
 
-		//TODO: Built in `Date` isn't capable of handling timezones properly, need to use a package (eg. https://moment.github.io/luxon/docs/manual/install.html)
 		expect(result).to.equal(
-			new Date('2020-10-23T00:00:00.000+00:00').setHours(0, 30, 0)
+			now
+				.startOf('day')
+				.set({ hour: 10 })
+				.valueOf()
 		);
 	});
 });
