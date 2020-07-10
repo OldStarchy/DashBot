@@ -8,6 +8,11 @@ type ChangeLog = {
 };
 
 const changeLog: ChangeLog = {
+	'0.4.0': {
+		Updated: [
+			"Replaced Date with luxon's DateTime for better timezone handling",
+		],
+	},
 	'0.3.6': {
 		Updated: [
 			"!brewing command works consistently, doesn't require players to be op, and is formatted better",
