@@ -23,6 +23,6 @@ export default class EchoCommand implements Command {
 				? message.rawContent.substr('!echoraw'.length).trimLeft()
 				: message.textContent.substr('!echo'.length).trimLeft();
 
-		await message.channel.sendText('`' + content + '`');
+		await message.channel.sendText(content);
 	}
 }

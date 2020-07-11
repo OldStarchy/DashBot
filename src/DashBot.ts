@@ -36,12 +36,14 @@ export default class DashBot extends EventEmitter {
 		this._chatServers.push(chatServer);
 
 		// TODO: Make this better
-		chatServer.on('message', this.onMessage.bind(this));
-		chatServer.on('presenceUpdate', e => {
-			this.emit(e);
-		});
-		chatServer.on('game.death', e => {
-			this.emit(e);
+		chatServer.awaitConnected().then(() => {
+			chatServer.on('message', this.onMessage.bind(this));
+			chatServer.on('presenceUpdate', e => {
+				this.emit(e);
+			});
+			chatServer.on('game.death', e => {
+				this.emit(e);
+			});
 		});
 	}
 

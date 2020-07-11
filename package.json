@@ -26,8 +26,10 @@
     "greenlock-express": "^4.0.3",
     "haiku-random": "^1.0.0",
     "luxon": "^1.24.1",
+    "mineflayer": "^2.23.0",
     "node-fetch": "^2.6.0",
     "tail": "^2.0.3",
+    "typed-emitter": "^1.2.0",
     "typescript": "^3.7.5",
     "winston": "^3.2.1"
   },

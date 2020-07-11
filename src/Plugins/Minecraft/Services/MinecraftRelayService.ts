@@ -244,6 +244,9 @@ export default class MinecraftRelayService implements Service {
 			return;
 		}
 
+		if (message.author.username === 'DashBotMC') return;
+		if (message.author.username === 'Turnerj') return;
+
 		await relay.relayChannel.sendText(
 			`<${message.author.username}> ${message.textContent}`
 		);
