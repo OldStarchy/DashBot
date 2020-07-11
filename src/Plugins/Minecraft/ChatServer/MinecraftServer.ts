@@ -4,10 +4,10 @@ import ChatServer, {
 import IdentityService from '../../../ChatServer/IdentityService';
 import Message from '../../../ChatServer/Message';
 import { CancellableEvent, EventHandler } from '../../../Events';
-import MinecraftLogClient from '../../../MinecraftLogClient/MinecraftLogClient';
-import DeathMessage from '../../../MinecraftLogClient/PlayerDeathMessage';
-import RconClient from '../../../Rcon/RconClient';
 import StorageRegister from '../../../StorageRegister';
+import MinecraftLogClient from '../LogClient/MinecraftLogClient';
+import DeathMessage from '../LogClient/PlayerDeathMessage';
+import RconClient from '../Rcon/RconClient';
 import MinecraftIdentity from './MinecraftIdentity';
 import MinecraftIdentityCache from './MinecraftIdentityCache';
 import MinecraftMessage from './MinecraftMessage';

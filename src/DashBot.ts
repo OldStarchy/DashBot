@@ -3,7 +3,7 @@ import ChatServer, { PresenceUpdateEventData } from './ChatServer/ChatServer';
 import Message from './ChatServer/Message';
 import Command from './Command';
 import { CancellableEvent, Event, EventEmitter, EventHandler } from './Events';
-import DeathMessage from './MinecraftLogClient/PlayerDeathMessage';
+import DeathMessage from './Plugins/Minecraft/LogClient/PlayerDeathMessage';
 import parseArguments from './util/parseArguments';
 
 export interface BeforeRunCommandData {

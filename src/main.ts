@@ -112,7 +112,7 @@ function createServerFromConfig(serverConfig: ChatServerConfig) {
 					serverConfig
 				);
 
-			throw new Error('Unrecognized server type');
+			logger.error('Unrecognized server type');
 	}
 }
 

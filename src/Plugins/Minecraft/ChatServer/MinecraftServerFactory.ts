@@ -2,12 +2,12 @@ import express from 'express';
 import { Logger } from 'winston';
 import IdentityService from '../../../ChatServer/IdentityService';
 import getVersion from '../../../getVersion';
-import MinecraftLogClient from '../../../MinecraftLogClient/MinecraftLogClient';
-import MinecraftPumpLogClient from '../../../MinecraftLogClient/MinecraftPumpLogClient';
-import MinecraftTailLogClient from '../../../MinecraftLogClient/MinecraftTailLogClient';
-import RconClient from '../../../Rcon/RconClient';
-import RconSocket from '../../../Rcon/RconSocket';
 import StorageRegister from '../../../StorageRegister';
+import MinecraftLogClient from '../LogClient/MinecraftLogClient';
+import MinecraftPumpLogClient from '../LogClient/MinecraftPumpLogClient';
+import MinecraftTailLogClient from '../LogClient/MinecraftTailLogClient';
+import RconClient from '../Rcon/RconClient';
+import RconSocket from '../Rcon/RconSocket';
 import MinecraftServer from './MinecraftServer';
 
 declare global {

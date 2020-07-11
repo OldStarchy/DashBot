@@ -1,5 +1,5 @@
 import TextChannel from '../../../ChatServer/TextChannel';
-import RconClient from '../../../Rcon/RconClient';
+import RconClient from '../Rcon/RconClient';
 import MinecraftServer from './MinecraftServer';
 
 export default class MinecraftTextChannel implements TextChannel {
