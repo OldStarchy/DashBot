@@ -8,6 +8,14 @@ type ChangeLog = {
 };
 
 const changeLog: ChangeLog = {
+	'0.5.0': {
+		Added: [
+			'The ability to load plugins dynamically from the plugins folder',
+		],
+		Updated: [
+			'Moved a bunch of things into plugins, such as Discord and Minecraft integration',
+		],
+	},
 	'0.4.0': {
 		Updated: [
 			"Replaced Date with luxon's DateTime for better timezone handling",
