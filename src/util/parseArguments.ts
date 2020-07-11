@@ -30,9 +30,9 @@ export default function parseArguments(str: string) {
 				pushWord();
 			} else if (chr === '"') {
 				inString = true;
+			} else {
+				currentWord.push(chr);
 			}
-
-			currentWord.push(chr);
 		}
 		head++;
 	}
