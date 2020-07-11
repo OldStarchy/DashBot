@@ -1,38 +1,3 @@
-interface MinecraftLogTailConfig {
-	/**
-	 * Reads chat messages from a Minecraft log file.
-	 */
-	type: 'tail';
-
-	/**
-	 * The path to Minecraft's "latest.log" file.
-	 */
-	logFilePath: string;
-}
-interface MinecraftLogPumpConfig {
-	/**
-	 * Listens for web requests from a "Minecraft Log Pump" client.
-	 */
-	type: 'webhook';
-
-	/**
-	 * Default: false
-	 * If true, and the tls is not configured, the Minecraft chat service will listen for requests over http
-	 */
-	allowInsecure?: boolean;
-
-	/**
-	 * A list of IP addresses that can post Minecraft log messages to dashbot.
-	 */
-	whitelist?: string[];
-}
-
-interface MinecraftRconConfig {
-	host: string;
-	port: number;
-	password: string;
-}
-
 interface ChatServerConfig {
 	type: string;
 	id?: string;

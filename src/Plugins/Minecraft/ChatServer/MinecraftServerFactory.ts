@@ -10,27 +10,6 @@ import RconClient from '../Rcon/RconClient';
 import RconSocket from '../Rcon/RconSocket';
 import MinecraftServer from './MinecraftServer';
 
-declare global {
-	interface MinecraftServerConfig extends ChatServerConfig {
-		/**
-		 * Default: null
-		 * Enables communication with a Minecraft server
-		 */
-		type: 'minecraft';
-
-		/**
-		 * Default: null
-		 * Configuring this allows dashbot to relay messages from a Minecraft server to a channel in discord
-		 */
-		logClient?: MinecraftLogTailConfig | MinecraftLogPumpConfig;
-		/**
-		 * Default: null
-		 * Configuring this allows dashbot to relay messages from a channel in discord to a Minecraft server
-		 */
-		rcon?: MinecraftRconConfig;
-	}
-}
-
 export default class MinecraftServerFactory {
 	make(
 		serverConfig: MinecraftServerConfig,
