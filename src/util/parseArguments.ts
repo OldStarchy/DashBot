@@ -26,19 +26,13 @@ export default function parseArguments(str: string) {
 					currentWord.push(chr);
 			}
 		} else {
-			switch (chr) {
-				// TODO: Convert this to use regex /\s/
-				case ' ':
-				case '\n':
-				case '\t':
-					pushWord();
-					break;
-				case '"':
-					inString = true;
-					break;
-				default:
-					currentWord.push(chr);
+			if (/\s/.test(chr)) {
+				pushWord();
+			} else if (chr === '"') {
+				inString = true;
 			}
+
+			currentWord.push(chr);
 		}
 		head++;
 	}

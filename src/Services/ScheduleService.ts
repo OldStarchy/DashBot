@@ -1,3 +1,4 @@
+import { DateTime } from 'luxon';
 import IdentityService from '../ChatServer/IdentityService';
 import Message from '../ChatServer/Message';
 import Command from '../Command';
@@ -109,12 +110,11 @@ export default class ScheduleService extends EventEmitter implements Service {
 				if (success) {
 					//TODO: get timezone for person, or fallback to channel/server default
 					await message.channel.sendText(
-						`"${reminder}" at ${new Date(time).toLocaleString(
-							'en-AU',
-							{
-								timeZone: 'Australia/Adelaide',
-							}
-						)} (${DateStringParser.getTimeDiffString(
+						`"${reminder}" at ${DateTime.utc(time)
+							.setZone('Australia/Adelaide')
+							.toLocaleString({
+								locale: 'en-AU',
+							})} (${DateStringParser.getTimeDiffString(
 							time - Date.now()
 						)})`
 					);

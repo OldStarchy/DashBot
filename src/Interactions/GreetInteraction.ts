@@ -30,12 +30,15 @@ const GreetingGrammar = {
  * Could probably be replaced with a OneOffReplyAction.
  */
 export default class GreetInteraction implements Interaction {
+	private _bot!: DashBot;
+
 	register(bot: DashBot) {
+		this._bot = bot;
 		bot.on('message', this.onMessage.bind(this));
 	}
+
 	async onMessage(event: Event<Message>) {
-		//TODO: Get name from config
-		const name = 'DashBot';
+		const name = this._bot.name;
 		const regexString = `^(oh )?((hey|hi|hello),? )?(there )?(dash|${name})( ?bot)?!?`;
 		const message = event.data;
 		const { author, textContent, channel } = message;

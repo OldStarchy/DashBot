@@ -59,9 +59,8 @@ export default class NumberGameInteraction implements Interaction {
 				event.cancel();
 
 				const number = Math.floor(Math.random() * 99) + 1;
-				//TODO: something like channel.getTag(author) for <!@id> tags in discord
 				channel.sendText(
-					`OK, @${author.username}, I'm thinking of a number between 1 and 100, inclusive`
+					`OK, ${author.tag}, I'm thinking of a number between 1 and 100, inclusive`
 				);
 
 				session.setData({

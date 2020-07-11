@@ -17,7 +17,7 @@ export default class DashBot extends EventEmitter {
 	private _stopTime: number | null = null;
 	private _chatServers: ChatServer[] = [];
 
-	constructor(private _logger: Logger) {
+	constructor(public readonly name: string, private _logger: Logger) {
 		super();
 
 		// eslint-disable-next-line @typescript-eslint/no-this-alias

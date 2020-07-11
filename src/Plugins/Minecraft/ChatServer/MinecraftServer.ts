@@ -31,7 +31,6 @@ export default class MinecraftServer
 	private _identityCache: MinecraftIdentityCache;
 
 	public readonly me: Readonly<MinecraftIdentity>;
-	private _rconAvailable = false;
 	private _id: string;
 	private _logReader: MinecraftLogClient;
 	private _rcon: RconClient | null;
@@ -149,11 +148,6 @@ export default class MinecraftServer
 
 	async connect() {
 		this._logReader.start();
-		if (this._rcon) {
-			await this._rcon.connect();
-			this._rconAvailable = true;
-			await this._rcon.disconnect();
-		}
 	}
 
 	async disconnect() {

@@ -1,6 +1,7 @@
 //@ts-check
 
 import fs from 'fs';
+import { Settings } from 'luxon';
 import path from 'path';
 import IdentityService from './ChatServer/IdentityService';
 import DashBot from './DashBot';
@@ -22,11 +23,12 @@ process.on('uncaughtException', e => {
 	logger.error(e.message);
 	process.exit(1);
 });
-//TODO: Set default timezone for luxon
+Settings.defaultLocale = 'en-AU';
+Settings.defaultZoneName = 'Australia/Adelaide';
 const config = loadConfig(storageDir);
 const packageRoot = path.dirname(__dirname);
 
-const bot = new DashBot(logger);
+const bot = new DashBot(config.botName ?? 'DashBot', logger);
 const storageFile = path.join(storageDir, 'storage.json');
 const storage = new StorageRegister(storageFile, logger, true);
 const identityService = new IdentityService(storage);
