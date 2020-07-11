@@ -1,11 +1,11 @@
 import { MessageReaction, User } from 'discord.js';
-import DiscordMessage from '../ChatServer/Discord/DiscordMessage';
 import Identity from '../ChatServer/Identity';
 import Interaction from '../ChatServer/Interaction';
 import Message from '../ChatServer/Message';
 import TextChannel from '../ChatServer/TextChannel';
 import DashBot from '../DashBot';
 import { Event } from '../Events';
+import DiscordMessage from '../Plugins/Discord/ChatServer/DiscordMessage';
 import Tracery from '../tracery/Tracery';
 import deferred, { Deferred } from '../util/deferred';
 import Emoji from '../util/emoji';

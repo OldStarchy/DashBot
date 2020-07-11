@@ -2,9 +2,6 @@
 
 import fs from 'fs';
 import path from 'path';
-import DiscordServerFactory, {
-	DiscordServerConfig,
-} from './ChatServer/Discord/DiscordServerFactory';
 import IdentityService from './ChatServer/IdentityService';
 import DashBot from './DashBot';
 import DashBotPlugin, { DashBotContext } from './DashBotPlugin';
@@ -99,21 +96,10 @@ logger.info(
 );
 
 function createServerFromConfig(serverConfig: ChatServerConfig) {
-	switch (serverConfig.type) {
-		case 'discord':
-			return new DiscordServerFactory().make(
-				serverConfig as DiscordServerConfig,
-				identityService,
-				logger
-			);
-		default:
-			if (context.chatServerFactories[serverConfig.type])
-				return context.chatServerFactories[serverConfig.type](
-					serverConfig
-				);
+	if (context.chatServerFactories[serverConfig.type])
+		return context.chatServerFactories[serverConfig.type](serverConfig);
 
-			logger.error('Unrecognized server type');
-	}
+	logger.error('Unrecognized server type');
 }
 
 for (const serverConfig of config.servers) {
