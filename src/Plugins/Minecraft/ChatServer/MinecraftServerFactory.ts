@@ -3,95 +3,128 @@ import { Logger } from 'winston';
 import IdentityService from '../../../ChatServer/IdentityService';
 import getVersion from '../../../getVersion';
 import StorageRegister from '../../../StorageRegister';
-import MinecraftLogClient from '../LogClient/MinecraftLogClient';
 import MinecraftPumpLogClient from '../LogClient/MinecraftPumpLogClient';
 import MinecraftTailLogClient from '../LogClient/MinecraftTailLogClient';
 import RconClient from '../Rcon/RconClient';
 import RconSocket from '../Rcon/RconSocket';
 import MinecraftServer from './MinecraftServer';
 
+interface MinecraftServerFactoryContext {
+	storage: StorageRegister;
+	identityService: IdentityService;
+	config: DashBotConfig;
+	storageDir: string;
+	packageRoot: string;
+	logger: Logger;
+}
+
 export default class MinecraftServerFactory {
 	make(
 		serverConfig: MinecraftServerConfig,
-		storage: StorageRegister,
-		identityService: IdentityService,
-		config: DashBotConfig,
-		storageDir: string,
-		packageRoot: string,
-		logger: Logger
+		context: MinecraftServerFactoryContext
 	): MinecraftServer {
-		let minecraftClient: MinecraftLogClient | null = null;
-		let rcon: RconClient | null = null;
+		const id = serverConfig.id;
 
-		if (serverConfig.logClient) {
-			switch (serverConfig.logClient.type) {
-				case 'webhook':
-					if (config.tls) {
-						minecraftClient = new MinecraftPumpLogClient({
-							express,
-							greenlockConfig: {
-								maintainerEmail: config.tls.maintainerEmail,
-								packageAgent: config.tls.packageAgent,
-								configDir: storageDir,
-								packageRoot,
-								cluster: false,
-								package: {
-									name: config.botName!.replace(
-										/[^\w\d]+/g,
-										''
-									),
-									version: getVersion(),
-								},
+		const {
+			storage,
+			identityService,
+			config: { botName },
+		} = context;
+
+		const logClient = this.makeLogClient(serverConfig, context);
+		if (!logClient) {
+			throw new Error(`Couldn't create minecraft server`);
+		}
+
+		const rcon = this.makeRconClient(serverConfig, context);
+
+		return new MinecraftServer({
+			id: id ?? 'Minecraft',
+			logClient,
+			rcon,
+			storage,
+			identityService,
+			botName: botName!,
+		});
+	}
+
+	private makeRconClient(
+		serverConfig: MinecraftServerConfig,
+		context: {
+			logger: Logger;
+		}
+	) {
+		const { rcon: rconConfig } = serverConfig;
+		const { logger } = context;
+
+		if (!rconConfig) return null;
+
+		return new RconClient(
+			new RconSocket(
+				rconConfig.host,
+				rconConfig.port,
+				rconConfig.password
+			),
+			logger
+		);
+	}
+
+	private makeLogClient(
+		{ logClient }: MinecraftServerConfig,
+		{
+			config: { tls, botName },
+			storageDir,
+			packageRoot,
+			logger,
+		}: {
+			config: DashBotConfig;
+			storageDir: string;
+			packageRoot: string;
+			logger: Logger;
+		}
+	) {
+		if (!logClient) {
+			return null;
+		}
+
+		if (logClient.type === 'webhook' && !tls && !logClient.allowInsecure) {
+			throw new Error(
+				".logClient.type is 'webhook' but .logClient.allowInsecure is false and config.tls is not set"
+			);
+		}
+
+		switch (logClient.type) {
+			case 'webhook':
+				if (tls) {
+					return new MinecraftPumpLogClient({
+						express,
+						greenlockConfig: {
+							maintainerEmail: tls.maintainerEmail,
+							packageAgent: tls.packageAgent,
+							configDir: storageDir,
+							packageRoot,
+							cluster: false,
+							package: {
+								name: botName!.replace(/[^\w\d]+/g, ''),
+								version: getVersion(),
 							},
-							whitelist: serverConfig.logClient.whitelist,
-							logger,
-						});
-					} else {
-						if (serverConfig.logClient.allowInsecure) {
-							minecraftClient = new MinecraftPumpLogClient({
-								express,
-								logger,
-								whitelist: serverConfig.logClient.whitelist,
-							});
-						} else {
-							throw new Error(
-								".logClient.type is 'webhook' but .logClient.allowInsecure is false and config.tls is not set"
-							);
-						}
-					}
-					break;
-
-				case 'tail':
-					minecraftClient = new MinecraftTailLogClient({
-						logFilePath: serverConfig.logClient.logFilePath,
+						},
+						whitelist: logClient.whitelist,
 						logger,
 					});
-					break;
-			}
-		}
+				} else {
+					return new MinecraftPumpLogClient({
+						express,
+						logger,
+						whitelist: logClient.whitelist,
+					});
+				}
 
-		if (serverConfig.rcon) {
-			rcon = new RconClient(
-				new RconSocket(
-					serverConfig.rcon.host,
-					serverConfig.rcon.port,
-					serverConfig.rcon.password
-				),
-				logger
-			);
+			case 'tail':
+				return new MinecraftTailLogClient({
+					logFilePath: logClient.logFilePath,
+					logger,
+				});
 		}
-
-		if (minecraftClient) {
-			return new MinecraftServer(
-				serverConfig.id ?? 'Minecraft',
-				minecraftClient,
-				rcon || null,
-				storage,
-				identityService,
-				config.botName!
-			);
-		}
-
-		throw new Error(`Couldn't create minecraft server`);
 	}
 }

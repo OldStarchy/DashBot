@@ -13,6 +13,18 @@ import MinecraftIdentityCache from './MinecraftIdentityCache';
 import MinecraftMessage from './MinecraftMessage';
 import MinecraftTextChannel from './MinecraftTextChannel';
 
+/**
+ * Enables communication with a Minecraft server
+ */
+export interface MinecraftServerOptions {
+	id: string;
+	logClient: MinecraftLogClient;
+	rcon: RconClient | null;
+	storage: StorageRegister;
+	identityService: IdentityService;
+	botName: string;
+}
+
 export default class MinecraftServer
 	implements ChatServer<MinecraftIdentity, MinecraftTextChannel> {
 	private _textChannel: MinecraftTextChannel;
@@ -20,15 +32,21 @@ export default class MinecraftServer
 
 	public readonly me: Readonly<MinecraftIdentity>;
 	private _rconAvailable = false;
+	private _id: string;
+	private _logReader: MinecraftLogClient;
+	private _rcon: RconClient | null;
+	private _identityService: IdentityService;
 
-	constructor(
-		private _id: string,
-		private _logReader: MinecraftLogClient,
-		private _rcon: RconClient | null,
-		storage: StorageRegister,
-		private _identityService: IdentityService,
-		botName: string
-	) {
+	constructor(options: MinecraftServerOptions) {
+		({
+			id: this._id,
+			logClient: this._logReader,
+			rcon: this._rcon,
+			identityService: this._identityService,
+		} = options);
+
+		const { storage, botName } = options;
+
 		this._textChannel = new MinecraftTextChannel(this, this._rcon);
 		this._identityCache = new MinecraftIdentityCache(this, storage);
 		this.me = new MinecraftIdentity(this, botName, '');

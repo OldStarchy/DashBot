@@ -13,12 +13,7 @@ export default class MinecraftPlugin extends DashBotPlugin {
 		context.chatServerFactories['minecraft'] = serverConfig => {
 			return new MinecraftServerFactory().make(
 				serverConfig as MinecraftServerConfig,
-				context.storage,
-				context.identityService,
-				context.config,
-				context.storageDir,
-				context.packageRoot,
-				context.logger
+				context
 			);
 		};
 
