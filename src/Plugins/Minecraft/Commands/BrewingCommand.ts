@@ -1,6 +1,6 @@
-import Message from '../ChatServer/Message';
-import MinecraftServer from '../ChatServer/Minecraft/MinecraftServer';
-import Command from '../Command';
+import Message from '../../../ChatServer/Message';
+import Command from '../../../Command';
+import MinecraftServer from '../ChatServer/MinecraftServer';
 import RconClient from '../Rcon/RconClient';
 import RichText, {
 	ClickEventAction,

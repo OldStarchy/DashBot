@@ -1,5 +1,5 @@
 import { Logger } from 'winston';
-import { Event, EventEmitter, EventHandler } from '../Events';
+import { Event, EventEmitter, EventHandler } from '../../../Events';
 import ChatMessage from './ChatMessage';
 import LogInOutMessage from './LogInOutMessage';
 import LogMessageParser from './LogMessageParser';

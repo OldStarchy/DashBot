@@ -1,6 +1,6 @@
-import { Event, EventEmitter, EventHandler } from '../../Events';
-import MojangApiClient from '../../MojangApiClient';
-import StorageRegister, { PersistentData } from '../../StorageRegister';
+import { Event, EventEmitter, EventHandler } from '../../../Events';
+import MojangApiClient from '../../../MojangApiClient';
+import StorageRegister, { PersistentData } from '../../../StorageRegister';
 import MinecraftIdentity from './MinecraftIdentity';
 import MinecraftServer from './MinecraftServer';
 
