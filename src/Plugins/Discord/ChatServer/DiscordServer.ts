@@ -1,30 +1,46 @@
 import Discord from 'discord.js';
 import { Logger } from 'winston';
-import { CancellableEvent, EventHandler } from '../../Events';
-import deferred from '../../util/deferred';
-import AudioChannel from '../AudioChannel';
-import ChatServer from '../ChatServer';
-import Identity from '../Identity';
-import IdentityService from '../IdentityService';
-import TextChannel from '../TextChannel';
+import AudioChannel from '../../../ChatServer/AudioChannel';
+import ChatServer from '../../../ChatServer/ChatServer';
+import Identity from '../../../ChatServer/Identity';
+import IdentityService from '../../../ChatServer/IdentityService';
+import TextChannel from '../../../ChatServer/TextChannel';
+import { CancellableEvent, EventHandler } from '../../../Events';
+import deferred from '../../../util/deferred';
 import DiscordIdentity from './DiscordIdentity';
 import DiscordMessage from './DiscordMessage';
 import DiscordTextChannel from './DiscordTextChannel';
 
 type TDiscordTextChannel = Discord.Message['channel'];
 
+export interface DiscordServerOptions {
+	id: string;
+	discordClient: Discord.Client;
+	botToken: string;
+	identityService: IdentityService;
+	logger: Logger;
+}
+
 export default class DiscordServer
 	implements ChatServer<DiscordIdentity, DiscordTextChannel> {
 	private _channelCache: Record<string, DiscordTextChannel> = {};
 	private _loggedIn = deferred<this>();
 
-	constructor(
-		private _id: string,
-		private _discordClient: Discord.Client,
-		private _config: { botToken: string },
-		private _identityService: IdentityService,
-		private _logger: Logger
-	) {
+	private _id: string;
+	private _discordClient: Discord.Client;
+	private _botToken: string;
+	private _identityService: IdentityService;
+	private _logger: Logger;
+
+	constructor(options: DiscordServerOptions) {
+		({
+			id: this._id,
+			discordClient: this._discordClient,
+			botToken: this._botToken,
+			identityService: this._identityService,
+			logger: this._logger,
+		} = options);
+
 		this._discordClient.on('ready', () => {
 			this._loggedIn.resolve(this);
 			this._logger.info('Logged in to discord');
@@ -40,7 +56,7 @@ export default class DiscordServer
 	}
 
 	async connect() {
-		await this._discordClient.login(this._config.botToken);
+		await this._discordClient.login(this._botToken);
 		await this._loggedIn;
 	}
 

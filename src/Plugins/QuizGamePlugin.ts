@@ -1,16 +1,20 @@
+/*
+ * Depends on discord plugin
+ */
 import { MessageReaction, User } from 'discord.js';
-import DiscordMessage from '../ChatServer/Discord/DiscordMessage';
 import Identity from '../ChatServer/Identity';
 import Interaction from '../ChatServer/Interaction';
 import Message from '../ChatServer/Message';
 import TextChannel from '../ChatServer/TextChannel';
 import DashBot from '../DashBot';
+import DashBotPlugin, { DashBotContext } from '../DashBotPlugin';
 import { Event } from '../Events';
 import Tracery from '../tracery/Tracery';
 import deferred, { Deferred } from '../util/deferred';
 import Emoji from '../util/emoji';
 import formatTable from '../util/formatTable';
 import sleep from '../util/sleep';
+import DiscordMessage from './Discord/ChatServer/DiscordMessage';
 
 interface QuizGameState {
 	playing: boolean;
@@ -30,7 +34,15 @@ const grammar = {
 	'next-question': ['Ok, next question.'],
 	'last-question': ['This is the last question.'],
 };
-export default class QuizGameService implements Interaction {
+export default class QuizGamePlugin extends DashBotPlugin {
+	public readonly name = 'Quiz Game';
+
+	register(context: DashBotContext) {
+		new QuizGameService().register(context.bot);
+	}
+}
+
+export class QuizGameService implements Interaction {
 	private _games: Record<string, QuizGameState> = {};
 
 	register(bot: DashBot) {

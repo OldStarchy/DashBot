@@ -1,14 +1,10 @@
 //@ts-check
 
+import fs from 'fs';
 import path from 'path';
-import DiscordServerFactory, {
-	DiscordServerConfig,
-} from './ChatServer/Discord/DiscordServerFactory';
 import IdentityService from './ChatServer/IdentityService';
-import MinecraftServerFactory, {
-	MinecraftServerConfig,
-} from './ChatServer/Minecraft/MinecraftServerFactory';
 import DashBot from './DashBot';
+import DashBotPlugin, { DashBotContext } from './DashBotPlugin';
 import loadConfig from './loadConfig';
 import Permissions from './Permissions';
 import createLogger from './Startup/createLogger';
@@ -37,29 +33,73 @@ const identityService = new IdentityService(storage);
 const statistics = new StatisticsTracker();
 const permissions = new Permissions(storage);
 
+const context = new DashBotContext(
+	bot,
+	storage,
+	identityService,
+	statistics,
+	permissions,
+	config,
+	logger,
+	storageDir,
+	packageRoot
+);
+
+// TODO: Move to config, allow multiple plugin locations (builtin + custom)
+const pluginsDir = './Plugins';
+
+const plugins: DashBotPlugin[] = [];
+
+fs.readdirSync(pluginsDir)
+	.filter(file => file !== '.' && file !== '..')
+	.map(file => {
+		const fullPath = path.join('.', pluginsDir, file);
+		if (fs.statSync(fullPath).isDirectory())
+			return path.join(file, 'Plugin.js');
+
+		return file;
+	})
+	.filter(file => file.endsWith('Plugin.js'))
+	.sort()
+	.map(file => path.join(pluginsDir, file))
+	.forEach(file => {
+		try {
+			// eslint-disable-next-line @typescript-eslint/no-var-requires
+			const _import = require('./' + file);
+			if (!_import.default) {
+				logger.warn(
+					`Plugin file "${require.resolve(
+						file
+					)}" is missing a default export.`
+				);
+				return;
+			}
+			const plugin = _import.default;
+
+			if (plugin.prototype instanceof DashBotPlugin) {
+				plugins.push(new plugin());
+			} else {
+				throw new Error("File didn't return an instance of a plugin");
+			}
+		} catch (e) {
+			logger.error(e);
+		}
+	});
+
+plugins.forEach(plugin => {
+	logger.info(`Adding plugin "${plugin.name}".`);
+	plugin.register(context);
+});
+
+logger.info(
+	`${plugins.length} plugin${plugins.length !== 1 ? 's' : ''} loaded.`
+);
+
 function createServerFromConfig(serverConfig: ChatServerConfig) {
-	switch (serverConfig.type) {
-		case 'minecraft':
-			return new MinecraftServerFactory().make(
-				serverConfig as MinecraftServerConfig,
-				storage,
-				identityService,
-				config,
-				storageDir,
-				packageRoot,
-				logger
-			);
+	if (context.chatServerFactories[serverConfig.type])
+		return context.chatServerFactories[serverConfig.type](serverConfig);
 
-		case 'discord':
-			return new DiscordServerFactory().make(
-				serverConfig as DiscordServerConfig,
-				identityService,
-				logger
-			);
-
-		default:
-			throw new Error('Unrecognized server type');
-	}
+	logger.error('Unrecognized server type');
 }
 
 for (const serverConfig of config.servers) {

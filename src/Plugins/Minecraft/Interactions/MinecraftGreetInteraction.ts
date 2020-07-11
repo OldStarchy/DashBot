@@ -1,12 +1,12 @@
 import { Logger } from 'winston';
-import ChatServer from '../ChatServer/ChatServer';
-import Identity from '../ChatServer/Identity';
-import Interaction from '../ChatServer/Interaction';
-import MinecraftServer from '../ChatServer/Minecraft/MinecraftServer';
-import DashBot from '../DashBot';
-import { Event } from '../Events';
-import DeathMessage from '../MinecraftLogClient/PlayerDeathMessage';
-import sleep from '../util/sleep';
+import ChatServer from '../../../ChatServer/ChatServer';
+import Identity from '../../../ChatServer/Identity';
+import Interaction from '../../../ChatServer/Interaction';
+import DashBot from '../../../DashBot';
+import { Event } from '../../../Events';
+import sleep from '../../../util/sleep';
+import MinecraftServer from '../ChatServer/MinecraftServer';
+import DeathMessage from '../LogClient/PlayerDeathMessage';
 
 export default class MinecraftGreetInteraction implements Interaction {
 	constructor(private _logger: Logger) {}

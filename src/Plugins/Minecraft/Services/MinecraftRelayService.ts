@@ -1,14 +1,14 @@
-import IdentityService from '../ChatServer/IdentityService';
-import Message from '../ChatServer/Message';
-import MinecraftServer from '../ChatServer/Minecraft/MinecraftServer';
-import TextChannel from '../ChatServer/TextChannel';
-import Command from '../Command';
-import DashBot from '../DashBot';
-import { Event } from '../Events';
-import Service from '../Service';
-import StorageRegister, { PersistentData } from '../StorageRegister';
-import Tracery from '../tracery/Tracery';
-import selectRandom from '../util/selectRandom';
+import IdentityService from '../../../ChatServer/IdentityService';
+import Message from '../../../ChatServer/Message';
+import TextChannel from '../../../ChatServer/TextChannel';
+import Command from '../../../Command';
+import DashBot from '../../../DashBot';
+import { Event } from '../../../Events';
+import Service from '../../../Service';
+import StorageRegister, { PersistentData } from '../../../StorageRegister';
+import Tracery from '../../../tracery/Tracery';
+import selectRandom from '../../../util/selectRandom';
+import MinecraftServer from '../ChatServer/MinecraftServer';
 
 interface MinecraftRelayServiceState {
 	relays: MinecraftRelayData[];
@@ -85,6 +85,7 @@ export default class MinecraftRelayService implements Service {
 
 	register(bot: DashBot) {
 		bot.on('message', this.onMessage.bind(this));
+		bot.registerCommand('minecraft', this.getEnableCommand());
 	}
 
 	private createRelay() {

@@ -3,7 +3,6 @@ import ChatServer, { PresenceUpdateEventData } from './ChatServer/ChatServer';
 import Message from './ChatServer/Message';
 import Command from './Command';
 import { CancellableEvent, Event, EventEmitter, EventHandler } from './Events';
-import DeathMessage from './MinecraftLogClient/PlayerDeathMessage';
 import parseArguments from './util/parseArguments';
 
 export interface BeforeRunCommandData {
@@ -140,22 +139,21 @@ export default class DashBot extends EventEmitter {
 		}
 	}
 
-	on(
-		event: 'beforeRunCommand',
-		handler: EventHandler<BeforeRunCommandData>
-	): void;
-	on(event: 'disconnected', handler: EventHandler<undefined>): void;
-	on(event: 'connected', handler: EventHandler<undefined>): void;
-	on(event: 'message', handler: EventHandler<Message>): void;
-	on(
-		event: 'presenceUpdate',
-		handler: EventHandler<PresenceUpdateEventData>
-	): void;
-	on(
-		event: 'game.death',
-		handler: EventHandler<{ message: DeathMessage; server: ChatServer }>
+	on<TEvent extends keyof DashBotEvents>(
+		event: TEvent,
+		handler: EventHandler<DashBotEvents[TEvent]>
 	): void;
 	on(event: string, handler: EventHandler<any>): void {
 		return super.on(event, handler);
+	}
+}
+
+declare global {
+	interface DashBotEvents {
+		beforeRunCommand: BeforeRunCommandData;
+		disconnected: undefined;
+		connected: undefined;
+		message: Message;
+		presenceUpdate: PresenceUpdateEventData;
 	}
 }

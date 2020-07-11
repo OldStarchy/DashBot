@@ -1,5 +1,5 @@
 import Discord from 'discord.js';
-import Message from '../Message';
+import Message from '../../../ChatServer/Message';
 import DiscordIdentity from './DiscordIdentity';
 import DiscordTextChannel from './DiscordTextChannel';
 

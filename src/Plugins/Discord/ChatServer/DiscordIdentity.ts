@@ -1,5 +1,5 @@
 import Discord from 'discord.js';
-import Identity from '../Identity';
+import Identity from '../../../ChatServer/Identity';
 import DiscordServer from './DiscordServer';
 
 export default class DiscordIdentity implements Identity {
