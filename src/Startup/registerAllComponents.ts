@@ -1,4 +1,3 @@
-import { Logger } from 'winston';
 import IdentityService from '../ChatServer/IdentityService';
 import EchoCommand from '../Commands/EchoCommand';
 import HaikuCommand from '../Commands/HaikuCommand';
@@ -32,8 +31,7 @@ export default function registerAllComponents(
 	identityService: IdentityService,
 	statistics: StatisticsTracker,
 	config: DashBotConfig,
-	permissions: Permissions,
-	logger: Logger
+	permissions: Permissions
 ) {
 	statistics.register(new UptimeTrackerStatistic(bot));
 	statistics.register(new CommandStatistic(storage, bot));

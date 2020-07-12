@@ -2,12 +2,10 @@ import bodyParser from 'body-parser';
 import { Express } from 'express';
 import Greenlock from 'greenlock-express';
 import { Server } from 'http';
-import MinecraftLogClient, {
-	MinecraftLogClientOptions,
-} from './MinecraftLogClient';
+import winston from 'winston';
+import MinecraftLogClient from './MinecraftLogClient';
 
-export interface MinecraftPumpLogClientOptions
-	extends MinecraftLogClientOptions {
+export interface MinecraftPumpLogClientOptions {
 	express: () => Express;
 	/**
 	 * Specify the port to use for a plain HTTP server, do not use with greenlockConfig
@@ -28,7 +26,7 @@ export default class MinecraftPumpLogClient extends MinecraftLogClient {
 	private _server: Server | null;
 
 	constructor(private readonly _options: MinecraftPumpLogClientOptions) {
-		super(_options);
+		super();
 		this._app = _options.express();
 		this._server = null;
 
@@ -40,7 +38,7 @@ export default class MinecraftPumpLogClient extends MinecraftLogClient {
 					this._options.whitelist &&
 					!this._options.whitelist.includes(req.ip)
 				) {
-					this.logger.warn(
+					winston.warn(
 						`Blocked request from invalid IP ${req.ip}`,
 						req.ip
 					);

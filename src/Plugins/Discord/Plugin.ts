@@ -1,3 +1,4 @@
+import winston from 'winston';
 import DashBotPlugin, { DashBotContext } from '../../DashBotPlugin';
 import DiscordServerFactory from './ChatServer/DiscordServerFactory';
 
@@ -11,6 +12,6 @@ export default class DiscordPlugin extends DashBotPlugin {
 			);
 		};
 
-		context.logger.info(`${this.name} loaded.`);
+		winston.info(`${this.name} loaded.`);
 	}
 }

@@ -1,4 +1,4 @@
-import { Logger } from 'winston';
+import winston from 'winston';
 import ChatServer from '../../../ChatServer/ChatServer';
 import Identity from '../../../ChatServer/Identity';
 import Interaction from '../../../ChatServer/Interaction';
@@ -9,7 +9,7 @@ import MinecraftServer from '../ChatServer/MinecraftServer';
 import DeathMessage from '../LogClient/PlayerDeathMessage';
 
 export default class MinecraftGreetInteraction implements Interaction {
-	constructor(private _logger: Logger) {}
+	constructor() {}
 	register(bot: DashBot) {
 		bot.on('presenceUpdate', this.onUserJoined.bind(this));
 		bot.on('game.death', this.onPlayerDeath.bind(this));
@@ -42,7 +42,7 @@ export default class MinecraftGreetInteraction implements Interaction {
 
 		await sleep(1000 + Math.random() * 1000);
 		channel.sendText('RIP my dude');
-		this._logger.info(message.content);
+		winston.info(message.content);
 
 		if (message.enemy) {
 			const rcon = server.getRcon();
@@ -59,7 +59,7 @@ export default class MinecraftGreetInteraction implements Interaction {
 					`{SkullOwner:${message.player}}`
 				);
 			} catch (e) {
-				this._logger.error(e);
+				winston.error(e);
 			}
 		}
 	}

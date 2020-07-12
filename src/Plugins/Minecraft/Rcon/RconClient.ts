@@ -1,4 +1,4 @@
-import { Logger } from 'winston';
+import winston from 'winston';
 import RconSocket from './RconSocket';
 import RichText, { Color, RichTextArray } from './RichText';
 
@@ -6,7 +6,7 @@ export default class RconClient {
 	private _disconnectTimeout: NodeJS.Timeout | null = null;
 	private _connected = false;
 
-	constructor(private _client: RconSocket, private _logger: Logger) {}
+	constructor(private _client: RconSocket) {}
 
 	async connect(disconnectTimeout = 1000 * 10) {
 		await this._client.connect();
@@ -194,7 +194,7 @@ export default class RconClient {
 			await this.connect();
 		}
 
-		this._logger.info(`running rcon """${data}"""`);
+		winston.info(`running rcon """${data}"""`);
 		const result = await this._client.send(data);
 
 		return result;

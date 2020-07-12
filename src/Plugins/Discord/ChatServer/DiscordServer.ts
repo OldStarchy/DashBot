@@ -1,5 +1,5 @@
 import Discord from 'discord.js';
-import { Logger } from 'winston';
+import winston from 'winston';
 import AudioChannel from '../../../ChatServer/AudioChannel';
 import ChatServer from '../../../ChatServer/ChatServer';
 import Identity from '../../../ChatServer/Identity';
@@ -18,7 +18,6 @@ export interface DiscordServerOptions {
 	discordClient: Discord.Client;
 	botToken: string;
 	identityService: IdentityService;
-	logger: Logger;
 }
 
 export default class DiscordServer
@@ -30,7 +29,6 @@ export default class DiscordServer
 	private _discordClient: Discord.Client;
 	private _botToken: string;
 	private _identityService: IdentityService;
-	private _logger: Logger;
 
 	constructor(options: DiscordServerOptions) {
 		({
@@ -38,12 +36,11 @@ export default class DiscordServer
 			discordClient: this._discordClient,
 			botToken: this._botToken,
 			identityService: this._identityService,
-			logger: this._logger,
 		} = options);
 
 		this._discordClient.on('ready', () => {
 			this._loggedIn.resolve(this);
-			this._logger.info('Logged in to discord');
+			winston.info('Logged in to discord');
 		});
 	}
 

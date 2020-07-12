@@ -1,3 +1,4 @@
+import winston from 'winston';
 import DashBotPlugin, { DashBotContext } from '../../DashBotPlugin';
 import MinecraftServerFactory from './ChatServer/MinecraftServerFactory';
 import BrewingCommand from './Commands/BrewingCommand';
@@ -7,7 +8,7 @@ import MinecraftRelayService from './Services/MinecraftRelayService';
 export default class MinecraftPlugin extends DashBotPlugin {
 	public readonly name = 'Minecraft Plugin';
 	register(context: DashBotContext) {
-		new MinecraftGreetInteraction(context.logger).register(context.bot);
+		new MinecraftGreetInteraction().register(context.bot);
 
 		context.bot.registerCommand('brewing', new BrewingCommand());
 		context.chatServerFactories['minecraft'] = serverConfig => {
@@ -24,6 +25,6 @@ export default class MinecraftPlugin extends DashBotPlugin {
 
 		minecraftRelayService.register(context.bot);
 
-		context.logger.info(`${this.name} loaded.`);
+		winston.info(`${this.name} loaded.`);
 	}
 }
