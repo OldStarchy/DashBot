@@ -1,11 +1,9 @@
 import { Client } from 'discord.js';
-import { Logger } from 'winston';
 import IdentityService from '../../../ChatServer/IdentityService';
 import DiscordServer from './DiscordServer';
 
 interface DiscordServerFactoryContext {
 	identityService: IdentityService;
-	logger: Logger;
 }
 
 export default class DiscordServerFactory {
@@ -13,14 +11,13 @@ export default class DiscordServerFactory {
 		serverConfig: DiscordServerConfig,
 		context: DiscordServerFactoryContext
 	) {
-		const { identityService, logger } = context;
+		const { identityService } = context;
 
 		return new DiscordServer({
 			id: serverConfig.id ?? 'Discord',
 			discordClient: new Client(),
 			botToken: serverConfig.botToken,
 			identityService,
-			logger,
 		});
 	}
 }

@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { Logger } from 'winston';
+import winston from 'winston';
 import { Event, EventEmitter, EventHandler } from './Events';
 import Storage from './Storage';
 
@@ -62,7 +62,7 @@ export default class StorageRegister {
 	private _fileWatcher: fs.FSWatcher | null = null;
 	private _changeTimeout: NodeJS.Timeout | null = null;
 
-	constructor(file: string, private readonly _logger: Logger, watch = false) {
+	constructor(file: string, watch = false) {
 		this._storage = new Storage(file, () => ({}));
 
 		this.load();
@@ -117,7 +117,7 @@ export default class StorageRegister {
 					try {
 						store.emit(new Event('dataLoaded', this._data[key]));
 					} catch (e) {
-						this._logger.error(e);
+						winston.error(e);
 					}
 				}
 			}

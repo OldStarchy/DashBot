@@ -1,4 +1,4 @@
-import { Logger } from 'winston';
+import winston from 'winston';
 import ChatServer, { PresenceUpdateEventData } from './ChatServer/ChatServer';
 import Message from './ChatServer/Message';
 import Command from './Command';
@@ -17,7 +17,7 @@ export default class DashBot extends EventEmitter {
 	private _stopTime: number | null = null;
 	private _chatServers: ChatServer[] = [];
 
-	constructor(public readonly name: string, private _logger: Logger) {
+	constructor(public readonly name: string) {
 		super();
 
 		// eslint-disable-next-line @typescript-eslint/no-this-alias
@@ -53,7 +53,7 @@ export default class DashBot extends EventEmitter {
 					await server.connect();
 					connections++;
 				} catch (e) {
-					this._logger.error("Couldn't connect to server");
+					winston.error("Couldn't connect to server");
 				}
 			})
 		);
@@ -70,7 +70,7 @@ export default class DashBot extends EventEmitter {
 					await server.disconnect();
 					this._stopTime = Date.now();
 				} catch (e) {
-					this._logger.error("Couldn't disconnect from server");
+					winston.error("Couldn't disconnect from server");
 				}
 			})
 		);
@@ -111,11 +111,9 @@ export default class DashBot extends EventEmitter {
 				await this.emitAsync(event);
 			}
 		} catch (e) {
-			this._logger.error(
-				`Message "${message.textContent}" caused an error`
-			);
+			winston.error(`Message "${message.textContent}" caused an error`);
 			if (e instanceof Error) {
-				this._logger.error(e.message);
+				winston.error(e.message);
 			}
 			await message.channel.sendText('Something broke :poop:');
 		}

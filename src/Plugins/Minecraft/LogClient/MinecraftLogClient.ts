@@ -1,4 +1,3 @@
-import { Logger } from 'winston';
 import { Event, EventEmitter, EventHandler } from '../../../Events';
 import ChatMessage from './ChatMessage';
 import LogInOutMessage from './LogInOutMessage';
@@ -11,16 +10,9 @@ export default interface MinecraftLogClient {
 	on(event: 'deathMessage', handler: EventHandler<DeathMessage>): this;
 }
 
-export interface MinecraftLogClientOptions {
-	logger: Logger;
-}
-
 export default abstract class MinecraftLogClient extends EventEmitter {
-	protected readonly logger: Logger;
-
-	constructor(options: MinecraftLogClientOptions) {
+	constructor() {
 		super();
-		this.logger = options.logger;
 	}
 	public abstract start(): void;
 	public abstract stop(): void;

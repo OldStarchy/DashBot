@@ -1,36 +1,78 @@
 //@ts-check
 
 import fs from 'fs';
-import { Settings } from 'luxon';
+import { DateTime, Settings } from 'luxon';
 import path from 'path';
+import winston from 'winston';
 import IdentityService from './ChatServer/IdentityService';
 import DashBot from './DashBot';
 import DashBotPlugin, { DashBotContext } from './DashBotPlugin';
 import loadConfig from './loadConfig';
 import Permissions from './Permissions';
-import createLogger from './Startup/createLogger';
 import handleCli from './Startup/handleCli';
 import registerAllComponents from './Startup/registerAllComponents';
 import StatisticsTracker from './StatisticsTracker';
 import StorageRegister from './StorageRegister';
 
-const args = process.argv.slice(2);
+function configureWinston(loggingDir: string) {
+	const errorStackTracerFormat = winston.format(info => {
+		if (info.error && info.error instanceof Error) {
+			info.message = `${
+				info.message.length > 0 ? info.message + ' ' : ''
+			}${info.error.stack}`;
+		}
+		return info;
+	});
+	const formatter = winston.format.printf(
+		({ service, level, message }) =>
+			`${DateTime.utc()
+				.setZone('Australia/Adelaide')
+				.toFormat(
+					'yyyy-MM-dd HH:mm:ss'
+				)} [${service}] ${level}: ${message}`
+	);
+	winston.configure({
+		level: 'info',
+		transports: [
+			new winston.transports.Console({
+				format: winston.format.combine(
+					winston.format.colorize(),
+					errorStackTracerFormat(),
+					formatter
+				),
+			}),
+			new winston.transports.File({
+				filename: path.join(loggingDir, 'dashbot.log'),
+				format: winston.format.combine(
+					errorStackTracerFormat(),
+					formatter
+				),
+			}),
+		],
+		defaultMeta: { service: 'core' },
+	});
+}
 
+const args = process.argv.slice(2);
 const storageDir = handleCli(args);
-const logger = createLogger(storageDir);
+
+configureWinston(storageDir);
 
 process.on('uncaughtException', e => {
-	logger.error(e.message);
-	process.exit(1);
+	winston.error('Uncaught Exception', { error: e });
 });
+
+winston.info('Starting...');
+
 Settings.defaultLocale = 'en-AU';
 Settings.defaultZoneName = 'Australia/Adelaide';
+
 const config = loadConfig(storageDir);
 const packageRoot = path.dirname(__dirname);
 
-const bot = new DashBot(config.botName ?? 'DashBot', logger);
+const bot = new DashBot(config.botName ?? 'DashBot');
 const storageFile = path.join(storageDir, 'storage.json');
-const storage = new StorageRegister(storageFile, logger, true);
+const storage = new StorageRegister(storageFile, true);
 const identityService = new IdentityService(storage);
 const statistics = new StatisticsTracker();
 const permissions = new Permissions(storage);
@@ -42,7 +84,6 @@ const context = new DashBotContext(
 	statistics,
 	permissions,
 	config,
-	logger,
 	storageDir,
 	packageRoot
 );
@@ -69,7 +110,7 @@ fs.readdirSync(pluginsDir)
 			// eslint-disable-next-line @typescript-eslint/no-var-requires
 			const _import = require('./' + file);
 			if (!_import.default) {
-				logger.warn(
+				winston.warn(
 					`Plugin file "${require.resolve(
 						file
 					)}" is missing a default export.`
@@ -84,16 +125,16 @@ fs.readdirSync(pluginsDir)
 				throw new Error("File didn't return an instance of a plugin");
 			}
 		} catch (e) {
-			logger.error(e);
+			winston.error(e);
 		}
 	});
 
 plugins.forEach(plugin => {
-	logger.info(`Adding plugin "${plugin.name}".`);
+	winston.info(`Adding plugin "${plugin.name}".`);
 	plugin.register(context);
 });
 
-logger.info(
+winston.info(
 	`${plugins.length} plugin${plugins.length !== 1 ? 's' : ''} loaded.`
 );
 
@@ -101,13 +142,13 @@ function createServerFromConfig(serverConfig: ChatServerConfig) {
 	if (context.chatServerFactories[serverConfig.type])
 		return context.chatServerFactories[serverConfig.type](serverConfig);
 
-	logger.error('Unrecognized server type');
+	winston.error('Unrecognized server type');
 }
 
 for (const serverConfig of config.servers) {
 	const server = createServerFromConfig(serverConfig);
 
-	if (server) {
+	if (server && (serverConfig.autoConnect ?? true)) {
 		bot.addServer(server);
 		identityService.addProvider(server);
 	}
@@ -119,8 +160,7 @@ registerAllComponents(
 	identityService,
 	statistics,
 	config,
-	permissions,
-	logger
+	permissions
 );
 
 bot.connect();
@@ -132,12 +172,12 @@ const signals: Record<'SIGHUP' | 'SIGINT' | 'SIGTERM', number> = {
 };
 
 const shutdown = async (signal?: string, value?: number) => {
-	if (signal) logger.info(`Shutting down due to ${signal}`);
-	else logger.info(`Shutting down`);
+	if (signal) winston.info(`Shutting down due to ${signal}`);
+	else winston.info(`Shutting down`);
 	await bot.disconnect();
 
 	if (value) {
-		logger.info(`server stopped by ${signal} with value ${value}`);
+		winston.info(`server stopped by ${signal} with value ${value}`);
 		process.exit(128 + value);
 	} else process.exit(0);
 };

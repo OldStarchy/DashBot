@@ -1,6 +1,7 @@
 interface ChatServerConfig {
 	type: string;
 	id?: string;
+	autoConnect?: boolean;
 }
 
 interface DashBotConfig {

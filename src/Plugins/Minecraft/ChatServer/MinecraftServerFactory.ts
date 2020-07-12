@@ -1,5 +1,4 @@
 import express from 'express';
-import { Logger } from 'winston';
 import IdentityService from '../../../ChatServer/IdentityService';
 import getVersion from '../../../getVersion';
 import StorageRegister from '../../../StorageRegister';
@@ -15,7 +14,6 @@ interface MinecraftServerFactoryContext {
 	config: DashBotConfig;
 	storageDir: string;
 	packageRoot: string;
-	logger: Logger;
 }
 
 export default class MinecraftServerFactory {
@@ -36,7 +34,7 @@ export default class MinecraftServerFactory {
 			throw new Error(`Couldn't create minecraft server`);
 		}
 
-		const rcon = this.makeRconClient(serverConfig, context);
+		const rcon = this.makeRconClient(serverConfig);
 
 		return new MinecraftServer({
 			id: id ?? 'Minecraft',
@@ -48,14 +46,8 @@ export default class MinecraftServerFactory {
 		});
 	}
 
-	private makeRconClient(
-		serverConfig: MinecraftServerConfig,
-		context: {
-			logger: Logger;
-		}
-	) {
+	private makeRconClient(serverConfig: MinecraftServerConfig) {
 		const { rcon: rconConfig } = serverConfig;
-		const { logger } = context;
 
 		if (!rconConfig) return null;
 
@@ -64,8 +56,7 @@ export default class MinecraftServerFactory {
 				rconConfig.host,
 				rconConfig.port,
 				rconConfig.password
-			),
-			logger
+			)
 		);
 	}
 
@@ -75,12 +66,10 @@ export default class MinecraftServerFactory {
 			config: { tls, botName },
 			storageDir,
 			packageRoot,
-			logger,
 		}: {
 			config: DashBotConfig;
 			storageDir: string;
 			packageRoot: string;
-			logger: Logger;
 		}
 	) {
 		if (!logClient) {
@@ -110,12 +99,10 @@ export default class MinecraftServerFactory {
 							},
 						},
 						whitelist: logClient.whitelist,
-						logger,
 					});
 				} else {
 					return new MinecraftPumpLogClient({
 						express,
-						logger,
 						whitelist: logClient.whitelist,
 					});
 				}
@@ -123,7 +110,6 @@ export default class MinecraftServerFactory {
 			case 'tail':
 				return new MinecraftTailLogClient({
 					logFilePath: logClient.logFilePath,
-					logger,
 				});
 		}
 	}

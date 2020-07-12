@@ -1,4 +1,3 @@
-import { Logger } from 'winston';
 import ChatServer from './ChatServer/ChatServer';
 import IdentityService from './ChatServer/IdentityService';
 import DashBot from './DashBot';
@@ -24,7 +23,6 @@ export class DashBotContext {
 		public readonly statistics: StatisticsTracker,
 		public readonly permissions: Permissions,
 		public readonly config: DashBotConfig,
-		public readonly logger: Logger,
 		public readonly storageDir: string,
 		public readonly packageRoot: string
 	) {}
