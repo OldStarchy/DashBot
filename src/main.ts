@@ -1,7 +1,7 @@
 //@ts-check
 
 import fs from 'fs';
-import { Settings } from 'luxon';
+import { DateTime, Settings } from 'luxon';
 import path from 'path';
 import winston from 'winston';
 import IdentityService from './ChatServer/IdentityService';
@@ -14,24 +14,59 @@ import registerAllComponents from './Startup/registerAllComponents';
 import StatisticsTracker from './StatisticsTracker';
 import StorageRegister from './StorageRegister';
 
-const args = process.argv.slice(2);
+function configureWinston(loggingDir: string) {
+	const errorStackTracerFormat = winston.format(info => {
+		if (info.error && info.error instanceof Error) {
+			info.message = `${
+				info.message.length > 0 ? info.message + ' ' : ''
+			}${info.error.stack}`;
+		}
+		return info;
+	});
+	const formatter = winston.format.printf(
+		({ service, level, message }) =>
+			`${DateTime.utc()
+				.setZone('Australia/Adelaide')
+				.toFormat(
+					'yyyy-MM-dd HH:mm:ss'
+				)} [${service}] ${level}: ${message}`
+	);
+	winston.configure({
+		level: 'info',
+		transports: [
+			new winston.transports.Console({
+				format: winston.format.combine(
+					winston.format.colorize(),
+					errorStackTracerFormat(),
+					formatter
+				),
+			}),
+			new winston.transports.File({
+				filename: path.join(loggingDir, 'dashbot.log'),
+				format: winston.format.combine(
+					errorStackTracerFormat(),
+					formatter
+				),
+			}),
+		],
+		defaultMeta: { service: 'core' },
+	});
+}
 
+const args = process.argv.slice(2);
 const storageDir = handleCli(args);
 
-winston.level = 'info';
-winston.add(new winston.transports.Console({ format: winston.format.json() }));
-winston.add(
-	new winston.transports.File({
-		filename: path.join(storageDir, 'dashbot.log'),
-	})
-);
+configureWinston(storageDir);
 
 process.on('uncaughtException', e => {
-	winston.error(e.message);
-	process.exit(1);
+	winston.error('Uncaught Exception', { error: e });
 });
+
+winston.info('Starting...');
+
 Settings.defaultLocale = 'en-AU';
 Settings.defaultZoneName = 'Australia/Adelaide';
+
 const config = loadConfig(storageDir);
 const packageRoot = path.dirname(__dirname);
 
