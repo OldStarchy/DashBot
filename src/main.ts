@@ -107,7 +107,7 @@ function createServerFromConfig(serverConfig: ChatServerConfig) {
 for (const serverConfig of config.servers) {
 	const server = createServerFromConfig(serverConfig);
 
-	if (server) {
+	if (server && (serverConfig.autoConnect ?? true)) {
 		bot.addServer(server);
 		identityService.addProvider(server);
 	}
