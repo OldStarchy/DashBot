@@ -1,4 +1,5 @@
 import mineflayer from 'mineflayer';
+import Vec3 from 'vec3';
 import winston from 'winston';
 import ChatServer, {
 	PresenceUpdateEventData,
@@ -96,6 +97,69 @@ export default class MineflayerClient
 		this.bot.on('game', () => {
 			winston.info('"game" event from mineflayer');
 		});
+
+		(() => {
+			let follow: string | null = null;
+			this.bot.on('chat', (username, message) => {
+				if (message === 'follow') {
+					follow = username;
+				} else if (message === 'stop') {
+					follow = null;
+				}
+			});
+
+			let timeout: NodeJS.Timeout | null = null;
+			this.bot.on('entityMoved', entity => {
+				if (entity.username !== follow) return;
+
+				this.bot?.chat(`${entity.username} moved`);
+
+				const pos = (entity.position as unknown) as InstanceType<
+					Vec3.Vec3
+				>;
+
+				const mypos = (this.bot?.player.entity
+					.position as unknown) as InstanceType<Vec3.Vec3>;
+
+				if (mypos.xzDistanceTo(pos) < 3) {
+					this.bot?.chat("I'm close");
+					//6 -> number of steps to ray trace
+					//5/16 -> distance to travel per step
+					// should go roughly 3 blocks out
+					if (!this.bot?.blockInSight(6, 5 / 16)) {
+						this.bot?.chat('TIME TO DIE');
+						this.bot?.attack(entity);
+						this.bot?.swingArm();
+					} else this.bot?.chat("But I can't see");
+					return;
+				} else this.bot?.chat("i'm on my way");
+
+				let jump = false;
+				if (mypos.y < pos.y) {
+					jump = true;
+				}
+
+				this.bot?.lookAt(
+					(new Vec3.Vec3(
+						pos.x,
+						pos.y + 1,
+						pos.z
+					) as unknown) as Vec3.Vec3,
+					false,
+					() => {
+						this.bot?.setControlState('forward', true);
+						if (jump) this.bot?.setControlState('jump', true);
+						if (timeout) clearTimeout(timeout);
+						timeout = setTimeout(() => {
+							this.bot?.setControlState('forward', false);
+							this.bot?.setControlState('jump', false);
+							this.bot?.chat('are you still there?');
+							timeout = null;
+						}, 1000);
+					}
+				);
+			});
+		})();
 	}
 
 	public getBot() {
