@@ -8,6 +8,11 @@ type ChangeLog = {
 };
 
 const changeLog: ChangeLog = {
+	minor: {
+		Updated: [
+			'Use singleton logger to avoid passing it in through all constructors',
+		],
+	},
 	'0.5.0': {
 		Added: [
 			'The ability to load plugins dynamically from the plugins folder',
