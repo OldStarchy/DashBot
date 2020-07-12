@@ -2,7 +2,7 @@ import { Logger } from 'winston';
 import ChatServer, { PresenceUpdateEventData } from './ChatServer/ChatServer';
 import Message from './ChatServer/Message';
 import Command from './Command';
-import { CancellableEvent, Event, EventEmitter, EventHandler } from './Events';
+import { Event, EventEmitter, EventHandler } from './Events';
 import parseArguments from './util/parseArguments';
 
 export interface BeforeRunCommandData {
@@ -59,7 +59,7 @@ export default class DashBot extends EventEmitter {
 		);
 		this._startTime = Date.now();
 		if (connections > 0) {
-			this.emit(new CancellableEvent('connected', undefined));
+			this.emit(new Event('connected', undefined));
 		}
 	}
 
@@ -74,7 +74,7 @@ export default class DashBot extends EventEmitter {
 				}
 			})
 		);
-		this.emit(new CancellableEvent('disconnected', undefined));
+		this.emit(new Event('disconnected', undefined));
 	}
 
 	public getUptime() {

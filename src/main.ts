@@ -131,12 +131,15 @@ const signals: Record<'SIGHUP' | 'SIGINT' | 'SIGTERM', number> = {
 	SIGTERM: 15,
 };
 
-const shutdown = async (signal: string, value: number) => {
-	logger.info(`Shutting down due to ${signal}`);
+const shutdown = async (signal?: string, value?: number) => {
+	if (signal) logger.info(`Shutting down due to ${signal}`);
+	else logger.info(`Shutting down`);
 	await bot.disconnect();
 
-	logger.info(`server stopped by ${signal} with value ${value}`);
-	process.exit(128 + value);
+	if (value) {
+		logger.info(`server stopped by ${signal} with value ${value}`);
+		process.exit(128 + value);
+	} else process.exit(0);
 };
 
 (Object.keys(signals) as ('SIGHUP' | 'SIGINT' | 'SIGTERM')[]).forEach(
@@ -146,3 +149,6 @@ const shutdown = async (signal: string, value: number) => {
 		});
 	}
 );
+
+// For safe shutdown when debugging
+(global as any).shutdown = shutdown;
