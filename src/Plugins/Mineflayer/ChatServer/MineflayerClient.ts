@@ -1,5 +1,5 @@
 import mineflayer from 'mineflayer';
-import { Logger } from 'winston';
+import winston from 'winston';
 import ChatServer, {
 	PresenceUpdateEventData,
 } from '../../../ChatServer/ChatServer';
@@ -20,7 +20,6 @@ export interface MineflayerOptions {
 	username: string;
 	password?: string;
 
-	logger: Logger;
 	identityService: IdentityService;
 }
 
@@ -38,10 +37,8 @@ export default class MineflayerClient
 	}
 
 	private bot: mineflayer.Bot | null = null;
-	private _logger: Logger;
 
 	constructor(private options: MineflayerOptions) {
-		this._logger = options.logger;
 		this._identityService = options.identityService;
 		this._loggedIn = deferred<this>();
 	}
@@ -84,20 +81,20 @@ export default class MineflayerClient
 		});
 
 		this.bot.on('spawn', () => {
-			this._logger.info('Bot Spawned in minecraft');
+			winston.info('Bot Spawned in minecraft');
 			this.bot!.chat('I have logged in');
 			this._loggedIn.resolve(this);
 		});
 		this.bot.on('kicked', () => {
-			this._logger.info("I've been kicked");
+			winston.info("I've been kicked");
 		});
 
 		this.bot.on('error', err => {
-			this._logger.error(err.message);
+			winston.error(err.message);
 		});
 
 		this.bot.on('game', () => {
-			this._logger.info('"game" event from mineflayer');
+			winston.info('"game" event from mineflayer');
 		});
 	}
 

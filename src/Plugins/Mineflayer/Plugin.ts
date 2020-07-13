@@ -22,7 +22,6 @@ export default class MineflayerPlugin extends DashBotPlugin {
 				port,
 				username,
 				password,
-				logger: context.logger,
 				identityService: context.identityService,
 			};
 
