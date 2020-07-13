@@ -1,3 +1,4 @@
+import { DateTime } from 'luxon';
 import mineflayer from 'mineflayer';
 import Vec3 from 'vec3';
 import winston from 'winston';
@@ -9,6 +10,7 @@ import IdentityService from '../../../ChatServer/IdentityService';
 import Message from '../../../ChatServer/Message';
 import { CancellableEvent, EventHandler } from '../../../Events';
 import deferred, { Deferred } from '../../../util/deferred';
+import bresenham3D from '../util/bresenham';
 import MineflayerBroadcastChannel from './MineflayerBroadcastChannel';
 import MineflayerIdentity from './MineflayerIdentity';
 import MineflayerMessage from './MineflayerMessage';
@@ -109,10 +111,11 @@ export default class MineflayerClient
 			});
 
 			let timeout: NodeJS.Timeout | null = null;
+			let lastHit = 0;
 			this.bot.on('entityMoved', entity => {
 				if (entity.username !== follow) return;
 
-				this.bot?.chat(`${entity.username} moved`);
+				// this.bot?.chat(`${entity.username} moved`);
 
 				const pos = (entity.position as unknown) as InstanceType<
 					Vec3.Vec3
@@ -121,18 +124,50 @@ export default class MineflayerClient
 				const mypos = (this.bot?.player.entity
 					.position as unknown) as InstanceType<Vec3.Vec3>;
 
+				// this.bot?.chat('I am at ' + mypos.toString());
+				// this.bot?.chat('you are at ' + mypos.toString());
+				const points = bresenham3D(
+					Math.floor(mypos.x * 10),
+					Math.floor(mypos.y * 10) + 10,
+					Math.floor(mypos.z * 10),
+					Math.floor(pos.x * 10),
+					Math.floor(pos.y * 10) + 10,
+					Math.floor(pos.z * 10)
+				);
+
 				if (mypos.xzDistanceTo(pos) < 3) {
-					this.bot?.chat("I'm close");
+					// this.bot?.chat("I'm close");
 					//6 -> number of steps to ray trace
 					//5/16 -> distance to travel per step
 					// should go roughly 3 blocks out
-					if (!this.bot?.blockInSight(6, 5 / 16)) {
-						this.bot?.chat('TIME TO DIE');
-						this.bot?.attack(entity);
-						this.bot?.swingArm();
-					} else this.bot?.chat("But I can't see");
+					if (
+						!points.find(p => {
+							const block = this.bot!.blockAt(
+								(Vec3([
+									p.x / 10,
+									p.y / 10,
+									p.z / 10,
+								]) as unknown) as typeof Vec3.Vec3
+							);
+							// this.bot?.chat(
+							// 	'at position ' +
+							// 		`${p.x / 10} ${p.y / 10} ${p.z /
+							// 			10} there is ${
+							// 			block ? block.name : 'air'
+							// 		}`
+							// );
+							return block?.boundingBox !== 'empty';
+						})
+					) {
+						// this.bot?.chat('TIME TO DIE');
+						if (DateTime.utc().valueOf() - lastHit > 400) {
+							this.bot?.attack(entity);
+							this.bot?.swingArm();
+							lastHit = DateTime.utc().valueOf();
+						}
+					} //else this.bot?.chat("But I can't see");
 					return;
-				} else this.bot?.chat("i'm on my way");
+				} //else this.bot?.chat("i'm on my way");
 
 				let jump = false;
 				if (mypos.y < pos.y) {
@@ -153,12 +188,17 @@ export default class MineflayerClient
 						timeout = setTimeout(() => {
 							this.bot?.setControlState('forward', false);
 							this.bot?.setControlState('jump', false);
-							this.bot?.chat('are you still there?');
+
+							if (lastPos.distanceTo(pos) > 0.5) {
+								this.bot?.chat('are you still there?');
+							}
+							lastPos = pos;
 							timeout = null;
 						}, 1000);
 					}
 				);
 			});
+			let lastPos = Vec3([0, 0, 0]);
 		})();
 	}
 
