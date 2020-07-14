@@ -16,20 +16,25 @@ export default function bresenham3D(
 	const ys = y2 > y1 ? 1 : -1;
 	const zs = z2 > z1 ? 1 : -1;
 
+	if (dx === 0 && dy === 0 && dz === 0) {
+		return points;
+	}
+
 	if (dx >= dy && dx >= dz) {
 		let p1 = 2 * dy - dx;
 		let p2 = 2 * dz - dx;
-		while (x1 != x2) {
+		const winSign = Math.sign(x1 - x2);
+		while (Math.sign(x1 - x2) === winSign) {
 			x1 += xs;
 			if (p1 >= 0) {
+				points.push({ x: x1, y: y1, z: z1 });
 				y1 += ys;
 				p1 -= 2 * dx;
-				points.push({ x: x1, y: y1, z: z1 });
 			}
 			if (p2 >= 0) {
+				points.push({ x: x1, y: y1, z: z1 });
 				z1 += zs;
 				p2 -= 2 * dx;
-				points.push({ x: x1, y: y1, z: z1 });
 			}
 			p1 += 2 * dy;
 			p2 += 2 * dz;
@@ -38,17 +43,18 @@ export default function bresenham3D(
 	} else if (dy >= dx && dy >= dz) {
 		let p1 = 2 * dx - dy;
 		let p2 = 2 * dz - dy;
-		while (y1 != y2) {
+		const winSign = Math.sign(y1 - y2);
+		while (Math.sign(y1 - y2) === winSign) {
 			y1 += ys;
 			if (p1 >= 0) {
+				points.push({ x: x1, y: y1, z: z1 });
 				x1 += xs;
 				p1 -= 2 * dy;
-				points.push({ x: x1, y: y1, z: z1 });
 			}
 			if (p2 >= 0) {
+				points.push({ x: x1, y: y1, z: z1 });
 				z1 += zs;
 				p2 -= 2 * dy;
-				points.push({ x: x1, y: y1, z: z1 });
 			}
 			p1 += 2 * dx;
 			p2 += 2 * dz;
@@ -57,17 +63,18 @@ export default function bresenham3D(
 	} else {
 		let p1 = 2 * dy - dz;
 		let p2 = 2 * dx - dz;
-		while (z1 != z2) {
+		const winSign = Math.sign(z1 - z2);
+		while (Math.sign(z1 - z2) === winSign) {
 			z1 += zs;
 			if (p1 >= 0) {
+				points.push({ x: x1, y: y1, z: z1 });
 				y1 += ys;
 				p1 -= 2 * dz;
-				points.push({ x: x1, y: y1, z: z1 });
 			}
 			if (p2 >= 0) {
+				points.push({ x: x1, y: y1, z: z1 });
 				x1 += xs;
 				p2 -= 2 * dz;
-				points.push({ x: x1, y: y1, z: z1 });
 			}
 			p1 += 2 * dy;
 			p2 += 2 * dx;

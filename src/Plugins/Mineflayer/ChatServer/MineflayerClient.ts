@@ -1,6 +1,8 @@
 import { DateTime } from 'luxon';
 import mineflayer from 'mineflayer';
-import Vec3 from 'vec3';
+import { Entity } from 'prismarine-entity';
+import { throttle } from 'throttle-debounce';
+import { Vec3 } from 'vec3';
 import winston from 'winston';
 import ChatServer, {
 	PresenceUpdateEventData,
@@ -10,7 +12,7 @@ import IdentityService from '../../../ChatServer/IdentityService';
 import Message from '../../../ChatServer/Message';
 import { CancellableEvent, EventHandler } from '../../../Events';
 import deferred, { Deferred } from '../../../util/deferred';
-import bresenham3D from '../util/bresenham';
+import blockMarch from '../util/blockMarch';
 import MineflayerBroadcastChannel from './MineflayerBroadcastChannel';
 import MineflayerIdentity from './MineflayerIdentity';
 import MineflayerMessage from './MineflayerMessage';
@@ -110,55 +112,48 @@ export default class MineflayerClient
 				}
 			});
 
-			let timeout: NodeJS.Timeout | null = null;
+			const timeout: NodeJS.Timeout | null = null;
 			let lastHit = 0;
 			this.bot.on('entityMoved', entity => {
 				if (entity.username !== follow) return;
-
+				playerMovedHandler(entity);
+			});
+			const playerMovedHandler = throttle(500, (entity: Entity) => {
 				// this.bot?.chat(`${entity.username} moved`);
 
-				const pos = (entity.position as unknown) as InstanceType<
-					Vec3.Vec3
-				>;
+				const pos = entity.position;
 
-				const mypos = (this.bot?.player.entity
-					.position as unknown) as InstanceType<Vec3.Vec3>;
+				const myPos = this.bot!.player.entity.position;
 
-				// this.bot?.chat('I am at ' + mypos.toString());
-				// this.bot?.chat('you are at ' + mypos.toString());
-				const points = bresenham3D(
-					Math.floor(mypos.x * 10),
-					Math.floor(mypos.y * 10) + 10,
-					Math.floor(mypos.z * 10),
-					Math.floor(pos.x * 10),
-					Math.floor(pos.y * 10) + 10,
-					Math.floor(pos.z * 10)
+				this.bot?.chat('I am at ' + myPos.toString());
+				this.bot?.chat('you are at ' + pos.toString());
+				let blocked = false;
+				blockMarch(
+					myPos.offset(0, 1.26, 0),
+					pos.offset(0, 1.26, 0),
+					blockPos => {
+						const block = this.bot!.blockAt(blockPos);
+						this.bot?.chat(
+							`/particle minecraft:composter ${blockPos.x}.5 ${blockPos.y}.5 ${blockPos.z}.5 0 0 0 0 10 force`
+						);
+						// this.bot?.chat(
+						// 	`particle minecraft:composter ${blockPos.x}.5 ${blockPos.y}.5 ${blockPos.z}.5 0 0 0 0 10 force`
+						// );
+						if (block && block.boundingBox !== 'empty') {
+							blocked = true;
+							return true;
+						}
+						return false;
+					}
 				);
 
-				if (mypos.xzDistanceTo(pos) < 3) {
+				if (myPos.xzDistanceTo(pos) < 3) {
 					// this.bot?.chat("I'm close");
 					//6 -> number of steps to ray trace
 					//5/16 -> distance to travel per step
 					// should go roughly 3 blocks out
-					if (
-						!points.find(p => {
-							const block = this.bot!.blockAt(
-								(Vec3([
-									p.x / 10,
-									p.y / 10,
-									p.z / 10,
-								]) as unknown) as typeof Vec3.Vec3
-							);
-							// this.bot?.chat(
-							// 	'at position ' +
-							// 		`${p.x / 10} ${p.y / 10} ${p.z /
-							// 			10} there is ${
-							// 			block ? block.name : 'air'
-							// 		}`
-							// );
-							return block?.boundingBox !== 'empty';
-						})
-					) {
+
+					if (!blocked) {
 						// this.bot?.chat('TIME TO DIE');
 						if (DateTime.utc().valueOf() - lastHit > 400) {
 							this.bot?.attack(entity);
@@ -169,36 +164,32 @@ export default class MineflayerClient
 					return;
 				} //else this.bot?.chat("i'm on my way");
 
-				let jump = false;
-				if (mypos.y < pos.y) {
-					jump = true;
-				}
+				// let jump = false;
+				// if (myPos.y < pos.y) {
+				// 	jump = true;
+				// }
 
 				this.bot?.lookAt(
-					(new Vec3.Vec3(
-						pos.x,
-						pos.y + 1,
-						pos.z
-					) as unknown) as Vec3.Vec3,
-					false,
-					() => {
-						this.bot?.setControlState('forward', true);
-						if (jump) this.bot?.setControlState('jump', true);
-						if (timeout) clearTimeout(timeout);
-						timeout = setTimeout(() => {
-							this.bot?.setControlState('forward', false);
-							this.bot?.setControlState('jump', false);
+					new Vec3(pos.x, pos.y + 1, pos.z),
+					false
+					// () => {
+					// 	this.bot?.setControlState('forward', true);
+					// 	if (jump) this.bot?.setControlState('jump', true);
+					// 	if (timeout) clearTimeout(timeout);
+					// 	timeout = setTimeout(() => {
+					// 		this.bot?.setControlState('forward', false);
+					// 		this.bot?.setControlState('jump', false);
 
-							if (lastPos.distanceTo(pos) > 0.5) {
-								this.bot?.chat('are you still there?');
-							}
-							lastPos = pos;
-							timeout = null;
-						}, 1000);
-					}
+					// 		if (lastPos.distanceTo(pos) > 0.5) {
+					// 			this.bot?.chat('are you still there?');
+					// 		}
+					// 		lastPos = pos;
+					// 		timeout = null;
+					// 	}, 1000);
+					// }
 				);
 			});
-			let lastPos = Vec3([0, 0, 0]);
+			const lastPos = new Vec3(0, 0, 0);
 		})();
 	}
 
