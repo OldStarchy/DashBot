@@ -59,5 +59,8 @@
     "prettier": "^1.19.1",
     "source-map-support": "^0.5.16",
     "ts-node": "^8.6.2"
+  },
+  "resolutions": {
+    "vec3": "0.1.6"
   }
 }
