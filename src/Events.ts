@@ -121,7 +121,7 @@ export class EventEmitter {
 		}
 	}
 
-	on(event: string, handler: EventHandler<any>, key: any | null = null) {
+	on(event: string, handler: EventHandler<any>, key: any = null) {
 		return this._on(event, handler, key !== null ? key : handler);
 	}
 
@@ -151,11 +151,7 @@ export class EventEmitter {
 		} while (index >= 0);
 	}
 
-	public once(
-		event: string,
-		handler: EventHandler<any>,
-		key: any | null = null
-	) {
+	public once(event: string, handler: EventHandler<any>, key: any = null) {
 		return this._once(event, handler, key !== null ? key : handler);
 	}
 
@@ -169,4 +165,25 @@ export class EventEmitter {
 			key
 		);
 	}
+}
+
+//TODO: Update eslint and add I prefix requirement (and other things)
+// eslint-disable-next-line @typescript-eslint/interface-name-prefix
+export interface IEventEmitter<TEventTypes> {
+	on<TEventName extends keyof TEventTypes>(
+		event: TEventName,
+		handler: EventHandler<TEventTypes[TEventName]>,
+		key?: any
+	): void;
+
+	once<TEventName extends keyof TEventTypes>(
+		event: TEventName,
+		handler: EventHandler<TEventTypes[TEventName]>,
+		key?: any
+	): void;
+
+	off<TEventName extends keyof TEventTypes>(
+		event: TEventName,
+		key?: any
+	): void;
 }
