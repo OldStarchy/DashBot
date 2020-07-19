@@ -1,4 +1,7 @@
+import { DateTime } from 'luxon';
 import mineflayer from 'mineflayer';
+import { Entity } from 'prismarine-entity';
+import { Vec3 } from 'vec3';
 import winston from 'winston';
 import ChatServer, {
 	PresenceUpdateEventData,
@@ -7,7 +10,14 @@ import Identity from '../../../ChatServer/Identity';
 import IdentityService from '../../../ChatServer/IdentityService';
 import Message from '../../../ChatServer/Message';
 import { CancellableEvent, EventHandler } from '../../../Events';
+import MojangApiClient from '../../../MojangApiClient';
 import deferred, { Deferred } from '../../../util/deferred';
+import FollowBehaviour from '../behaviours/FollowBehaviour';
+import AttackCommand from '../commands/AttackCommand';
+import FollowCommand from '../commands/FollowCommand';
+import blockMarch from '../util/blockMarch';
+import BusyLock from '../util/BusyLock';
+import { deltaYaw } from '../util/deltaYaw';
 import MineflayerBroadcastChannel from './MineflayerBroadcastChannel';
 import MineflayerIdentity from './MineflayerIdentity';
 import MineflayerMessage from './MineflayerMessage';
@@ -23,10 +33,17 @@ export interface MineflayerOptions {
 	identityService: IdentityService;
 }
 
+declare global {
+	// eslint-disable-next-line @typescript-eslint/no-empty-interface
+	interface MineflayerBehaviours {}
+}
+
 export default class MineflayerClient
 	implements ChatServer<MineflayerIdentity, MineflayerTextChannel> {
 	private _loggedIn: Deferred<this>;
 	private _identityService: IdentityService;
+	private _behaviours: Partial<MineflayerBehaviours>;
+	private _busyLock: BusyLock = new BusyLock();
 
 	get id() {
 		return this.options.username;
@@ -41,6 +58,124 @@ export default class MineflayerClient
 	constructor(private options: MineflayerOptions) {
 		this._identityService = options.identityService;
 		this._loggedIn = deferred<this>();
+
+		this._behaviours = {};
+	}
+
+	private init() {
+		new FollowBehaviour({}, { client: this });
+
+		new FollowCommand(this);
+		new AttackCommand(this);
+	}
+	/**
+	 * Sets a "BusyLock" on the bot. Basically asking if the bot is busy.
+	 *
+	 * If successful, a "release" function is returned that can release the lock.
+	 *
+	 * If setBusyLock is called while locked, it will return false unless the new lock has higher priority.
+	 *
+	 * If the new lock has higher priority, the old locks `cancelled` function will be called.
+	 *
+	 * ```ts
+	 * // Dance 100 times but stop if something else comes up
+	 * const danceLock = bot.getBusyLock(0);
+	 * if (danceLock) {
+	 * 	let dance = 100;
+	 *
+	 * 	while (!danceLock.cancelled && dance-- > 0) {
+	 * 		await dance();
+	 * 	}
+	 *
+	 * 	danceLock.release();
+	 * }
+	 * ```
+	 */
+	getBusyLock(priority: number) {
+		return this._busyLock.getBusyLock(priority);
+	}
+
+	isBusy(priority?: number) {
+		return this._busyLock.isBusy(priority);
+	}
+
+	stop(priority: number) {
+		return this._busyLock.stop(priority);
+	}
+
+	get behaviours(): Readonly<Partial<MineflayerBehaviours>> {
+		return { ...this._behaviours };
+	}
+
+	setBehaviour<TBehaviourName extends keyof MineflayerBehaviours>(
+		name: TBehaviourName,
+		behaviour: MineflayerBehaviours[TBehaviourName]
+	) {
+		if (this._behaviours[name])
+			throw new Error(`Behaviour ${name} defined twice`);
+		this._behaviours[name] = behaviour;
+	}
+
+	private _nextAttackTime = 0;
+	async attack(target: Entity) {
+		if (this._nextAttackTime > DateTime.utc().valueOf()) return false;
+
+		const bot = this.getBot();
+		if (!bot) return false;
+
+		const pos = target.position;
+		const myPos = bot.player.entity.position;
+
+		const distance = myPos.xzDistanceTo(pos);
+
+		if (distance > 4) {
+			return;
+		}
+
+		let blocked = false;
+		blockMarch(
+			myPos.offset(0, 1.26, 0),
+			pos.offset(0, 1.26, 0),
+			blockPos => {
+				const block = bot.blockAt(blockPos);
+				if (block && block.boundingBox !== 'empty') {
+					blocked = true;
+					return true;
+				}
+				return false;
+			}
+		);
+
+		if (blocked) {
+			return false;
+		}
+
+		this._nextAttackTime =
+			DateTime.utc().valueOf() + Math.round(Math.random() * 300 + 100);
+
+		const hitChance = 1.5 / distance;
+
+		await new Promise<boolean>(s => {
+			bot.lookAt(
+				new Vec3(pos.x, pos.y + target.height, pos.z),
+				false,
+				() => {
+					const delta = pos.minus(
+						myPos.offset(0, bot.entity.height, 0)
+					);
+					const yaw = Math.atan2(-delta.x, -delta.z);
+
+					if (Math.abs(deltaYaw(bot.entity.yaw, yaw)) < 0.01) {
+						bot?.swingArm();
+						if (Math.random() < hitChance) {
+							bot?.attack(target);
+							return s(true);
+						}
+					}
+					return s(false);
+				}
+			);
+		});
 	}
 
 	async connect(): Promise<void> {
@@ -80,22 +215,30 @@ export default class MineflayerClient
 			];
 		});
 
-		this.bot.on('spawn', () => {
-			winston.info('Bot Spawned in minecraft');
+		this.bot.on('login', () => {
+			winston.info('Bot logged in to minecraft');
 			this.bot!.chat('I have logged in');
-			this._loggedIn.resolve(this);
+
+			this.bot!.once('spawn', () => {
+				this._loggedIn.resolve(this);
+			});
 		});
+
 		this.bot.on('kicked', () => {
 			winston.info("I've been kicked");
+			this.disconnect();
 		});
 
 		this.bot.on('error', err => {
 			winston.error(err.message);
+			this.disconnect();
 		});
 
 		this.bot.on('game', () => {
 			winston.info('"game" event from mineflayer');
 		});
+
+		this.init();
 	}
 
 	public getBot() {
@@ -160,25 +303,31 @@ export default class MineflayerClient
 		return this.makeWhisperChannel(person.username);
 	}
 
-	private makeIdentity(username: string): MineflayerIdentity | null;
-	private makeIdentity(player: mineflayer.Player): MineflayerIdentity | null;
-	private makeIdentity(
+	private async makeIdentity(username: string): Promise<MineflayerIdentity>;
+	private async makeIdentity(
+		player: mineflayer.Player
+	): Promise<MineflayerIdentity>;
+	private async makeIdentity(
 		usernameOrPlayer: mineflayer.Player | string
-	): MineflayerIdentity | null {
-		if (!this.bot) return null;
+	): Promise<MineflayerIdentity> {
+		if (!this.bot) throw new Error('no bot');
+
+		const mojang = new MojangApiClient();
 
 		if (typeof usernameOrPlayer === 'string')
 			return new MineflayerIdentity(
 				this,
 				usernameOrPlayer,
-				(this.bot.players[usernameOrPlayer] as any).uuid,
+				(await mojang.getUuidFromUsername(usernameOrPlayer))?.id ??
+					usernameOrPlayer,
 				usernameOrPlayer === this.bot.username
 			);
 		else {
 			return new MineflayerIdentity(
 				this,
 				usernameOrPlayer.username,
-				(usernameOrPlayer as any).uuid,
+				(await mojang.getUuidFromUsername(usernameOrPlayer.username))
+					?.id ?? usernameOrPlayer.username,
 				usernameOrPlayer.username === this.bot.username
 			);
 		}
@@ -210,7 +359,7 @@ export default class MineflayerClient
 			case 'message':
 				this.bot.on(
 					'chat',
-					(
+					async (
 						username: string,
 						message: string
 						// _translate: string | null,
@@ -222,7 +371,7 @@ export default class MineflayerClient
 								'message',
 								new MineflayerMessage(
 									this.broadcastChannel,
-									this.makeIdentity(username)!,
+									(await this.makeIdentity(username))!,
 									message
 								)
 							)
@@ -231,7 +380,7 @@ export default class MineflayerClient
 				);
 				this.bot.on(
 					'whisper',
-					(
+					async (
 						username: string,
 						message: string
 						// _translate: string | null,
@@ -243,7 +392,7 @@ export default class MineflayerClient
 								'message',
 								new MineflayerMessage(
 									this.makeWhisperChannel(username),
-									this.makeIdentity(username)!,
+									(await this.makeIdentity(username))!,
 									message
 								)
 							)
