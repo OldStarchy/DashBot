@@ -9,6 +9,7 @@ type ChangeLog = {
 
 const changeLog: ChangeLog = {
 	minor: {
+		Added: ['Add basic mineflayer integration for minecraft bots'],
 		Updated: [
 			'Use singleton logger to avoid passing it in through all constructors',
 		],
