@@ -14,7 +14,11 @@ export class BusyLockKey extends EventEmitter {
 	}
 
 	on(event: 'cancelled', handler: EventHandler<void>): void {
-		return super.on(event, handler);
+		super.on(event, handler);
+
+		if (this.cancelled) {
+			handler(new Event('cancelled', void 0));
+		}
 	}
 }
 
