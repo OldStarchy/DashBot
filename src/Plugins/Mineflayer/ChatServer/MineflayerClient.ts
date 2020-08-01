@@ -26,6 +26,8 @@ import MineflayerIdentity from './MineflayerIdentity';
 import MineflayerMessage from './MineflayerMessage';
 import MineflayerTextChannel from './MineflayerTextChannel';
 import MineflayerWhisperChannel from './MineflayerWhisperChannel';
+import StopCommand from '../commands/StopCommand';
+import StopPleaseCommand from '../commands/StopPleaseCommand';
 
 export interface MineflayerOptions {
 	host: string;
@@ -73,6 +75,8 @@ export default class MineflayerClient
 		new AttackCommand(this);
 		new FishCommand(this);
 		new DropAllCommand(this);
+		new StopCommand(this);
+		new StopPleaseCommand(this);
 	}
 	/**
 	 * Sets a "BusyLock" on the bot. Basically asking if the bot is busy.
