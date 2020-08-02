@@ -4,6 +4,8 @@ import HaikuCommand from '../Commands/HaikuCommand';
 import HelpCommand from '../Commands/HelpCommand';
 import IdCommand from '../Commands/IdCommand';
 import JokeCommand, { ICanHazDadJokeClient } from '../Commands/JokeCommand';
+import LoginCommand from '../Commands/LoginCommand';
+import LogoutCommand from '../Commands/LogoutCommand';
 import PermissionCommand from '../Commands/PermissionCommand';
 import PetCommand from '../Commands/PetCommand';
 import PickCommand from '../Commands/PickCommand';
@@ -59,20 +61,21 @@ export default function registerAllComponents(
 	updateAnnouncerService.register(bot);
 	new ScheduleService({ storage, identityService }).register(bot);
 
-	bot.registerCommand('announce', updateAnnouncerService.getCommand());
+	bot.commands.add(updateAnnouncerService.getCommand());
 
-	bot.registerCommand('stats', new StatisticsCommand(statistics));
-	bot.registerCommand('joke', new JokeCommand(new ICanHazDadJokeClient()));
-	bot.registerCommand('haiku', new HaikuCommand());
-	bot.registerCommand('poll', new PollCommand());
-	bot.registerCommand('pick', new PickCommand());
-	bot.registerCommand('pet', petCommand);
-	bot.registerCommand('help', helpCommand);
-	bot.registerCommand('version', new VersionCommand());
-	bot.registerCommand('echo', new EchoCommand(permissions));
-	bot.registerCommand('echoraw', new EchoCommand(permissions));
-	bot.registerCommand('id', new IdCommand(permissions));
-	bot.registerCommand('permissions', new PermissionCommand(permissions));
+	bot.commands.add(new StatisticsCommand(statistics));
+	bot.commands.add(new JokeCommand(new ICanHazDadJokeClient()));
+	bot.commands.add(new HaikuCommand());
+	bot.commands.add(new PollCommand());
+	bot.commands.add(new PickCommand());
+	bot.commands.add(petCommand);
+	bot.commands.add(helpCommand);
+	bot.commands.add(new VersionCommand());
+	bot.commands.add(new EchoCommand(permissions));
+	bot.commands.add(new IdCommand(permissions));
+	bot.commands.add(new PermissionCommand(permissions));
+	bot.commands.add(new LoginCommand(bot));
+	bot.commands.add(new LogoutCommand(bot));
 
 	new TraceryInteraction().register(bot);
 	new NumberGameInteraction(storage).register(bot);

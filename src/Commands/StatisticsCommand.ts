@@ -4,14 +4,15 @@ import StatisticsTracker from '../StatisticsTracker';
 import formatTable from '../util/formatTable';
 import sleep from '../util/sleep';
 
-export default class StatisticsCommand implements Command {
-	constructor(private readonly _stats: StatisticsTracker) {}
+export default class StatisticsCommand extends Command {
+	readonly name = 'stats';
+	readonly description = 'Shows statistics';
 
-	async run(message: Message | null) {
-		if (message === null) {
-			return;
-		}
+	constructor(private readonly _stats: StatisticsTracker) {
+		super();
+	}
 
+	async run(message: Message) {
 		await message.channel.sendText('Gathering stats...');
 		await sleep(1000);
 

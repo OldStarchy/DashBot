@@ -3,8 +3,13 @@ import Command from '../Command';
 import Permissions from '../Permissions';
 import formatTable from '../util/formatTable';
 
-export default class IdCommand implements Command {
-	constructor(private readonly permissions: Permissions) {}
+export default class IdCommand extends Command {
+	readonly name = 'id';
+	readonly description = 'Shows you your identity information';
+
+	constructor(private readonly permissions: Permissions) {
+		super();
+	}
 	async run(message: Message | null) {
 		if (message === null) {
 			return;

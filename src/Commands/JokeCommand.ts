@@ -5,8 +5,13 @@ import Command from '../Command';
 /**
  * Performs an Imgur search and posts a random result
  */
-export default class JokeCommand implements Command {
-	constructor(private readonly _jokes: ICanHazDadJokeClient) {}
+export default class JokeCommand extends Command {
+	readonly name = 'joke';
+	readonly description = 'Gets you an amazingly funny joke (sometimes).';
+
+	constructor(private readonly _jokes: ICanHazDadJokeClient) {
+		super();
+	}
 
 	async run(message: Message | null) {
 		if (message === null) {

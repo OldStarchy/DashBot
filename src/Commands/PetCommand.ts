@@ -13,7 +13,10 @@ interface PetActionStorage {
 	petsPerPerson: Record<string, number>;
 }
 
-export default class PetCommand implements Command, StatisticProvider {
+export default class PetCommand extends Command implements StatisticProvider {
+	readonly name = 'pet';
+	readonly description = 'Shows dashbot you care';
+
 	private _timesPet = 0;
 	private _timesPetToday = 0;
 	private _timesPetTodayDate = PetCommand.getDateKey();
@@ -22,6 +25,7 @@ export default class PetCommand implements Command, StatisticProvider {
 	private _store: PersistentData<PetActionStorage>;
 
 	constructor(storage: StorageRegister) {
+		super();
 		this._store = storage.createStore('PetAction');
 		this._store.on('dataLoaded', this.onReadData.bind(this));
 	}

@@ -24,6 +24,9 @@ export interface MinecraftPumpLogClientOptions {
 export default class MinecraftPumpLogClient extends MinecraftLogClient {
 	private readonly _app: Express;
 	private _server: Server | null;
+	get isRunning() {
+		return this._server !== null;
+	}
 
 	constructor(private readonly _options: MinecraftPumpLogClientOptions) {
 		super();

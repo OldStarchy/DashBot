@@ -85,7 +85,7 @@ export default class MinecraftRelayService implements Service {
 
 	register(bot: DashBot) {
 		bot.on('message', this.onMessage.bind(this));
-		bot.registerCommand('minecraft', this.getEnableCommand());
+		bot.commands.add(this.getEnableCommand());
 	}
 
 	private createRelay() {
@@ -244,6 +244,9 @@ export default class MinecraftRelayService implements Service {
 			return;
 		}
 
+		if (message.author.username === 'DashBotMC') return;
+		if (message.author.username === 'Turnerj') return;
+
 		await relay.relayChannel.sendText(
 			`<${message.author.username}> ${message.textContent}`
 		);
@@ -276,7 +279,11 @@ export default class MinecraftRelayService implements Service {
 		// eslint-disable-next-line @typescript-eslint/no-this-alias
 		const service = this;
 
-		class ServiceCommand implements Command {
+		class ServiceCommand extends Command {
+			readonly name = 'minecraft';
+			readonly description =
+				'Allows you to link a minecraft server with a discord text chat channel.';
+
 			async run(
 				message: Message | null,
 				_command: string,

@@ -1,7 +1,7 @@
 import winston from 'winston';
 import ChatServer, { PresenceUpdateEventData } from './ChatServer/ChatServer';
 import Message from './ChatServer/Message';
-import Command from './Command';
+import Command, { CommandSet } from './Command';
 import { Event, EventEmitter, EventForEmitter } from './Events';
 import MinecraftServer from './Plugins/Minecraft/ChatServer/MinecraftServer';
 import parseArguments from './util/parseArguments';
@@ -13,28 +13,35 @@ export interface BeforeRunCommandData {
 }
 
 export default class DashBot extends EventEmitter<DashBotEvents> {
-	private _commands: Record<string, Command> = {};
 	private _startTime: number | null = null;
 	private _stopTime: number | null = null;
-	private _chatServers: ChatServer[] = [];
+	readonly servers: ChatServer[] = [];
+
+	readonly commands = new CommandSet();
 
 	constructor(public readonly name: string) {
 		super();
 
 		// eslint-disable-next-line @typescript-eslint/no-this-alias
 		const bot = this;
-		class DisconnectCommand implements Command {
-			async run() {
+		class DisconnectCommand extends Command {
+			readonly name = 'disconnect';
+			readonly description = 'Shuts down dasbhot';
+			async run(message: Message) {
+				winston.warn(
+					`Shutdown command invoked by ${message.author.username} in ${message.channel.name} in ${message.channel.server.id}`
+				);
 				//TODO: Check for admin or something
 				await bot.disconnect();
 				process.exit(0);
 			}
 		}
-		this.registerCommand('disconnect', new DisconnectCommand());
+
+		this.commands.add(new DisconnectCommand());
 	}
 
 	public addServer(chatServer: ChatServer) {
-		this._chatServers.push(chatServer);
+		this.servers.push(chatServer);
 
 		// TODO: Make this better
 		chatServer.on('message', this.onMessage.bind(this));
@@ -47,27 +54,40 @@ export default class DashBot extends EventEmitter<DashBotEvents> {
 			});
 	}
 
-	public async connect() {
+	public async connect(serverIds?: string[]) {
+		const serversToConnectTo =
+			serverIds === undefined
+				? this.servers
+				: this.servers.filter(server => serverIds.includes(server.id));
+
 		let connections = 0;
 		await Promise.all(
-			this._chatServers.map(async server => {
+			serversToConnectTo.map(async server => {
 				try {
 					await server.connect();
 					connections++;
 				} catch (e) {
-					winston.error("Couldn't connect to server");
+					winston.error(
+						`Couldn't connect to server ${
+							server.id
+						} due to ${JSON.stringify(e)}`,
+						{ error: e }
+					);
 				}
 			})
 		);
 		this._startTime = Date.now();
 		if (connections > 0) {
+			winston.info(
+				`Connected to ${connections} of ${serversToConnectTo.length} servers (${this.servers.length} available)`
+			);
 			this.emit(new Event('connected', undefined));
 		}
 	}
 
 	public async disconnect() {
 		await Promise.all(
-			this._chatServers.map(async server => {
+			this.servers.map(async server => {
 				try {
 					await server.disconnect();
 					this._stopTime = Date.now();
@@ -89,10 +109,6 @@ export default class DashBot extends EventEmitter<DashBotEvents> {
 		}
 
 		return 0;
-	}
-
-	registerCommand(key: string, command: Command) {
-		this._commands[key] = command;
 	}
 
 	private async onMessage(event: EventForEmitter<ChatServer, 'message'>) {
@@ -121,22 +137,20 @@ export default class DashBot extends EventEmitter<DashBotEvents> {
 		}
 	}
 
-	async runCommand(message: Message | null, name: string, ...args: string[]) {
-		if (this._commands[name]) {
-			const event = this.emit(
-				new Event('beforeRunCommand', {
-					message,
-					name,
-					args,
-				})
-			);
+	async runCommand(message: Message, commandName: string, ...args: string[]) {
+		const event = this.emit(
+			new Event('beforeRunCommand', {
+				message,
+				name: commandName,
+				args,
+			})
+		);
 
-			if (event.isCancelled()) {
-				return;
-			}
-
-			await this._commands[name].run(message, name, ...args);
+		if (event.isCancelled()) {
+			return;
 		}
+
+		await this.commands.run(message, commandName, args);
 	}
 }
 

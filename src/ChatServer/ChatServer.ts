@@ -21,6 +21,7 @@ export default interface ChatServer<
 > extends EventEmitter<ChatServerEvents> {
 	readonly id: string;
 	readonly me: Readonly<TIdentity>;
+	readonly isConnected: boolean;
 	connect(): Promise<void>;
 	disconnect(): Promise<void>;
 	getAudioChannels(): Promise<AudioChannel[]>;

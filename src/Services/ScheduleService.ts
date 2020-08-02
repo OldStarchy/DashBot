@@ -78,7 +78,11 @@ export default class ScheduleService extends EventEmitter<ScheduleServiceEvents>
 		// eslint-disable-next-line @typescript-eslint/no-this-alias
 		const service = this;
 
-		this._remindCommand = new (class RemindCommand implements Command {
+		this._remindCommand = new (class RemindCommand extends Command {
+			readonly name = 'remind';
+			readonly description =
+				"Sets a one-off reminder.\n!remind <date / time> <message>\nYou can have up to 5 reminders at a time. Once you set one, you can't change it so set them wisely";
+
 			async run(
 				message: Message | null,
 				name: string,
@@ -141,7 +145,7 @@ export default class ScheduleService extends EventEmitter<ScheduleServiceEvents>
 		})();
 	}
 	register(dashBot: DashBot) {
-		dashBot.registerCommand('remind', this._remindCommand);
+		dashBot.commands.add(this._remindCommand);
 		this.start();
 
 		this.on('reminder', async e => {

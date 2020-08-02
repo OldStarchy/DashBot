@@ -132,10 +132,11 @@ const stripRichContent = (content: RichText) =>
 		.map(part => part!.toString())
 		.join('');
 
-export default class BrewingCommand implements Command {
-	async run(message: Message | null, name: string, ...args: string[]) {
-		if (message === null) return;
+export default class BrewingCommand extends Command {
+	readonly name = 'brewing';
+	readonly description = 'Shows potion brewing recipes for MineCraft';
 
+	async run(message: Message, ...args: string[]) {
 		const channel = message.channel;
 		const server = channel.server;
 

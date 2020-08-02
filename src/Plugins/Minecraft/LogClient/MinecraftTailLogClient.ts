@@ -8,6 +8,9 @@ interface MinecraftTailLogClientOptions {
 export default class MinecraftTailLogClient extends MinecraftLogClient {
 	private readonly _logFilePath: string;
 	private _tail: Tail | null = null;
+	public get isRunning() {
+		return this._tail !== null;
+	}
 
 	constructor(options: MinecraftTailLogClientOptions) {
 		super();
@@ -30,5 +33,6 @@ export default class MinecraftTailLogClient extends MinecraftLogClient {
 
 	stop() {
 		this._tail?.unwatch();
+		this._tail = null;
 	}
 }

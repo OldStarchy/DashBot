@@ -2,9 +2,14 @@ import Message from '../ChatServer/Message';
 import Command from '../Command';
 import Permissions from '../Permissions';
 
-export default class EchoCommand implements Command {
-	constructor(private readonly permissions: Permissions) {}
-	async run(message: Message | null, command: string) {
+export default class EchoCommand extends Command {
+	readonly name = 'echo';
+	readonly description = 'Says what you say';
+
+	constructor(private readonly permissions: Permissions) {
+		super();
+	}
+	async run(message: Message) {
 		if (message === null) {
 			return;
 		}
@@ -18,11 +23,8 @@ export default class EchoCommand implements Command {
 			return;
 		}
 
-		const content =
-			command === 'echoraw'
-				? message.rawContent.substr('!echoraw'.length).trimLeft()
-				: message.textContent.substr('!echo'.length).trimLeft();
+		const content = message.textContent.substr('!echo'.length).trimLeft();
 
-		await message.channel.sendText('`' + content + '`');
+		await message.channel.sendText(content);
 	}
 }

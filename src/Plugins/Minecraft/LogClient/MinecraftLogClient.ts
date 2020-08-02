@@ -18,6 +18,7 @@ export default abstract class MinecraftLogClient extends EventEmitter<
 	}
 	public abstract start(): void;
 	public abstract stop(): void;
+	public abstract get isRunning(): boolean;
 
 	public onLineReceived(line: string) {
 		const message = LogMessageParser.parse(line);

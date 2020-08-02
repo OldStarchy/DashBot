@@ -1,3 +1,6 @@
+/**
+ * Eg. `this._options = shallowMerge(defaults, options);`
+ */
 export default function shallowMerge<A extends {}, B extends {}>(
 	a: A,
 	b: B

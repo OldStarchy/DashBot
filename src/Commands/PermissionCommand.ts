@@ -14,8 +14,13 @@ enum PermissionsPermissions {
 	MANAGE_ADMINS = 'permissions.manage-admins',
 }
 
-export default class PermissionCommand implements Command {
-	constructor(private readonly permissions: Permissions) {}
+export default class PermissionCommand extends Command {
+	readonly name = 'permission';
+	readonly description = '(WIP) Handles assigning permissions to people';
+
+	constructor(private readonly permissions: Permissions) {
+		super();
+	}
 
 	private parseIdentity(identity: Identity, str: string) {
 		if (str === 'me') {
