@@ -145,7 +145,7 @@ export default class ScheduleService extends EventEmitter<ScheduleServiceEvents>
 		})();
 	}
 	register(dashBot: DashBot) {
-		dashBot.registerCommand('remind', this._remindCommand);
+		dashBot.commands.add(this._remindCommand);
 		this.start();
 
 		this.on('reminder', async e => {

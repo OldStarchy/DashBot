@@ -19,8 +19,7 @@ export default class ImgurPlugin extends DashBotPlugin {
 	public readonly name = 'Imgur Plugin';
 	register(context: DashBotContext) {
 		if (context.config.imgurClientId) {
-			context.bot.registerCommand(
-				'imgur',
+			context.bot.commands.add(
 				new ImgurCommand(new ImgurClient(context.config.imgurClientId))
 			);
 		}

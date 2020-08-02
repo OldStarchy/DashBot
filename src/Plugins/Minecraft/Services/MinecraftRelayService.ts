@@ -85,7 +85,7 @@ export default class MinecraftRelayService implements Service {
 
 	register(bot: DashBot) {
 		bot.on('message', this.onMessage.bind(this));
-		bot.registerCommand('minecraft', this.getEnableCommand());
+		bot.commands.add(this.getEnableCommand());
 	}
 
 	private createRelay() {

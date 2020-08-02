@@ -13,7 +13,6 @@ export interface BeforeRunCommandData {
 }
 
 export default class DashBot extends EventEmitter<DashBotEvents> {
-	private _commands: Record<string, Command> = {};
 	private _startTime: number | null = null;
 	private _stopTime: number | null = null;
 	private _chatServers: ChatServer[] = [];
@@ -99,10 +98,6 @@ export default class DashBot extends EventEmitter<DashBotEvents> {
 		return 0;
 	}
 
-	registerCommand(key: string, command: Command) {
-		this._commands[key] = command;
-	}
-
 	private async onMessage(event: EventForEmitter<ChatServer, 'message'>) {
 		const message = event.data;
 		if (message.author.isBot) {
@@ -130,21 +125,19 @@ export default class DashBot extends EventEmitter<DashBotEvents> {
 	}
 
 	async runCommand(message: Message, commandName: string, ...args: string[]) {
-		if (this._commands[commandName]) {
-			const event = this.emit(
-				new Event('beforeRunCommand', {
-					message,
-					name: commandName,
-					args,
-				})
-			);
+		const event = this.emit(
+			new Event('beforeRunCommand', {
+				message,
+				name: commandName,
+				args,
+			})
+		);
 
-			if (event.isCancelled()) {
-				return;
-			}
-
-			await this.commands.run(message, commandName, args);
+		if (event.isCancelled()) {
+			return;
 		}
+
+		await this.commands.run(message, commandName, args);
 	}
 }
 

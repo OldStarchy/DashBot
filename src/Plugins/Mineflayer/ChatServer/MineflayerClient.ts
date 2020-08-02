@@ -7,14 +7,18 @@ import winston from 'winston';
 import ChatServer, { ChatServerEvents } from '../../../ChatServer/ChatServer';
 import Identity from '../../../ChatServer/Identity';
 import IdentityService from '../../../ChatServer/IdentityService';
+import { CommandSet } from '../../../Command';
 import { CancellableEvent, EventEmitter } from '../../../Events';
 import MojangApiClient from '../../../MojangApiClient';
 import deferred, { Deferred } from '../../../util/deferred';
+import parseArguments from '../../../util/parseArguments';
 import FollowBehaviour from '../behaviours/FollowBehaviour';
 import AttackCommand from '../commands/AttackCommand';
 import DropAllCommand from '../commands/DropAllCommand';
 import FishCommand from '../commands/FishCommand';
 import FollowCommand from '../commands/FollowCommand';
+import StopCommand from '../commands/StopCommand';
+import StopPleaseCommand from '../commands/StopPleaseCommand';
 import blockMarch from '../util/blockMarch';
 import BusyLock from '../util/BusyLock';
 import { deltaYaw } from '../util/deltaYaw';
@@ -23,8 +27,6 @@ import MineflayerIdentity from './MineflayerIdentity';
 import MineflayerMessage from './MineflayerMessage';
 import MineflayerTextChannel from './MineflayerTextChannel';
 import MineflayerWhisperChannel from './MineflayerWhisperChannel';
-import StopCommand from '../commands/StopCommand';
-import StopPleaseCommand from '../commands/StopPleaseCommand';
 
 export interface MineflayerOptions {
 	host: string;
@@ -51,6 +53,8 @@ export default class MineflayerClient
 	private _busyLock: BusyLock = new BusyLock();
 	private _mcData: MinecraftData.IndexedData | null = null;
 
+	readonly commands = new CommandSet();
+
 	get id() {
 		return this.options.username;
 	}
@@ -72,12 +76,36 @@ export default class MineflayerClient
 	private init() {
 		new FollowBehaviour({}, { client: this });
 
-		new FollowCommand(this);
-		new AttackCommand(this);
-		new FishCommand(this);
-		new DropAllCommand(this);
-		new StopCommand(this);
-		new StopPleaseCommand(this);
+		this.commands.add(new FollowCommand(this));
+		this.commands.add(new AttackCommand(this));
+		this.commands.add(new FishCommand(this));
+		this.commands.add(new DropAllCommand(this));
+		this.commands.add(new StopCommand(this));
+		this.commands.add(new StopPleaseCommand(this));
+
+		this.on('message', async e => {
+			const message = e.data;
+			if (message.author.isBot) return;
+			const textContent = message.textContent;
+
+			try {
+				if (textContent.startsWith('!')) {
+					const parameters = parseArguments(textContent);
+
+					const name = parameters.shift()!.substr(1);
+
+					await this.commands.run(message, name, parameters);
+				}
+			} catch (e) {
+				winston.error(
+					`Message "${message.textContent}" caused an error`
+				);
+				if (e instanceof Error) {
+					winston.error(e.message);
+				}
+				await message.channel.sendText('Something broke :poop:');
+			}
+		});
 	}
 	/**
 	 * Sets a "BusyLock" on the bot. Basically asking if the bot is busy.
