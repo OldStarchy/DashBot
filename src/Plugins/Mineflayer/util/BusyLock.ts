@@ -1,6 +1,6 @@
-import { Event, EventEmitter, EventHandler } from '../../../Events';
+import { Event, EventHandler, PublicEventEmitter } from '../../../Events';
 
-export class BusyLockKey extends EventEmitter {
+export class BusyLockKey extends PublicEventEmitter<{ cancelled: void }> {
 	private _cancelled = false;
 	constructor(readonly priority: number, readonly release: () => void) {
 		super();
@@ -13,7 +13,7 @@ export class BusyLockKey extends EventEmitter {
 		return this._cancelled;
 	}
 
-	on(event: 'cancelled', handler: EventHandler<void>): void {
+	on(event: 'cancelled', handler: EventHandler<'cancelled', void>): void {
 		super.on(event, handler);
 
 		if (this.cancelled) {
@@ -31,7 +31,7 @@ export default class BusyLock {
 		}
 
 		if (this._current) {
-			this._current.emit(new Event<void>('cancelled', void 0));
+			this._current.emit(new Event('cancelled', void 0));
 		}
 
 		const key = new BusyLockKey(priority, () => {
@@ -57,7 +57,7 @@ export default class BusyLock {
 		}
 
 		if (this._current) {
-			this._current.emit(new Event<void>('cancelled', void 0));
+			this._current.emit(new Event('cancelled', void 0));
 			this._current = null;
 		}
 

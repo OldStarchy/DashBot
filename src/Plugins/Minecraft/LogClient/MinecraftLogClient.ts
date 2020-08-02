@@ -1,16 +1,18 @@
-import { Event, EventEmitter, EventHandler } from '../../../Events';
+import { Event, EventEmitter } from '../../../Events';
 import ChatMessage from './ChatMessage';
 import LogInOutMessage from './LogInOutMessage';
 import LogMessageParser from './LogMessageParser';
 import DeathMessage from './PlayerDeathMessage';
 
-export default interface MinecraftLogClient {
-	on(event: 'chatMessage', handler: EventHandler<ChatMessage>): this;
-	on(event: 'logInOutMessage', handler: EventHandler<LogInOutMessage>): this;
-	on(event: 'deathMessage', handler: EventHandler<DeathMessage>): this;
+export interface MinecraftLogClientEvents {
+	chatMessage: ChatMessage;
+	logInOutMessage: LogInOutMessage;
+	deathMessage: DeathMessage;
 }
 
-export default abstract class MinecraftLogClient extends EventEmitter {
+export default abstract class MinecraftLogClient extends EventEmitter<
+	MinecraftLogClientEvents
+> {
 	constructor() {
 		super();
 	}
