@@ -361,6 +361,7 @@ export default class MineflayerClient
 	}
 
 	async disconnect(): Promise<void> {
+		this._busyLock.stop(Infinity);
 		this.unbindEvents();
 		this.bot?.end();
 		this.bot = null;
