@@ -1,4 +1,3 @@
-import { Bot } from 'mineflayer';
 import winston from 'winston';
 import Message from '../../../ChatServer/Message';
 import TextChannel from '../../../ChatServer/TextChannel';
@@ -18,14 +17,12 @@ export default class FishCommand extends Command {
 		" Rod in Bot's inventory.";
 
 	private followLock: BusyLockKey | null = null;
-	private bot: Bot;
 	private channel: TextChannel | null = null;
 	private fishing = false;
 	private _lineIsOut = false;
 
 	constructor(private client: MineflayerClient) {
 		super();
-		this.bot = this.client.getBot()!;
 	}
 
 	async run(message: Message): Promise<void> {
@@ -61,17 +58,20 @@ export default class FishCommand extends Command {
 	}
 
 	private async _fish() {
+		const bot = this.client.getBot()!;
+		if (!bot) return;
+
 		this.fishing = true;
 		while (this.fishing) {
 			this._lineIsOut = true;
 			const err = await new Promise<Error | undefined>(s => {
-				this.bot.fish(s);
+				bot.fish(s);
 			});
 			this._lineIsOut = false;
 
 			if (err) {
 				winston.error(err.message, { error: err });
-				this.bot.chat('Failure.');
+				bot.chat('Failure.');
 				this.stopFishing();
 				return;
 			}
@@ -79,33 +79,37 @@ export default class FishCommand extends Command {
 			await sleep(500);
 
 			// const { player, entity } = await new Promise((s, f) => {
-			// 	this.bot.once(
+			// 	bot.once(
 			// 		'playerCollect',
 			// 		(player: Entity, entity: Entity) => {
 			// 			s({ player, entity });
 			// 		}
 			// 	);
 			// });
-			// if (entity.kind === 'Drops' && player === this.bot.entity) {
+			// if (entity.kind === 'Drops' && player === bot.entity) {
 			// }
 		}
 	}
 
 	stopFishing() {
 		this.fishing = false;
-		if (this._lineIsOut) this.bot.activateItem();
+		const bot = this.client.getBot()!;
+		if (bot && this._lineIsOut) bot.activateItem();
+		this._lineIsOut = false;
 	}
 
 	async equipFishingRod() {
+		const bot = this.client.getBot()!;
+		if (!bot) return;
 		const mcData = this.client.getMcData()!;
 		const fishingRod = mcData.itemsByName['fishing_rod'].id;
 		const err = await new Promise<Error | undefined>(s => {
-			(this.bot as any).equip(fishingRod, 'hand', s);
+			(bot as any).equip(fishingRod, 'hand', s);
 		});
 
 		if (err) {
 			winston.error(err.message, { error: err });
-			this.bot.chat('Failure.');
+			bot.chat('Failure.');
 			return;
 		}
 	}
