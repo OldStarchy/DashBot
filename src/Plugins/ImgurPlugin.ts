@@ -19,8 +19,7 @@ export default class ImgurPlugin extends DashBotPlugin {
 	public readonly name = 'Imgur Plugin';
 	register(context: DashBotContext) {
 		if (context.config.imgurClientId) {
-			context.bot.registerCommand(
-				'imgur',
+			context.bot.commands.add(
 				new ImgurCommand(new ImgurClient(context.config.imgurClientId))
 			);
 		}
@@ -30,8 +29,14 @@ export default class ImgurPlugin extends DashBotPlugin {
 /**
  * Performs an Imgur search and posts a random result
  */
-export class ImgurCommand implements Command {
-	constructor(private readonly _imgur: ImgurClient) {}
+export class ImgurCommand extends Command {
+	readonly name = 'imgur';
+	readonly description =
+		'Finds a random image from Imgur that (hopefully) matches your search terms';
+
+	constructor(private readonly _imgur: ImgurClient) {
+		super();
+	}
 
 	async run(message: Message | null, _: string, ...query: string[]) {
 		if (message === null) {
