@@ -8,7 +8,7 @@ type ChangeLog = {
 };
 
 const changeLog: ChangeLog = {
-	'0.7.1': {
+	'0.7.2': {
 		Updated: [
 			'Dashbot now stops doing things when disconnecting from minecraft',
 		],
