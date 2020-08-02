@@ -1,4 +1,5 @@
 import { DateTime } from 'luxon';
+import MinecraftData from 'minecraft-data';
 import mineflayer from 'mineflayer';
 import { Entity } from 'prismarine-entity';
 import { Vec3 } from 'vec3';
@@ -11,6 +12,8 @@ import MojangApiClient from '../../../MojangApiClient';
 import deferred, { Deferred } from '../../../util/deferred';
 import FollowBehaviour from '../behaviours/FollowBehaviour';
 import AttackCommand from '../commands/AttackCommand';
+import DropAllCommand from '../commands/DropAllCommand';
+import FishCommand from '../commands/FishCommand';
 import FollowCommand from '../commands/FollowCommand';
 import blockMarch from '../util/blockMarch';
 import BusyLock from '../util/BusyLock';
@@ -20,6 +23,8 @@ import MineflayerIdentity from './MineflayerIdentity';
 import MineflayerMessage from './MineflayerMessage';
 import MineflayerTextChannel from './MineflayerTextChannel';
 import MineflayerWhisperChannel from './MineflayerWhisperChannel';
+import StopCommand from '../commands/StopCommand';
+import StopPleaseCommand from '../commands/StopPleaseCommand';
 
 export interface MineflayerOptions {
 	host: string;
@@ -44,6 +49,7 @@ export default class MineflayerClient
 	private _identityService: IdentityService;
 	private _behaviours: Partial<MineflayerBehaviours>;
 	private _busyLock: BusyLock = new BusyLock();
+	private _mcData: MinecraftData.IndexedData | null = null;
 
 	get id() {
 		return this.options.username;
@@ -68,6 +74,10 @@ export default class MineflayerClient
 
 		new FollowCommand(this);
 		new AttackCommand(this);
+		new FishCommand(this);
+		new DropAllCommand(this);
+		new StopCommand(this);
+		new StopPleaseCommand(this);
 	}
 	/**
 	 * Sets a "BusyLock" on the bot. Basically asking if the bot is busy.
@@ -179,6 +189,10 @@ export default class MineflayerClient
 		});
 	}
 
+	getMcData() {
+		return this._mcData;
+	}
+
 	async connect(): Promise<void> {
 		if (this.bot) {
 			return;
@@ -189,6 +203,13 @@ export default class MineflayerClient
 			port: this.options.port,
 			username: this.options.username,
 			password: this.options.password,
+		});
+
+		this.bot.on('login', () => {
+			// eslint-disable-next-line @typescript-eslint/no-var-requires
+			this._mcData = require('minecraft-data')(
+				this.bot!.version
+			) as MinecraftData.IndexedData;
 		});
 
 		this.awaitConnected().then(() => {

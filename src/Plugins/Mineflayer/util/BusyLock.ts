@@ -1,4 +1,4 @@
-import { Event, PublicEventEmitter } from '../../../Events';
+import { Event, EventHandler, PublicEventEmitter } from '../../../Events';
 
 export class BusyLockKey extends PublicEventEmitter<{ cancelled: void }> {
 	private _cancelled = false;
@@ -11,6 +11,14 @@ export class BusyLockKey extends PublicEventEmitter<{ cancelled: void }> {
 
 	get cancelled() {
 		return this._cancelled;
+	}
+
+	on(event: 'cancelled', handler: EventHandler<'cancelled', void>): void {
+		super.on(event, handler);
+
+		if (this.cancelled) {
+			handler(new Event('cancelled', void 0));
+		}
 	}
 }
 

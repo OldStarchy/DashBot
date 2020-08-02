@@ -1,90 +1,61 @@
-import { EventForEmitter } from '../../../Events';
-import parseArguments from '../../../util/parseArguments';
+import Message from '../../../ChatServer/Message';
 import MineflayerClient from '../ChatServer/MineflayerClient';
 import { BusyLockKey } from '../util/BusyLock';
+import './MineflayerCommand';
+import { AbstractMineflayerCommand } from './MineflayerCommand';
 
 const priority = 10;
 
-export default class FollowCommand {
+export default class FollowCommand extends AbstractMineflayerCommand {
+	name = 'follow';
+	alias = null;
+	description =
+		'Bot follows the target Player, standing still whenever in range.' +
+		' If target argument is not provided, the target defaults to' +
+		" the calling player. You must call 'stop' to end this command.";
 	private followLock: BusyLockKey | null = null;
 
 	constructor(private client: MineflayerClient) {
-		client.on('message', this.onMessage.bind(this));
+		super(client);
 	}
 
-	onMessage(event: EventForEmitter<MineflayerClient, 'message'>) {
+	async run(message: Message, ...args: string[]): Promise<void> {
 		const bot = this.client.getBot!();
 		const follow = this.client.behaviours.follow!;
 
 		const {
-			textContent: message,
+			textContent: textContent,
 			author: { username, tag },
-			channel,
-		} = event.data;
+			channel: channel,
+		} = message;
 
-		const args = parseArguments(message);
+		if (this.client.isBusy(priority)) {
+			channel.sendText("I'm too busy");
+			return;
+		}
 
-		const command = args.shift();
+		const target = args.length > 0 ? args[0] : username;
 
-		switch (command) {
-			case 'follow':
-				if (this.client.isBusy(priority)) {
-					channel.sendText("I'm too busy");
-					return;
-				}
+		const targetPlayer = bot?.players[target] ?? null;
 
-				const target = args.length > 0 ? args[0] : username;
+		if (!targetPlayer) {
+			channel.sendText("Couldn't find target");
+			return;
+		}
 
-				const targetPlayer = bot?.players[target] ?? null;
+		const newLock = this.client.getBusyLock(priority);
 
-				if (!targetPlayer) {
-					channel.sendText("Couldn't find target");
-					return;
-				}
+		if (newLock && !newLock.cancelled) {
+			channel.sendText(`Following ${tag}.`);
+			follow.setTarget(target);
 
-				const newLock = this.client.getBusyLock(priority);
-
-				if (newLock && !newLock.cancelled) {
-					channel.sendText(`Following ${tag}.`);
-					follow.setTarget(target);
-
-					this.followLock = newLock;
-					this.followLock.on('cancelled', () => {
-						follow.setTarget(null);
-						this.followLock = null;
-					});
-				} else {
-					channel.sendText("I'm too busy");
-				}
-				break;
-
-			case 'stop':
-				if (this.client.isBusy()) {
-					if (this.client.stop(11)) {
-						channel.sendText('OK');
-						this.client.getBot()?.clearControlStates();
-					} else {
-						channel.sendText('No');
-					}
-				} else {
-					channel.sendText('Not doing anything.');
-					this.client.getBot()?.clearControlStates();
-				}
-				break;
-
-			case 'stop!':
-				if (this.client.isBusy()) {
-					if (this.client.stop(101)) {
-						channel.sendText('OK');
-						this.client.getBot()?.clearControlStates();
-					} else {
-						channel.sendText('No');
-					}
-				} else {
-					channel.sendText('Not doing anything.');
-					this.client.getBot()?.clearControlStates();
-				}
-				break;
+			this.followLock = newLock;
+			this.followLock.on('cancelled', () => {
+				follow.setTarget(null);
+				this.followLock = null;
+			});
+		} else {
+			channel.sendText("I'm too busy");
 		}
 	}
 }
