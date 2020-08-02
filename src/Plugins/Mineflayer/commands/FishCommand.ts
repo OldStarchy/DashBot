@@ -2,23 +2,56 @@ import { Bot } from 'mineflayer';
 import winston from 'winston';
 import Message from '../../../ChatServer/Message';
 import TextChannel from '../../../ChatServer/TextChannel';
-import { Event } from '../../../Events';
-import parseArguments from '../../../util/parseArguments';
 import sleep from '../../../util/sleep';
 import MineflayerClient from '../ChatServer/MineflayerClient';
 import { BusyLockKey } from '../util/BusyLock';
+import { AbstractMindflayerCommand } from './MindflayerCommand';
 
 const priority = 10;
 
-export default class FishCommand {
+export default class FishCommand extends AbstractMindflayerCommand {
+	name = 'fish';
+	alias = null;
+	description =
+		'Bot automatically selects its Fishing Rod from its' +
+		" inventory and starts fishing. A subsequent call to 'fish'" +
+		' will stop fishing. This will fail if there is no Fishing' +
+		" Rod in Bot's inventory.";
+
 	private followLock: BusyLockKey | null = null;
 	private bot: Bot;
 	private channel: TextChannel | null = null;
 	private fishing = false;
+	private _lineIsOut = false;
 
 	constructor(private client: MineflayerClient) {
+		super(client);
 		this.bot = this.client.getBot()!;
-		client.on('message', this.onMessage.bind(this));
+	}
+
+	async run(message: Message, ...args: string[]): Promise<void> {
+		const textContent = message.textContent;
+
+		const channel = message.channel;
+
+		if (this.client.isBusy(priority)) {
+			channel.sendText("I'm too busy");
+			return;
+		}
+
+		const newLock = this.client.getBusyLock(priority);
+		if (newLock && !newLock.cancelled) {
+			this.channel = channel;
+			await this.startFishing();
+
+			this.followLock = newLock;
+			this.followLock.on('cancelled', () => {
+				this.stopFishing();
+				this.followLock = null;
+			});
+		} else {
+			channel.sendText("I'm too busy");
+		}
 	}
 
 	async startFishing() {
@@ -30,7 +63,6 @@ export default class FishCommand {
 		this._fish();
 	}
 
-	private _lineIsOut = false;
 	private async _fish() {
 		this.fishing = true;
 		while (this.fishing) {
@@ -78,38 +110,6 @@ export default class FishCommand {
 			winston.error(err.message, { error: err });
 			this.bot.chat('Failure.');
 			return;
-		}
-	}
-
-	async onMessage(event: Event<Message>) {
-		const { textContent: message, channel } = event.data;
-
-		const args = parseArguments(message);
-
-		const command = args.shift();
-
-		switch (command) {
-			case 'fish':
-				if (this.client.isBusy(priority)) {
-					channel.sendText("I'm too busy");
-					return;
-				}
-
-				const newLock = this.client.getBusyLock(priority);
-
-				if (newLock && !newLock.cancelled) {
-					this.channel = channel;
-					await this.startFishing();
-
-					this.followLock = newLock;
-					this.followLock.on('cancelled', () => {
-						this.stopFishing();
-						this.followLock = null;
-					});
-				} else {
-					channel.sendText("I'm too busy");
-				}
-				break;
 		}
 	}
 }
