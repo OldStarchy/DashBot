@@ -1,5 +1,5 @@
 import Message from '../../../ChatServer/Message';
-import { Event } from '../../../Events';
+import { EventForEmitter } from '../../../Events';
 import parseArguments from '../../../util/parseArguments';
 import MineflayerClient from '../ChatServer/MineflayerClient';
 
@@ -25,7 +25,7 @@ export abstract class AbstractMindflayerCommand implements MindflayerCommand {
 		}:\n${this.description}`;
 	}
 
-	onMessage(event: Event<Message>) {
+	onMessage(event: EventForEmitter<MineflayerClient, 'message'>) {
 		const args = parseArguments(event.data.textContent);
 		const command = args.shift()!.toLowerCase();
 
