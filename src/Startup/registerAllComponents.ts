@@ -4,6 +4,8 @@ import HaikuCommand from '../Commands/HaikuCommand';
 import HelpCommand from '../Commands/HelpCommand';
 import IdCommand from '../Commands/IdCommand';
 import JokeCommand, { ICanHazDadJokeClient } from '../Commands/JokeCommand';
+import LoginCommand from '../Commands/LoginCommand';
+import LogoutCommand from '../Commands/LogoutCommand';
 import PermissionCommand from '../Commands/PermissionCommand';
 import PetCommand from '../Commands/PetCommand';
 import PickCommand from '../Commands/PickCommand';
@@ -72,6 +74,8 @@ export default function registerAllComponents(
 	bot.commands.add(new EchoCommand(permissions));
 	bot.commands.add(new IdCommand(permissions));
 	bot.commands.add(new PermissionCommand(permissions));
+	bot.commands.add(new LoginCommand(bot));
+	bot.commands.add(new LogoutCommand(bot));
 
 	new TraceryInteraction().register(bot);
 	new NumberGameInteraction(storage).register(bot);

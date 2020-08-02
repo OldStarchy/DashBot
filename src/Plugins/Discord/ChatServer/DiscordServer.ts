@@ -26,6 +26,7 @@ export default class DiscordServer extends EventEmitter<DiscordServerEvents>
 	implements ChatServer<DiscordIdentity, DiscordTextChannel> {
 	private _channelCache: Record<string, DiscordTextChannel> = {};
 	private _loggedIn = deferred<this>();
+	private _isLoggedIn = false;
 
 	private _id: string;
 	private _discordClient: Discord.Client;
@@ -67,14 +68,21 @@ export default class DiscordServer extends EventEmitter<DiscordServerEvents>
 		return new DiscordIdentity(this, this._discordClient.user!);
 	}
 
+	get isConnected() {
+		return this._isLoggedIn;
+	}
+
 	async connect() {
 		await this._discordClient.login(this._botToken);
 		await this._loggedIn;
+		this._isLoggedIn = true;
 	}
 
 	async disconnect() {
 		this._discordClient.destroy();
 		this._loggedIn.reject('disconnected');
+		//TODO: Set false when logged out any other way (eg. kicked)
+		this._isLoggedIn = false;
 	}
 
 	async awaitConnected() {

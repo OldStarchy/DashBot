@@ -139,6 +139,10 @@ export default class MinecraftServer extends EventEmitter<MinecraftServerEvents>
 		if (this._rcon) await this._rcon.disconnect();
 	}
 
+	get isConnected() {
+		return this._logReader.isRunning;
+	}
+
 	async getIdentityById(id: string) {
 		return this._identityCache.getById(id);
 	}

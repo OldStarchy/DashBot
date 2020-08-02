@@ -15,7 +15,7 @@ export interface BeforeRunCommandData {
 export default class DashBot extends EventEmitter<DashBotEvents> {
 	private _startTime: number | null = null;
 	private _stopTime: number | null = null;
-	private _chatServers: ChatServer[] = [];
+	readonly servers: ChatServer[] = [];
 
 	readonly commands = new CommandSet();
 
@@ -41,7 +41,7 @@ export default class DashBot extends EventEmitter<DashBotEvents> {
 	}
 
 	public addServer(chatServer: ChatServer) {
-		this._chatServers.push(chatServer);
+		this.servers.push(chatServer);
 
 		// TODO: Make this better
 		chatServer.on('message', this.onMessage.bind(this));
@@ -57,10 +57,8 @@ export default class DashBot extends EventEmitter<DashBotEvents> {
 	public async connect(serverIds?: string[]) {
 		const serversToConnectTo =
 			serverIds === undefined
-				? this._chatServers
-				: this._chatServers.filter(server =>
-						serverIds.includes(server.id)
-				  );
+				? this.servers
+				: this.servers.filter(server => serverIds.includes(server.id));
 
 		let connections = 0;
 		await Promise.all(
@@ -81,7 +79,7 @@ export default class DashBot extends EventEmitter<DashBotEvents> {
 		this._startTime = Date.now();
 		if (connections > 0) {
 			winston.info(
-				`Connected to ${connections} of ${serversToConnectTo.length} servers (${this._chatServers.length} available)`
+				`Connected to ${connections} of ${serversToConnectTo.length} servers (${this.servers.length} available)`
 			);
 			this.emit(new Event('connected', undefined));
 		}
@@ -89,7 +87,7 @@ export default class DashBot extends EventEmitter<DashBotEvents> {
 
 	public async disconnect() {
 		await Promise.all(
-			this._chatServers.map(async server => {
+			this.servers.map(async server => {
 				try {
 					await server.disconnect();
 					this._stopTime = Date.now();

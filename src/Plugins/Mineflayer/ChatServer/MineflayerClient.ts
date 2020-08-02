@@ -63,7 +63,17 @@ export default class MineflayerClient
 		throw new Error('Method not implemented.');
 	}
 
+	get isConnected() {
+		return this.bot !== null;
+	}
+
 	private bot: mineflayer.Bot | null = null;
+
+	private boundOnLogin = this.onLogin.bind(this);
+	private boundOnKicked = this.onKicked.bind(this);
+	private boundOnError = this.onError.bind(this);
+	private boundOnChat = this.onChat.bind(this);
+	private boundOnWhisper = this.onWhisper.bind(this);
 
 	constructor(private options: MineflayerOptions) {
 		super();
@@ -71,6 +81,8 @@ export default class MineflayerClient
 		this._loggedIn = deferred<this>();
 
 		this._behaviours = {};
+
+		this.init();
 	}
 
 	private init() {
@@ -233,13 +245,6 @@ export default class MineflayerClient
 			password: this.options.password,
 		});
 
-		this.bot.on('login', () => {
-			// eslint-disable-next-line @typescript-eslint/no-var-requires
-			this._mcData = require('minecraft-data')(
-				this.bot!.version
-			) as MinecraftData.IndexedData;
-		});
-
 		this.awaitConnected().then(() => {
 			const USERNAME_REGEX = '(?:\\(.+\\)|\\[.+\\]|.)*?(\\w+)';
 			this.bot!.chatPatterns = [
@@ -265,73 +270,90 @@ export default class MineflayerClient
 			];
 		});
 
-		this.bot.on('login', () => {
-			winston.info('Bot logged in to minecraft');
-			this.bot!.chat('I have logged in');
+		this.bindEvents();
+	}
 
-			this.bot!.once('spawn', () => {
-				this._loggedIn.resolve(this);
-			});
+	private bindEvents() {
+		if (!this.bot) return;
+		this.bot.on('login', this.boundOnLogin);
+		this.bot.on('kicked', this.boundOnKicked);
+		this.bot.on('error', this.boundOnError);
+		this.bot.on('chat', this.boundOnChat);
+		this.bot.on('whisper', this.boundOnWhisper);
+	}
+
+	private unbindEvents() {
+		if (!this.bot) return;
+		this.bot.off('login', this.boundOnLogin);
+		this.bot.off('kicked', this.boundOnKicked);
+		this.bot.off('error', this.boundOnError);
+		this.bot.off('chat', this.boundOnChat);
+		this.bot.off('whisper', this.boundOnWhisper);
+	}
+
+	private onLogin() {
+		winston.info('Bot logged in to minecraft');
+		this.bot!.chat('I have logged in');
+
+		// eslint-disable-next-line @typescript-eslint/no-var-requires
+		this._mcData = require('minecraft-data')(
+			this.bot!.version
+		) as MinecraftData.IndexedData;
+
+		this.bot!.once('spawn', () => {
+			this._loggedIn.resolve(this);
 		});
+	}
+	private onKicked() {
+		winston.info("I've been kicked");
+		this.disconnect();
+	}
 
-		this.bot.on('kicked', () => {
-			winston.info("I've been kicked");
-			this.disconnect();
-		});
+	private onError(err: Error) {
+		winston.error(err.message);
+		this.disconnect();
+	}
 
-		this.bot.on('error', err => {
-			winston.error(err.message);
-			this.disconnect();
-		});
+	private async onChat(
+		username: string,
+		message: string
+		// _translate: string | null,
+		// _jsonMsg: string,
+		// _matches: string[] | null
+	) {
+		if (!this._loggedIn) return;
 
-		this.bot.on('game', () => {
-			winston.info('"game" event from mineflayer');
-		});
-
-		this.bot.on(
-			'chat',
-			async (
-				username: string,
-				message: string
-				// _translate: string | null,
-				// _jsonMsg: string,
-				// _matches: string[] | null
-			) => {
-				this.emit(
-					new CancellableEvent(
-						'message',
-						new MineflayerMessage(
-							this.broadcastChannel,
-							(await this.makeIdentity(username))!,
-							message
-						)
-					)
-				);
-			}
+		this.emit(
+			new CancellableEvent(
+				'message',
+				new MineflayerMessage(
+					this.broadcastChannel,
+					(await this.makeIdentity(username))!,
+					message
+				)
+			)
 		);
+	}
 
-		this.bot.on(
-			'whisper',
-			async (
-				username: string,
-				message: string
-				// _translate: string | null,
-				// _jsonMsg: string,
-				// _matches: string[] | null
-			) => {
-				this.emit(
-					new CancellableEvent(
-						'message',
-						new MineflayerMessage(
-							this.makeWhisperChannel(username),
-							(await this.makeIdentity(username))!,
-							message
-						)
-					)
-				);
-			}
+	private async onWhisper(
+		username: string,
+		message: string
+		// _translate: string | null,
+		// _jsonMsg: string,
+		// _matches: string[] | null
+	) {
+		if (!this._loggedIn) return;
+
+		this.emit(
+			new CancellableEvent(
+				'message',
+				new MineflayerMessage(
+					this.makeWhisperChannel(username),
+					(await this.makeIdentity(username))!,
+					message
+				)
+			)
 		);
-		this.init();
 	}
 
 	public getBot() {
@@ -339,6 +361,7 @@ export default class MineflayerClient
 	}
 
 	async disconnect(): Promise<void> {
+		this.unbindEvents();
 		this.bot?.end();
 		this.bot = null;
 		this._loggedIn = deferred<this>();
@@ -403,7 +426,8 @@ export default class MineflayerClient
 	private async makeIdentity(
 		usernameOrPlayer: mineflayer.Player | string
 	): Promise<MineflayerIdentity> {
-		if (!this.bot) throw new Error('no bot');
+		const bot = this.bot;
+		if (!bot) throw new Error('Not logged in');
 
 		const mojang = new MojangApiClient();
 
@@ -413,7 +437,7 @@ export default class MineflayerClient
 				usernameOrPlayer,
 				(await mojang.getUuidFromUsername(usernameOrPlayer))?.id ??
 					usernameOrPlayer,
-				usernameOrPlayer === this.bot.username
+				usernameOrPlayer === bot.username
 			);
 		else {
 			return new MineflayerIdentity(
@@ -421,14 +445,15 @@ export default class MineflayerClient
 				usernameOrPlayer.username,
 				(await mojang.getUuidFromUsername(usernameOrPlayer.username))
 					?.id ?? usernameOrPlayer.username,
-				usernameOrPlayer.username === this.bot.username
+				usernameOrPlayer.username === bot.username
 			);
 		}
 	}
 	async getIdentityById(id: string): Promise<MineflayerIdentity | null> {
-		if (!this.bot) return null;
+		const bot = this.bot;
+		if (!bot) throw new Error('Not logged in');
 
-		const player = Object.values(this.bot.players).find(
+		const player = Object.values(bot.players).find(
 			player => (player as any).uuid === id
 		);
 

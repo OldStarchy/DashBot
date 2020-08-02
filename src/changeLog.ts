@@ -12,6 +12,8 @@ const changeLog: ChangeLog = {
 		Added: [
 			'Add basic mineflayer integration for minecraft bots',
 			'Add follow and attack commands for mineflayer bot',
+			'Add fishing ability',
+			'Add login / logout commands for logging in and out of MineCraft',
 		],
 	},
 	'0.6.0': {
