@@ -66,6 +66,7 @@ jobs:
       - run:
           name: Deploy
           command: |
+            echo "$DEPLOY_HOST_ECDSA" >> ~/.ssh/known_hosts
             ssh $DEPLOY_HOST './dashbot-restart.sh'
 workflows:
   main:
