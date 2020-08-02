@@ -8,9 +8,10 @@ type ChangeLog = {
 };
 
 const changeLog: ChangeLog = {
-	minor: {
+	'0.6.0': {
 		Updated: [
 			'Use singleton logger to avoid passing it in through all constructors',
+			'Strongly type all event emitter events',
 		],
 	},
 	'0.5.0': {
