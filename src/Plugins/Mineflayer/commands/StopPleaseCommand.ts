@@ -1,8 +1,8 @@
 import Message from '../../../ChatServer/Message';
 import MineflayerClient from '../ChatServer/MineflayerClient';
-import { AbstractMindflayerCommand } from './MindflayerCommand';
+import { AbstractMineflayerCommand } from './MineflayerCommand';
 
-export default class StopPleaseCommand extends AbstractMindflayerCommand {
+export default class StopPleaseCommand extends AbstractMineflayerCommand {
 	name = 'stop!';
 	alias = null;
 	description =

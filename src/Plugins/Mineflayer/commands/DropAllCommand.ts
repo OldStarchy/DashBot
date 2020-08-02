@@ -1,11 +1,11 @@
 import { Bot } from 'mineflayer';
 import Message from '../../../ChatServer/Message';
 import MineflayerClient from '../ChatServer/MineflayerClient';
-import { AbstractMindflayerCommand } from './MindflayerCommand';
+import { AbstractMineflayerCommand } from './MineflayerCommand';
 
 const priority = 10;
 
-export default class DropAllCommand extends AbstractMindflayerCommand {
+export default class DropAllCommand extends AbstractMineflayerCommand {
 	name = 'dropall';
 	alias = null;
 	description =

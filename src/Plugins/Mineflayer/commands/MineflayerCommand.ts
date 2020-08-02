@@ -3,14 +3,14 @@ import { EventForEmitter } from '../../../Events';
 import parseArguments from '../../../util/parseArguments';
 import MineflayerClient from '../ChatServer/MineflayerClient';
 
-export default interface MindflayerCommand {
+export default interface MineflayerCommand {
 	readonly name: string;
 	readonly alias: string[] | null;
 	getUsage(): string;
 	run(message: Message, ...args: string[]): Promise<void>;
 }
 
-export abstract class AbstractMindflayerCommand implements MindflayerCommand {
+export abstract class AbstractMineflayerCommand implements MineflayerCommand {
 	abstract readonly name: string;
 	abstract readonly alias: string[] | null;
 	abstract readonly description: string;

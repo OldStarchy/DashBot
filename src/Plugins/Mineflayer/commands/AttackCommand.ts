@@ -1,11 +1,11 @@
 import Message from '../../../ChatServer/Message';
 import MineflayerClient from '../ChatServer/MineflayerClient';
 import { BusyLockKey } from '../util/BusyLock';
-import { AbstractMindflayerCommand } from './MindflayerCommand';
+import { AbstractMineflayerCommand } from './MineflayerCommand';
 
 const priority = 10;
 
-export default class AttackCommand extends AbstractMindflayerCommand {
+export default class AttackCommand extends AbstractMineflayerCommand {
 	name = 'attack';
 	alias = null;
 	description =

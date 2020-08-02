@@ -5,11 +5,11 @@ import TextChannel from '../../../ChatServer/TextChannel';
 import sleep from '../../../util/sleep';
 import MineflayerClient from '../ChatServer/MineflayerClient';
 import { BusyLockKey } from '../util/BusyLock';
-import { AbstractMindflayerCommand } from './MindflayerCommand';
+import { AbstractMineflayerCommand } from './MineflayerCommand';
 
 const priority = 10;
 
-export default class FishCommand extends AbstractMindflayerCommand {
+export default class FishCommand extends AbstractMineflayerCommand {
 	name = 'fish';
 	alias = null;
 	description =

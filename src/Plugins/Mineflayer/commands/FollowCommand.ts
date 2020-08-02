@@ -1,12 +1,12 @@
 import Message from '../../../ChatServer/Message';
 import MineflayerClient from '../ChatServer/MineflayerClient';
 import { BusyLockKey } from '../util/BusyLock';
-import './MindflayerCommand';
-import { AbstractMindflayerCommand } from './MindflayerCommand';
+import './MineflayerCommand';
+import { AbstractMineflayerCommand } from './MineflayerCommand';
 
 const priority = 10;
 
-export default class FollowCommand extends AbstractMindflayerCommand {
+export default class FollowCommand extends AbstractMineflayerCommand {
 	name = 'follow';
 	alias = null;
 	description =
