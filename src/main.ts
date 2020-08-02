@@ -145,10 +145,15 @@ function createServerFromConfig(serverConfig: ChatServerConfig) {
 	winston.error('Unrecognized server type');
 }
 
+const autoConnectServers: string[] = [];
 for (const serverConfig of config.servers) {
 	const server = createServerFromConfig(serverConfig);
 
-	if (server && (serverConfig.autoConnect ?? true)) {
+	if (server) {
+		if (serverConfig.autoConnect ?? true) {
+			autoConnectServers.push(server.id);
+		}
+
 		bot.addServer(server);
 		identityService.addProvider(server);
 	}
@@ -163,7 +168,7 @@ registerAllComponents(
 	permissions
 );
 
-bot.connect();
+bot.connect(autoConnectServers);
 
 const signals: Record<'SIGHUP' | 'SIGINT' | 'SIGTERM', number> = {
 	SIGHUP: 1,

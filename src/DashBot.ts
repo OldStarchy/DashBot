@@ -54,20 +54,35 @@ export default class DashBot extends EventEmitter<DashBotEvents> {
 			});
 	}
 
-	public async connect() {
+	public async connect(serverIds?: string[]) {
+		const serversToConnectTo =
+			serverIds === undefined
+				? this._chatServers
+				: this._chatServers.filter(server =>
+						serverIds.includes(server.id)
+				  );
+
 		let connections = 0;
 		await Promise.all(
-			this._chatServers.map(async server => {
+			serversToConnectTo.map(async server => {
 				try {
 					await server.connect();
 					connections++;
 				} catch (e) {
-					winston.error("Couldn't connect to server");
+					winston.error(
+						`Couldn't connect to server ${
+							server.id
+						} due to ${JSON.stringify(e)}`,
+						{ error: e }
+					);
 				}
 			})
 		);
 		this._startTime = Date.now();
 		if (connections > 0) {
+			winston.info(
+				`Connected to ${connections} of ${serversToConnectTo.length} servers (${this._chatServers.length} available)`
+			);
 			this.emit(new Event('connected', undefined));
 		}
 	}
