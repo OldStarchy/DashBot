@@ -8,6 +8,9 @@ type ChangeLog = {
 };
 
 const changeLog: ChangeLog = {
+	'0.7.1': {
+		Fixed: ['Removed some test code that broke prod'],
+	},
 	'0.7.0': {
 		Added: [
 			'Add basic mineflayer integration for minecraft bots',

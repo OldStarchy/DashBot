@@ -2,7 +2,6 @@ import Message from '../../../ChatServer/Message';
 import Command from '../../../Command';
 import MineflayerClient from '../ChatServer/MineflayerClient';
 import { BusyLockKey } from '../util/BusyLock';
-import './MineflayerCommand';
 
 const priority = 10;
 

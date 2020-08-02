@@ -106,27 +106,31 @@ fs.readdirSync(pluginsDir)
 	.sort()
 	.map(file => path.join(pluginsDir, file))
 	.forEach(file => {
-		try {
-			// eslint-disable-next-line @typescript-eslint/no-var-requires
-			const _import = require('./' + file);
-			if (!_import.default) {
-				winston.warn(
-					`Plugin file "${require.resolve(
-						file
-					)}" is missing a default export.`
-				);
-				return;
-			}
-			const plugin = _import.default;
-
-			if (plugin.prototype instanceof DashBotPlugin) {
-				plugins.push(new plugin());
-			} else {
-				throw new Error("File didn't return an instance of a plugin");
-			}
-		} catch (e) {
-			winston.error(e);
+		// try {
+		winston.info(`Loading ${require.resolve('./' + file)}...`);
+		// eslint-disable-next-line @typescript-eslint/no-var-requires
+		const _import = require('./' + file);
+		winston.info(`Loaded`);
+		if (!_import.default) {
+			winston.warn(
+				`Plugin file "${require.resolve(
+					'./' + file
+				)}" is missing a default export.`
+			);
+			return;
 		}
+		const plugin = _import.default;
+
+		if (plugin.prototype instanceof DashBotPlugin) {
+			winston.info(`Instantiating plugin...`);
+			plugins.push(new plugin());
+			winston.info(`Done`);
+		} else {
+			throw new Error("File didn't return an instance of a plugin");
+		}
+		// } catch (e) {
+		// 	winston.error(e);
+		// }
 	});
 
 plugins.forEach(plugin => {
