@@ -8,7 +8,7 @@ type ChangeLog = {
 };
 
 const changeLog: ChangeLog = {
-	minor: {
+	'0.7.0': {
 		Added: [
 			'Add basic mineflayer integration for minecraft bots',
 			'Add follow and attack commands for mineflayer bot',
