@@ -6,12 +6,14 @@ import Storage from './Storage';
 export interface DataStore<TData> {
 	setData(data: TData): void;
 	getData(): TData | undefined;
-
-	on(event: 'dataLoaded', handler: EventHandler<TData | undefined>): void;
-	emit(event: Event<TData | undefined>): void;
 }
 
-export class PersistentData<TData> extends EventEmitter
+interface PersistentDataEvents<TData> {
+	dataLoaded: TData | undefined;
+}
+
+export class PersistentData<TData>
+	extends EventEmitter<PersistentDataEvents<TData>>
 	implements DataStore<TData> {
 	constructor(
 		private readonly _name: string,
@@ -41,18 +43,22 @@ export class PersistentData<TData> extends EventEmitter
 		return data;
 	}
 
-	on(event: 'dataLoaded', handler: EventHandler<TData | undefined>): void {
-		super.on(event, handler);
+	on<TEventName extends keyof PersistentDataEvents<TData>>(
+		event: TEventName,
+		handler: EventHandler<
+			TEventName,
+			PersistentDataEvents<TData>[TEventName]
+		>,
+		key?: any
+	): void {
+		super.on(event, handler, key);
 		const current = this._register.getData(this._name) as TData | undefined;
 		if (current) {
-			this.emit(new Event<TData>('dataLoaded', current));
+			this.emit(new Event('dataLoaded', current));
 		}
 	}
 
-	emit<T>(event: Event<T>): Event<T>;
-	emit(event: Event<TData>): Event<TData> {
-		return super.emit<TData>(event);
-	}
+	emit = super.emit;
 }
 
 export default class StorageRegister {
@@ -96,11 +102,11 @@ export default class StorageRegister {
 		this.load();
 	}
 
-	createStore<T>(key: string, bindEvents = true) {
-		const store = new PersistentData<T>(key, this);
+	createStore<TData>(key: string, bindEvents = true) {
+		const store = new PersistentData<TData>(key, this);
 
 		if (bindEvents) {
-			this._stores[key] = store;
+			this._stores[key] = store as PersistentData<unknown>;
 		}
 
 		return store;

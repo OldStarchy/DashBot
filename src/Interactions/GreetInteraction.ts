@@ -1,7 +1,6 @@
 import Interaction from '../ChatServer/Interaction';
-import Message from '../ChatServer/Message';
 import DashBot from '../DashBot';
-import { Event } from '../Events';
+import { EventForEmitter } from '../Events';
 import Tracery from '../tracery/Tracery';
 
 const GreetingGrammar = {
@@ -37,7 +36,7 @@ export default class GreetInteraction implements Interaction {
 		bot.on('message', this.onMessage.bind(this));
 	}
 
-	async onMessage(event: Event<Message>) {
+	async onMessage(event: EventForEmitter<DashBot, 'message'>) {
 		const name = this._bot.name;
 		const regexString = `^(oh )?((hey|hi|hello),? )?(there )?(dash|${name})( ?bot)?!?`;
 		const message = event.data;

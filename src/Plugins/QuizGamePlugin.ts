@@ -8,7 +8,7 @@ import Message from '../ChatServer/Message';
 import TextChannel from '../ChatServer/TextChannel';
 import DashBot from '../DashBot';
 import DashBotPlugin, { DashBotContext } from '../DashBotPlugin';
-import { Event } from '../Events';
+import { EventForEmitter } from '../Events';
 import Tracery from '../tracery/Tracery';
 import deferred, { Deferred } from '../util/deferred';
 import Emoji from '../util/emoji';
@@ -49,7 +49,7 @@ export class QuizGameService implements Interaction {
 		bot.on('message', this.onMessage.bind(this));
 	}
 
-	private onMessage(event: Event<Message>) {
+	private onMessage(event: EventForEmitter<DashBot, 'message'>) {
 		const message = event.data;
 		const channel = message.channel;
 
@@ -123,7 +123,9 @@ export class QuizGameService implements Interaction {
 
 		const message = (await channel.sendText(
 			`All players react to this message with ${Emoji.THUMBS_UP} to play. React with ${Emoji.OK} to begin the game`
-		)) as DiscordMessage;
+		)) as void | DiscordMessage;
+
+		if (!message) return;
 
 		await message.react(Emoji.THUMBS_UP);
 		await message.react(Emoji.NO_ENTRY);

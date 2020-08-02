@@ -1,4 +1,4 @@
-import { Event } from '../Events';
+import { EventForEmitter } from '../Events';
 import StorageRegister, { PersistentData } from '../StorageRegister';
 import ChatServer from './ChatServer';
 import Identity from './Identity';
@@ -20,7 +20,9 @@ export default class IdentityService {
 		this._people = [];
 	}
 
-	private onDataLoaded(event: Event<PersonIdentityMap[] | undefined>) {
+	private onDataLoaded(
+		event: EventForEmitter<IdentityService['_store'], 'dataLoaded'>
+	) {
 		const data = event.data;
 		if (data === undefined) {
 			return;

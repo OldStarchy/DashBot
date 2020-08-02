@@ -29,10 +29,24 @@ export type ScheduleServiceOptions = PartialDefaults<
 	typeof defaultOptions
 >;
 
-interface ScheduleServiceData {
-	events: { timestamp: number; event: Event<unknown>; owner: string }[];
+interface ScheduleServiceEvents {
+	reminder: {
+		reminder: string;
+		serverId: string;
+		channelId: string;
+	};
+	[eventName: string]: unknown;
 }
-export default class ScheduleService extends EventEmitter implements Service {
+
+interface ScheduleServiceData {
+	events: {
+		timestamp: number;
+		event: Event<string, unknown>;
+		owner: string;
+	}[];
+}
+export default class ScheduleService extends EventEmitter<ScheduleServiceEvents>
+	implements Service {
 	private _interval: number;
 	private _intervalId: NodeJS.Timeout | null = null;
 	private _store: DataStore<ScheduleServiceData>;
@@ -160,7 +174,11 @@ export default class ScheduleService extends EventEmitter implements Service {
 		if (any) this._store.setData({ events });
 	}
 
-	queueEvent<T>(timestamp: number, event: Event<T>, owner: string) {
+	queueEvent<T>(
+		timestamp: number,
+		event: Event<string, unknown>,
+		owner: string
+	) {
 		const events = this._store.getData()?.events || [];
 
 		if (this._maxTimersPerPerson > 0) {

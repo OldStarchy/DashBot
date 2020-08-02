@@ -1,25 +1,18 @@
 import winston from 'winston';
-import ChatServer from '../../../ChatServer/ChatServer';
-import Identity from '../../../ChatServer/Identity';
 import Interaction from '../../../ChatServer/Interaction';
 import DashBot from '../../../DashBot';
-import { Event } from '../../../Events';
+import { EventForEmitter } from '../../../Events';
 import sleep from '../../../util/sleep';
 import MinecraftServer from '../ChatServer/MinecraftServer';
-import DeathMessage from '../LogClient/PlayerDeathMessage';
 
 export default class MinecraftGreetInteraction implements Interaction {
-	constructor() {}
 	register(bot: DashBot) {
 		bot.on('presenceUpdate', this.onUserJoined.bind(this));
 		bot.on('game.death', this.onPlayerDeath.bind(this));
 	}
 
 	private async onUserJoined(
-		event: Event<{
-			identity: Identity;
-			joined: boolean;
-		}>
+		event: EventForEmitter<DashBot, 'presenceUpdate'>
 	) {
 		const { identity, joined } = event.data;
 
@@ -30,9 +23,7 @@ export default class MinecraftGreetInteraction implements Interaction {
 		}
 	}
 
-	private async onPlayerDeath(
-		event: Event<{ message: DeathMessage; server: ChatServer }>
-	) {
+	private async onPlayerDeath(event: EventForEmitter<DashBot, 'game.death'>) {
 		const { message, server } = event.data;
 
 		if (!message.player) return;

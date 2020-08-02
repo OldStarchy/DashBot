@@ -1,11 +1,11 @@
 import Discord from 'discord.js';
 import winston from 'winston';
 import AudioChannel from '../../../ChatServer/AudioChannel';
-import ChatServer from '../../../ChatServer/ChatServer';
+import ChatServer, { ChatServerEvents } from '../../../ChatServer/ChatServer';
 import Identity from '../../../ChatServer/Identity';
 import IdentityService from '../../../ChatServer/IdentityService';
 import TextChannel from '../../../ChatServer/TextChannel';
-import { CancellableEvent, EventHandler } from '../../../Events';
+import { CancellableEvent, EventEmitter } from '../../../Events';
 import deferred from '../../../util/deferred';
 import DiscordIdentity from './DiscordIdentity';
 import DiscordMessage from './DiscordMessage';
@@ -20,7 +20,9 @@ export interface DiscordServerOptions {
 	identityService: IdentityService;
 }
 
-export default class DiscordServer
+type DiscordServerEvents = ChatServerEvents;
+
+export default class DiscordServer extends EventEmitter<DiscordServerEvents>
 	implements ChatServer<DiscordIdentity, DiscordTextChannel> {
 	private _channelCache: Record<string, DiscordTextChannel> = {};
 	private _loggedIn = deferred<this>();
@@ -31,6 +33,7 @@ export default class DiscordServer
 	private _identityService: IdentityService;
 
 	constructor(options: DiscordServerOptions) {
+		super();
 		({
 			id: this._id,
 			discordClient: this._discordClient,
@@ -42,6 +45,18 @@ export default class DiscordServer
 			this._loggedIn.resolve(this);
 			winston.info('Logged in to discord');
 		});
+
+		this._discordClient.on('message', message =>
+			this.emit(
+				new CancellableEvent(
+					'message',
+					new DiscordMessage(
+						this.getChannel(message.channel),
+						message
+					)
+				)
+			)
+		);
 	}
 
 	get id() {
@@ -58,39 +73,12 @@ export default class DiscordServer
 	}
 
 	async disconnect() {
-		await this._discordClient.destroy();
+		this._discordClient.destroy();
 		this._loggedIn.reject('disconnected');
 	}
 
 	async awaitConnected() {
 		return this._loggedIn;
-	}
-
-	on(event: string, handler: EventHandler<any>): void {
-		switch (event) {
-			case 'message':
-				this._discordClient.on(event, message =>
-					handler(
-						new CancellableEvent(
-							'message',
-							new DiscordMessage(
-								this.getChannel(message.channel),
-								message
-							)
-						)
-					)
-				);
-				break;
-
-			case 'presenceUpdate':
-			// TODO: this
-			// this._discordClient.on(event, presence => {
-			// 	presence?.status
-			// })
-			default:
-				// this._discordClient.on(event, handler);
-				break;
-		}
 	}
 
 	private getChannel(internalChannel: TDiscordTextChannel) {

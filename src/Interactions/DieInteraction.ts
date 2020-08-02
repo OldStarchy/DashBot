@@ -1,7 +1,6 @@
 import Interaction from '../ChatServer/Interaction';
-import Message from '../ChatServer/Message';
 import DashBot from '../DashBot';
-import { Event } from '../Events';
+import { EventForEmitter } from '../Events';
 import sleep from '../util/sleep';
 
 /**
@@ -20,7 +19,7 @@ export default class DieInteraction implements Interaction {
 		bot.on('message', this.onMessage.bind(this));
 	}
 
-	async onMessage(event: Event<Message>) {
+	async onMessage(event: EventForEmitter<DashBot, 'message'>) {
 		const message = event.data;
 
 		const { textContent, author, channel } = message;

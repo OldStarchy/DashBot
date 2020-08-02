@@ -2,7 +2,7 @@ import Interaction from '../ChatServer/Interaction';
 import Message from '../ChatServer/Message';
 import Command from '../Command';
 import DashBot from '../DashBot';
-import { Event } from '../Events';
+import { EventForEmitter } from '../Events';
 import SessionStore from '../SessionStore';
 import StorageRegister from '../StorageRegister';
 import Tracery from '../tracery/Tracery';
@@ -112,7 +112,7 @@ export default class HelpCommand implements Command, Interaction {
 		if (session.pendingAnswer) sessionStore.clearData();
 	}
 
-	private async onMessage(event: Event<Message>) {
+	private async onMessage(event: EventForEmitter<DashBot, 'message'>) {
 		await this.run(event.data);
 	}
 
