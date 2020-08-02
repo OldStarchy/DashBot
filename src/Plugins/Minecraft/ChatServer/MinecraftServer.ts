@@ -1,9 +1,6 @@
-import ChatServer, {
-	PresenceUpdateEventData,
-} from '../../../ChatServer/ChatServer';
+import ChatServer, { ChatServerEvents } from '../../../ChatServer/ChatServer';
 import IdentityService from '../../../ChatServer/IdentityService';
-import Message from '../../../ChatServer/Message';
-import { CancellableEvent, EventHandler } from '../../../Events';
+import { CancellableEvent, EventEmitter } from '../../../Events';
 import StorageRegister from '../../../StorageRegister';
 import MinecraftLogClient from '../LogClient/MinecraftLogClient';
 import DeathMessage from '../LogClient/PlayerDeathMessage';
@@ -25,7 +22,13 @@ export interface MinecraftServerOptions {
 	botName: string;
 }
 
-export default class MinecraftServer
+interface MinecraftServerEvents extends ChatServerEvents {
+	'game.death': {
+		message: DeathMessage;
+		server: ChatServer;
+	};
+}
+export default class MinecraftServer extends EventEmitter<MinecraftServerEvents>
 	implements ChatServer<MinecraftIdentity, MinecraftTextChannel> {
 	private _textChannel: MinecraftTextChannel;
 	private _identityCache: MinecraftIdentityCache;
@@ -37,6 +40,7 @@ export default class MinecraftServer
 	private _identityService: IdentityService;
 
 	constructor(options: MinecraftServerOptions) {
+		super();
 		({
 			id: this._id,
 			logClient: this._logReader,
@@ -49,6 +53,49 @@ export default class MinecraftServer
 		this._textChannel = new MinecraftTextChannel(this, this._rcon);
 		this._identityCache = new MinecraftIdentityCache(this, storage);
 		this.me = new MinecraftIdentity(this, botName, '');
+
+		this._logReader.on('chatMessage', async event => {
+			const chatMessage = event.data;
+			await this._identityCache.addByName(chatMessage.author);
+
+			this.emit(
+				new CancellableEvent(
+					'message',
+					new MinecraftMessage(
+						this._textChannel,
+						this._identityCache.getByName(chatMessage.author)!,
+						chatMessage.message
+					)
+				)
+			);
+		});
+
+		this._logReader.on('logInOutMessage', async event => {
+			const message = event.data;
+			await this._identityCache.addByName(message.who);
+
+			this.emit(
+				new CancellableEvent('presenceUpdate', {
+					identity: this._identityCache.getByName(message.who)!,
+					joined: message.event === 'joined',
+				})
+			);
+		});
+
+		this._logReader.on('deathMessage', async event => {
+			const message = event.data;
+
+			if (!message.player) return; //Intentional game design
+
+			await this._identityCache.addByName(message.player!);
+
+			this.emit(
+				new CancellableEvent('game.death', {
+					message: message,
+					server: this,
+				})
+			);
+		});
 	}
 
 	async getTextChannels() {
@@ -73,69 +120,6 @@ export default class MinecraftServer
 
 	async awaitConnected() {
 		return this;
-	}
-
-	on(event: string, handler: EventHandler<any>): void {
-		switch (event) {
-			case 'message':
-				this._logReader.on('chatMessage', async event => {
-					const chatMessage = event.data;
-					await this._identityCache.addByName(chatMessage.author);
-
-					handler(
-						new CancellableEvent<Message>(
-							'message',
-							new MinecraftMessage(
-								this._textChannel,
-								this._identityCache.getByName(
-									chatMessage.author
-								)!,
-								chatMessage.message
-							)
-						)
-					);
-				});
-				return;
-
-			case 'presenceUpdate':
-				this._logReader.on('logInOutMessage', async event => {
-					const message = event.data;
-					await this._identityCache.addByName(message.who);
-
-					handler(
-						new CancellableEvent<PresenceUpdateEventData>(
-							'presenceUpdate',
-							{
-								identity: this._identityCache.getByName(
-									message.who
-								)!,
-								joined: message.event === 'joined',
-							}
-						)
-					);
-				});
-
-				return;
-			case 'game.death':
-				this._logReader.on('deathMessage', async event => {
-					const message = event.data;
-
-					if (!message.player) return; //Intentional game design
-
-					await this._identityCache.addByName(message.player!);
-
-					handler(
-						new CancellableEvent<{
-							message: DeathMessage;
-							server: ChatServer;
-						}>('game.death', { message: message, server: this })
-					);
-				});
-
-				return;
-		}
-
-		//TODO: other events
 	}
 
 	async getPrivateTextChannel(): Promise<null> {

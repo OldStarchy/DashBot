@@ -1,7 +1,6 @@
 import Interaction from '../ChatServer/Interaction';
-import Message from '../ChatServer/Message';
 import DashBot from '../DashBot';
-import { Event } from '../Events';
+import { EventForEmitter } from '../Events';
 import SessionStore from '../SessionStore';
 import StorageRegister from '../StorageRegister';
 import Tracery from '../tracery/Tracery';
@@ -41,7 +40,7 @@ export default class NumberGameInteraction implements Interaction {
 		bot.on('message', this.onMessage.bind(this));
 	}
 
-	async onMessage(event: Event<Message>): Promise<void> {
+	async onMessage(event: EventForEmitter<DashBot, 'message'>): Promise<void> {
 		const message = event.data;
 		if (message === undefined) {
 			return;

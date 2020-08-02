@@ -1,5 +1,5 @@
-export class Event<TData> {
-	constructor(public readonly event: string, public data: TData) {}
+export class Event<TEventName extends string, TData> {
+	constructor(public readonly event: TEventName, public data: TData) {}
 
 	isCancelled() {
 		return false;
@@ -10,7 +10,10 @@ export class Event<TData> {
 	}
 }
 
-export class CancellableEvent<TData> extends Event<TData> {
+export class CancellableEvent<TEventName extends string, TData> extends Event<
+	TEventName,
+	TData
+> {
 	private _cancelled = false;
 
 	isCancelled() {
@@ -22,14 +25,33 @@ export class CancellableEvent<TData> extends Event<TData> {
 	}
 }
 
-export type EventHandler<TData = unknown> = (
-	event: Event<TData>
+export type EventHandler<TEventName extends string, TData> = (
+	event: Event<TEventName, TData> | CancellableEvent<TEventName, TData>
 ) => void | Promise<void>;
 
-export class EventEmitter {
+export type EventsFromEmitter<TEmitter> = TEmitter extends EventEmitter<
+	infer TEvents
+>
+	? TEvents
+	: never;
+export type EventForEmitter<
+	TEmitter,
+	TEventName extends keyof EventsFromEmitter<TEmitter> & string
+> = Event<TEventName, EventsFromEmitter<TEmitter>[TEventName]>;
+
+export type EventHandlerForEmitter<
+	TEmitter,
+	TEventName extends keyof EventsFromEmitter<TEmitter> & string
+> = EventHandler<TEventName, EventsFromEmitter<TEmitter>[TEventName]>;
+
+export class EventEmitter<TEvents> {
+	// https://github.com/microsoft/TypeScript/issues/1396#issuecomment-66071124
+	// TODO: Once noUnusedLocals is enabled in tsconfig add @ts-expect-error here
+	private readonly _typeHint_events!: TEvents;
+
 	private eventHandlers: {
 		[eventName: string]: {
-			handler: EventHandler<any>;
+			handler: EventHandler<string, TEvents[keyof TEvents & string]>;
 			key: any;
 		}[];
 	} = {};
@@ -49,7 +71,9 @@ export class EventEmitter {
 		return events;
 	}
 
-	emit<T = unknown>(event: Event<T>) {
+	protected emit<TEventName extends keyof TEvents & string>(
+		event: Event<TEventName, TEvents[TEventName]>
+	) {
 		const events = EventEmitter.extractEventTypes(event.event);
 
 		events
@@ -60,9 +84,9 @@ export class EventEmitter {
 
 		return event;
 	}
-	private internalEmit<T = unknown>(
-		event: Event<T>,
-		handlers: EventHandler<any>[]
+	private internalEmit<TEventName extends keyof TEvents & string>(
+		event: Event<TEventName, TEvents[TEventName]>,
+		handlers: EventHandler<TEventName, TEvents[TEventName]>[]
 	) {
 		if (event instanceof CancellableEvent) {
 			for (const handler of handlers) {
@@ -79,7 +103,9 @@ export class EventEmitter {
 		}
 	}
 
-	async emitAsync<T = unknown>(event: Event<T>) {
+	protected async emitAsync<TEventName extends keyof TEvents & string>(
+		event: Event<TEventName, TEvents[TEventName]>
+	) {
 		const events = EventEmitter.extractEventTypes(event.event);
 
 		const handlerss = events
@@ -94,9 +120,9 @@ export class EventEmitter {
 		return event;
 	}
 
-	private async internalEmitAsync<T = unknown>(
-		event: Event<T>,
-		handlers: EventHandler<any>[]
+	private async internalEmitAsync<TEventName extends keyof TEvents & string>(
+		event: Event<TEventName, TEvents[TEventName]>,
+		handlers: EventHandler<TEventName, TEvents[TEventName]>[]
 	) {
 		if (event instanceof CancellableEvent) {
 			for (const handler of handlers) {
@@ -121,19 +147,33 @@ export class EventEmitter {
 		}
 	}
 
-	on(event: string, handler: EventHandler<any>, key: any | null = null) {
+	on<TEventName extends keyof TEvents & string>(
+		event: TEventName,
+		handler: EventHandler<TEventName, TEvents[TEventName]>,
+		key: any = null
+	) {
 		return this._on(event, handler, key !== null ? key : handler);
 	}
 
-	private _on(event: string, handler: EventHandler<any>, key: any) {
+	private _on<TEventName extends keyof TEvents & string>(
+		event: TEventName,
+		handler: EventHandler<TEventName, TEvents[TEventName]>,
+		key: any
+	) {
 		if (!this.eventHandlers[event]) {
 			this.eventHandlers[event] = [];
 		}
 
-		this.eventHandlers[event].push({ handler, key });
+		this.eventHandlers[event].push({
+			handler: handler as EventHandler<string, any>,
+			key,
+		});
 	}
 
-	off(event: string, key: any) {
+	off<TEventName extends keyof TEvents & string>(
+		event: TEventName,
+		key: any
+	) {
 		return this._off(event, key);
 	}
 
@@ -151,15 +191,19 @@ export class EventEmitter {
 		} while (index >= 0);
 	}
 
-	public once(
-		event: string,
-		handler: EventHandler<any>,
-		key: any | null = null
+	public once<TEventName extends keyof TEvents & string>(
+		event: TEventName,
+		handler: EventHandler<TEventName, TEvents[TEventName]>,
+		key: any = null
 	) {
 		return this._once(event, handler, key !== null ? key : handler);
 	}
 
-	private _once(event: string, handler: EventHandler<any>, key: any) {
+	private _once<TEventName extends keyof TEvents & string>(
+		event: TEventName,
+		handler: EventHandler<TEventName, TEvents[TEventName]>,
+		key: any
+	) {
 		this.on(
 			event,
 			e => {
@@ -169,4 +213,31 @@ export class EventEmitter {
 			key
 		);
 	}
+}
+
+export interface EventEmitter<TEvents> {
+	on<TEventName extends keyof TEvents & string>(
+		event: TEventName,
+		handler: EventHandler<TEventName, TEvents[TEventName]>,
+		key: any
+	): void;
+
+	once<TEventName extends keyof TEvents & string>(
+		event: TEventName,
+		handler: EventHandler<TEventName, TEvents[TEventName]>,
+		key?: any
+	): void;
+
+	off<TEventName extends keyof TEvents & string>(
+		event: TEventName,
+		key: any
+	): void;
+}
+
+/**
+ * An event emitter that exposes its emit functions publicly
+ */
+export class PublicEventEmitter<TEvents> extends EventEmitter<TEvents> {
+	public emit = super.emit;
+	public emitAsync = super.emitAsync;
 }

@@ -2,7 +2,8 @@ import winston from 'winston';
 import ChatServer, { PresenceUpdateEventData } from './ChatServer/ChatServer';
 import Message from './ChatServer/Message';
 import Command from './Command';
-import { Event, EventEmitter, EventHandler } from './Events';
+import { Event, EventEmitter, EventForEmitter } from './Events';
+import MinecraftServer from './Plugins/Minecraft/ChatServer/MinecraftServer';
 import parseArguments from './util/parseArguments';
 
 export interface BeforeRunCommandData {
@@ -11,7 +12,7 @@ export interface BeforeRunCommandData {
 	args: string[];
 }
 
-export default class DashBot extends EventEmitter {
+export default class DashBot extends EventEmitter<DashBotEvents> {
 	private _commands: Record<string, Command> = {};
 	private _startTime: number | null = null;
 	private _stopTime: number | null = null;
@@ -40,9 +41,10 @@ export default class DashBot extends EventEmitter {
 		chatServer.on('presenceUpdate', e => {
 			this.emit(e);
 		});
-		chatServer.on('game.death', e => {
-			this.emit(e);
-		});
+		if (chatServer instanceof MinecraftServer)
+			chatServer.on('game.death', e => {
+				this.emit(e);
+			});
 	}
 
 	public async connect() {
@@ -93,7 +95,7 @@ export default class DashBot extends EventEmitter {
 		this._commands[key] = command;
 	}
 
-	private async onMessage(event: Event<Message>) {
+	private async onMessage(event: EventForEmitter<ChatServer, 'message'>) {
 		const message = event.data;
 		if (message.author.isBot) {
 			return;
@@ -122,7 +124,7 @@ export default class DashBot extends EventEmitter {
 	async runCommand(message: Message | null, name: string, ...args: string[]) {
 		if (this._commands[name]) {
 			const event = this.emit(
-				new Event<BeforeRunCommandData>('beforeRunCommand', {
+				new Event('beforeRunCommand', {
 					message,
 					name,
 					args,
@@ -135,14 +137,6 @@ export default class DashBot extends EventEmitter {
 
 			await this._commands[name].run(message, name, ...args);
 		}
-	}
-
-	on<TEvent extends keyof DashBotEvents>(
-		event: TEvent,
-		handler: EventHandler<DashBotEvents[TEvent]>
-	): void;
-	on(event: string, handler: EventHandler<any>): void {
-		return super.on(event, handler);
 	}
 }
 

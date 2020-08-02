@@ -1,7 +1,6 @@
 import Interaction from '../ChatServer/Interaction';
-import Message from '../ChatServer/Message';
 import DashBot from '../DashBot';
-import { Event } from '../Events';
+import { EventForEmitter } from '../Events';
 import Tracery from '../tracery/Tracery';
 
 type Trigger = string | RegExp | Array<string | RegExp>;
@@ -23,7 +22,7 @@ export default class ABResponseInteraction implements Interaction {
 	register(bot: DashBot) {
 		bot.on('message', this.onMessage.bind(this));
 	}
-	async onMessage(event: Event<Message>) {
+	async onMessage(event: EventForEmitter<DashBot, 'message'>) {
 		const message = event.data;
 
 		const content = message.textContent;

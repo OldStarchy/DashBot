@@ -1,5 +1,5 @@
-import DashBot, { BeforeRunCommandData } from '../DashBot';
-import { Event } from '../Events';
+import DashBot from '../DashBot';
+import { EventForEmitter } from '../Events';
 import { Statistic, StatisticProvider } from '../StatisticsTracker';
 import StorageRegister, { PersistentData } from '../StorageRegister';
 
@@ -19,7 +19,9 @@ export default class CommandStatistic implements StatisticProvider {
 		return this._store.getData(() => CommandStatistic.defaultData);
 	}
 
-	private onBeforeRunCommand(event: Event<BeforeRunCommandData>) {
+	private onBeforeRunCommand(
+		event: EventForEmitter<DashBot, 'beforeRunCommand'>
+	) {
 		switch (event.data.name) {
 			case 'disconnect':
 			case 'minecraft':

@@ -1,10 +1,12 @@
-import { Event, EventEmitter, EventHandler } from '../../../Events';
+import { Event, EventEmitter, EventForEmitter } from '../../../Events';
 import MojangApiClient from '../../../MojangApiClient';
 import StorageRegister, { PersistentData } from '../../../StorageRegister';
 import MinecraftIdentity from './MinecraftIdentity';
 import MinecraftServer from './MinecraftServer';
 
-export default class MinecraftIdentityCache extends EventEmitter {
+export default class MinecraftIdentityCache extends EventEmitter<{
+	identityChanged: Record<'id' | 'name' | 'oldName', string>;
+}> {
 	private _cache: {
 		name: string;
 		id: string;
@@ -25,7 +27,7 @@ export default class MinecraftIdentityCache extends EventEmitter {
 		);
 	}
 	private onDataLoaded(
-		event: Event<MinecraftIdentityCache['_cache'] | undefined>
+		event: EventForEmitter<MinecraftIdentityCache['_store'], 'dataLoaded'>
 	) {
 		const data = event.data;
 		if (data && typeof data == 'object' && data instanceof Array) {
@@ -91,12 +93,5 @@ export default class MinecraftIdentityCache extends EventEmitter {
 		const item = this.internalGetByName(name);
 		if (item === undefined) return null;
 		return new MinecraftIdentity(this.server, item.name, item.id);
-	}
-
-	public on(
-		event: 'identityChanged',
-		handler: EventHandler<Record<'id' | 'name' | 'string', string>>
-	) {
-		super.on(event, handler);
 	}
 }
