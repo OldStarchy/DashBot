@@ -1,26 +1,25 @@
 import { Bot } from 'mineflayer';
 import Message from '../../../ChatServer/Message';
+import Command from '../../../Command';
 import MineflayerClient from '../ChatServer/MineflayerClient';
-import { AbstractMineflayerCommand } from './MineflayerCommand';
 
 const priority = 10;
 
-export default class DropAllCommand extends AbstractMineflayerCommand {
-	name = 'dropall';
-	alias = null;
-	description =
+export default class DropAllCommand extends Command {
+	readonly name = 'dropall';
+	readonly description =
 		'Bot drops all the items in their inventory.' +
 		' This does not drop equipped gear.';
 
 	private bot: Bot;
 
 	constructor(private client: MineflayerClient) {
-		super(client);
+		super();
 		this.bot = this.client.getBot()!;
 	}
 
 	async run(message: Message, ...args: string[]): Promise<void> {
-		const channel = message.channel;
+		const { channel } = message;
 
 		if (this.client.isBusy(priority)) {
 			channel.sendText("I'm too busy");

@@ -1,22 +1,22 @@
 import Message from '../../../ChatServer/Message';
+import Command from '../../../Command';
 import MineflayerClient from '../ChatServer/MineflayerClient';
 import { BusyLockKey } from '../util/BusyLock';
 import './MineflayerCommand';
-import { AbstractMineflayerCommand } from './MineflayerCommand';
 
 const priority = 10;
 
-export default class FollowCommand extends AbstractMineflayerCommand {
-	name = 'follow';
-	alias = null;
-	description =
+export default class FollowCommand extends Command {
+	readonly name = 'follow';
+	readonly description =
 		'Bot follows the target Player, standing still whenever in range.' +
 		' If target argument is not provided, the target defaults to' +
 		" the calling player. You must call 'stop' to end this command.";
+
 	private followLock: BusyLockKey | null = null;
 
 	constructor(private client: MineflayerClient) {
-		super(client);
+		super();
 	}
 
 	async run(message: Message, ...args: string[]): Promise<void> {
@@ -24,7 +24,6 @@ export default class FollowCommand extends AbstractMineflayerCommand {
 		const follow = this.client.behaviours.follow!;
 
 		const {
-			textContent: textContent,
 			author: { username, tag },
 			channel: channel,
 		} = message;

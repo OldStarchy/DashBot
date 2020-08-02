@@ -22,11 +22,13 @@ const grammar = {
 };
 
 /**
- * Allows you to create polls (much like other existing poll bots).
- *
- * `!poll "this is my question" yes no maybe "i don't know".`
  */
-export default class PollCommand implements Command {
+export default class PollCommand extends Command {
+	readonly name = 'poll';
+	readonly description =
+		'Allows you to create polls (much like other existing poll bots).\n' +
+		'`!poll "this is my question" yes no maybe "i don\'t know".`';
+
 	static readonly answersEmoji = [
 		Emoji.ZERO,
 		Emoji.ONE,
@@ -42,9 +44,6 @@ export default class PollCommand implements Command {
 	];
 
 	async run(message: Message, _: string, ...args: string[]) {
-		if (message === null) {
-			return;
-		}
 		const channel = message.channel;
 		if (!channel.supportsReactions) {
 			await channel.sendText("This chat does't support polls");

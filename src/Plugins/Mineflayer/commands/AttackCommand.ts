@@ -1,14 +1,13 @@
 import Message from '../../../ChatServer/Message';
+import Command from '../../../Command';
 import MineflayerClient from '../ChatServer/MineflayerClient';
 import { BusyLockKey } from '../util/BusyLock';
-import { AbstractMineflayerCommand } from './MineflayerCommand';
 
 const priority = 10;
 
-export default class AttackCommand extends AbstractMineflayerCommand {
-	name = 'attack';
-	alias = null;
-	description =
+export default class AttackCommand extends Command {
+	readonly name = 'attack';
+	readonly description =
 		'Bot will follow the the target Player and attack them with' +
 		' its currently selected item whenever it is in range.' +
 		' This will fail if the target is not provided as an argument.' +
@@ -17,11 +16,11 @@ export default class AttackCommand extends AbstractMineflayerCommand {
 	private followLock: BusyLockKey | null = null;
 
 	constructor(private client: MineflayerClient) {
-		super(client);
+		super();
 	}
 
 	async run(message: Message, ...args: string[]): Promise<void> {
-		const channel = message.channel;
+		const { channel } = message;
 		const bot = this.client.getBot!();
 		const follow = this.client.behaviours.follow!;
 

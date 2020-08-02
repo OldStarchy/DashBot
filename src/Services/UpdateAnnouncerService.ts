@@ -159,12 +159,10 @@ export default class UpdateAnnouncerService implements Service {
 	getCommand() {
 		// eslint-disable-next-line @typescript-eslint/no-this-alias
 		const self = this;
-		class SetChannelCommand implements Command {
-			async run(message: Message, _: string, here?: string) {
-				if (message === null) {
-					return;
-				}
-
+		class SetChannelCommand extends Command {
+			readonly name = 'announce';
+			readonly description = 'Shows the current version changelog';
+			async run(message: Message, here?: string) {
 				if (here === 'here') {
 					if (
 						self.permissions.has(

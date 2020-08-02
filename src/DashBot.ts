@@ -1,7 +1,7 @@
 import winston from 'winston';
 import ChatServer, { PresenceUpdateEventData } from './ChatServer/ChatServer';
 import Message from './ChatServer/Message';
-import Command from './Command';
+import Command, { CommandSet } from './Command';
 import { Event, EventEmitter, EventForEmitter } from './Events';
 import MinecraftServer from './Plugins/Minecraft/ChatServer/MinecraftServer';
 import parseArguments from './util/parseArguments';
@@ -18,19 +18,27 @@ export default class DashBot extends EventEmitter<DashBotEvents> {
 	private _stopTime: number | null = null;
 	private _chatServers: ChatServer[] = [];
 
+	readonly commands = new CommandSet();
+
 	constructor(public readonly name: string) {
 		super();
 
 		// eslint-disable-next-line @typescript-eslint/no-this-alias
 		const bot = this;
-		class DisconnectCommand implements Command {
-			async run() {
+		class DisconnectCommand extends Command {
+			readonly name = 'disconnect';
+			readonly description = 'Shuts down dasbhot';
+			async run(message: Message) {
+				winston.warn(
+					`Shutdown command invoked by ${message.author.username} in ${message.channel.name} in ${message.channel.server.id}`
+				);
 				//TODO: Check for admin or something
 				await bot.disconnect();
 				process.exit(0);
 			}
 		}
-		this.registerCommand('disconnect', new DisconnectCommand());
+
+		this.commands.add(new DisconnectCommand());
 	}
 
 	public addServer(chatServer: ChatServer) {
@@ -121,12 +129,12 @@ export default class DashBot extends EventEmitter<DashBotEvents> {
 		}
 	}
 
-	async runCommand(message: Message | null, name: string, ...args: string[]) {
-		if (this._commands[name]) {
+	async runCommand(message: Message, commandName: string, ...args: string[]) {
+		if (this._commands[commandName]) {
 			const event = this.emit(
 				new Event('beforeRunCommand', {
 					message,
-					name,
+					name: commandName,
 					args,
 				})
 			);
@@ -135,7 +143,7 @@ export default class DashBot extends EventEmitter<DashBotEvents> {
 				return;
 			}
 
-			await this._commands[name].run(message, name, ...args);
+			await this.commands.run(message, commandName, args);
 		}
 	}
 }

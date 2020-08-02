@@ -2,17 +2,16 @@ import { Bot } from 'mineflayer';
 import winston from 'winston';
 import Message from '../../../ChatServer/Message';
 import TextChannel from '../../../ChatServer/TextChannel';
+import Command from '../../../Command';
 import sleep from '../../../util/sleep';
 import MineflayerClient from '../ChatServer/MineflayerClient';
 import { BusyLockKey } from '../util/BusyLock';
-import { AbstractMineflayerCommand } from './MineflayerCommand';
 
 const priority = 10;
 
-export default class FishCommand extends AbstractMineflayerCommand {
-	name = 'fish';
-	alias = null;
-	description =
+export default class FishCommand extends Command {
+	readonly name = 'fish';
+	readonly description =
 		'Bot automatically selects its Fishing Rod from its' +
 		" inventory and starts fishing. A subsequent call to 'fish'" +
 		' will stop fishing. This will fail if there is no Fishing' +
@@ -25,14 +24,12 @@ export default class FishCommand extends AbstractMineflayerCommand {
 	private _lineIsOut = false;
 
 	constructor(private client: MineflayerClient) {
-		super(client);
+		super();
 		this.bot = this.client.getBot()!;
 	}
 
-	async run(message: Message, ...args: string[]): Promise<void> {
-		const textContent = message.textContent;
-
-		const channel = message.channel;
+	async run(message: Message): Promise<void> {
+		const { channel } = message;
 
 		if (this.client.isBusy(priority)) {
 			channel.sendText("I'm too busy");

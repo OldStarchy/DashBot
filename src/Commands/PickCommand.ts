@@ -27,7 +27,10 @@ const grammar = {
  *
  * `!poll "this is my question" yes no maybe "i don't know".`
  */
-export default class PickCommand implements Command {
+export default class PickCommand extends Command {
+	readonly name = 'pick';
+	readonly description = 'Chooses a random answer for you';
+
 	async run(message: Message, _: string, ...args: string[]) {
 		if (message === null) {
 			return;

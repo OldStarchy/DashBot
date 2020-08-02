@@ -37,7 +37,10 @@ interface HelpCommandSession {
 /**
  * Placeholder help action supposed to give people hints as to what DashBot can do, however due to the "conversational"-like invocation phrases I feel like it doesn't really make sense to just list all the "commands" so not much work has been put in this.
  */
-export default class HelpCommand implements Command, Interaction {
+export default class HelpCommand extends Command implements Interaction {
+	readonly name = 'help';
+	readonly description = 'Shows help for available commands';
+
 	private static readonly defaultSession: Readonly<HelpCommandSession> = {
 		pendingAnswer: false,
 		sentMessageTime: 0,
@@ -46,6 +49,7 @@ export default class HelpCommand implements Command, Interaction {
 	private readonly _session: SessionStore<HelpCommandSession>;
 
 	constructor(private storage: StorageRegister) {
+		super();
 		this._session = new SessionStore(storage);
 	}
 

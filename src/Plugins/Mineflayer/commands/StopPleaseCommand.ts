@@ -1,21 +1,20 @@
 import Message from '../../../ChatServer/Message';
+import Command from '../../../Command';
 import MineflayerClient from '../ChatServer/MineflayerClient';
-import { AbstractMineflayerCommand } from './MineflayerCommand';
 
-export default class StopPleaseCommand extends AbstractMineflayerCommand {
-	name = 'stop!';
-	alias = null;
-	description =
+export default class StopPleaseCommand extends Command {
+	readonly name = 'stop!';
+	readonly description =
 		'Stops the currently executing command even if that command is high priority.';
 
 	constructor(private client: MineflayerClient) {
-		super(client);
+		super();
 	}
 
-	async run(message: Message /*, ...args: string[]*/): Promise<void> {
+	async run(message: Message): Promise<void> {
 		const bot = this.client.getBot()!;
 
-		const channel = message.channel;
+		const { channel } = message;
 
 		if (this.client.isBusy()) {
 			if (this.client.stop(999)) {
