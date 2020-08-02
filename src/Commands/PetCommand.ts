@@ -1,7 +1,7 @@
 import { DateTime } from 'luxon';
 import Message from '../ChatServer/Message';
 import Command from '../Command';
-import { Event } from '../Events';
+import { EventForEmitter } from '../Events';
 import { Statistic, StatisticProvider } from '../StatisticsTracker';
 import StorageRegister, { PersistentData } from '../StorageRegister';
 
@@ -79,7 +79,9 @@ export default class PetCommand implements Command, StatisticProvider {
 		return statistics;
 	}
 
-	public onReadData(event: Event<PetActionStorage | undefined>) {
+	public onReadData(
+		event: EventForEmitter<PetCommand['_store'], 'dataLoaded'>
+	) {
 		const data = event.data;
 
 		if (data) {
