@@ -31,8 +31,9 @@ export default function blockMarch(
 	end: Vec3,
 	callback: (block: Vec3) => boolean
 ): void {
-	let count = 50;
-	while (count-- > 0) {
+	const limit = 50;
+	let count = -1;
+	while (count++ < limit) {
 		const dx = end.x - start.x;
 		const dy = end.y - start.y;
 		const dz = end.z - start.z;
@@ -41,9 +42,9 @@ export default function blockMarch(
 		const fy = ((start.y % 1) + 1) % 1;
 		const fz = ((start.z % 1) + 1) % 1;
 
-		const crossX = (((fx + 0.5) % 1) - 0.5) ** 2 < 0.01;
-		const crossY = (((fy + 0.5) % 1) - 0.5) ** 2 < 0.01;
-		const crossZ = (((fz + 0.5) % 1) - 0.5) ** 2 < 0.01;
+		const crossX = (((fx + 0.5) % 1) - 0.5) ** 2 < 0.01 && dx !== 0;
+		const crossY = (((fy + 0.5) % 1) - 0.5) ** 2 < 0.01 && dy !== 0;
+		const crossZ = (((fz + 0.5) % 1) - 0.5) ** 2 < 0.01 && dz !== 0;
 
 		if (crossX && !crossY && !crossZ) {
 			if (
@@ -220,7 +221,13 @@ export default function blockMarch(
 				return;
 		}
 
-		if (!crossX && !crossY && !crossZ) {
+		if (
+			!crossX &&
+			!crossY &&
+			!crossZ &&
+			// We haven't moved through any cells; if this is the first iteration, collide with the current cell. If this is not the first iteration, we would have already collided with this cell when moving into it
+			count === 0
+		) {
 			if (
 				callback(
 					new Vec3(
