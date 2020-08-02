@@ -3,13 +3,10 @@ import mineflayer from 'mineflayer';
 import { Entity } from 'prismarine-entity';
 import { Vec3 } from 'vec3';
 import winston from 'winston';
-import ChatServer, {
-	PresenceUpdateEventData,
-} from '../../../ChatServer/ChatServer';
+import ChatServer, { ChatServerEvents } from '../../../ChatServer/ChatServer';
 import Identity from '../../../ChatServer/Identity';
 import IdentityService from '../../../ChatServer/IdentityService';
-import Message from '../../../ChatServer/Message';
-import { CancellableEvent, EventHandler } from '../../../Events';
+import { CancellableEvent, EventEmitter } from '../../../Events';
 import MojangApiClient from '../../../MojangApiClient';
 import deferred, { Deferred } from '../../../util/deferred';
 import FollowBehaviour from '../behaviours/FollowBehaviour';
@@ -38,7 +35,10 @@ declare global {
 	interface MineflayerBehaviours {}
 }
 
+type MineflayerClientEvents = ChatServerEvents;
+
 export default class MineflayerClient
+	extends EventEmitter<MineflayerClientEvents>
 	implements ChatServer<MineflayerIdentity, MineflayerTextChannel> {
 	private _loggedIn: Deferred<this>;
 	private _identityService: IdentityService;
@@ -56,6 +56,7 @@ export default class MineflayerClient
 	private bot: mineflayer.Bot | null = null;
 
 	constructor(private options: MineflayerOptions) {
+		super();
 		this._identityService = options.identityService;
 		this._loggedIn = deferred<this>();
 
@@ -238,6 +239,49 @@ export default class MineflayerClient
 			winston.info('"game" event from mineflayer');
 		});
 
+		this.bot.on(
+			'chat',
+			async (
+				username: string,
+				message: string
+				// _translate: string | null,
+				// _jsonMsg: string,
+				// _matches: string[] | null
+			) => {
+				this.emit(
+					new CancellableEvent(
+						'message',
+						new MineflayerMessage(
+							this.broadcastChannel,
+							(await this.makeIdentity(username))!,
+							message
+						)
+					)
+				);
+			}
+		);
+
+		this.bot.on(
+			'whisper',
+			async (
+				username: string,
+				message: string
+				// _translate: string | null,
+				// _jsonMsg: string,
+				// _matches: string[] | null
+			) => {
+				this.emit(
+					new CancellableEvent(
+						'message',
+						new MineflayerMessage(
+							this.makeWhisperChannel(username),
+							(await this.makeIdentity(username))!,
+							message
+						)
+					)
+				);
+			}
+		);
 		this.init();
 	}
 
@@ -344,62 +388,6 @@ export default class MineflayerClient
 		}
 
 		return null;
-	}
-
-	on(event: 'message', handler: EventHandler<Message>): void;
-	on(
-		event: 'presenceUpdate',
-		handler: EventHandler<PresenceUpdateEventData>
-	): void;
-	on(event: string, handler: EventHandler<unknown>): void;
-	on(event: any, handler: any) {
-		if (!this.bot) return;
-
-		switch (event) {
-			case 'message':
-				this.bot.on(
-					'chat',
-					async (
-						username: string,
-						message: string
-						// _translate: string | null,
-						// _jsonMsg: string,
-						// _matches: string[] | null
-					) => {
-						handler(
-							new CancellableEvent<Message>(
-								'message',
-								new MineflayerMessage(
-									this.broadcastChannel,
-									(await this.makeIdentity(username))!,
-									message
-								)
-							)
-						);
-					}
-				);
-				this.bot.on(
-					'whisper',
-					async (
-						username: string,
-						message: string
-						// _translate: string | null,
-						// _jsonMsg: string,
-						// _matches: string[] | null
-					) => {
-						handler(
-							new CancellableEvent<Message>(
-								'message',
-								new MineflayerMessage(
-									this.makeWhisperChannel(username),
-									(await this.makeIdentity(username))!,
-									message
-								)
-							)
-						);
-					}
-				);
-		}
 	}
 
 	getIdentityService(): IdentityService {

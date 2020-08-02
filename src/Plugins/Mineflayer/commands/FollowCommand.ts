@@ -1,5 +1,4 @@
-import Message from '../../../ChatServer/Message';
-import { Event } from '../../../Events';
+import { EventForEmitter } from '../../../Events';
 import parseArguments from '../../../util/parseArguments';
 import MineflayerClient from '../ChatServer/MineflayerClient';
 import { BusyLockKey } from '../util/BusyLock';
@@ -13,7 +12,7 @@ export default class FollowCommand {
 		client.on('message', this.onMessage.bind(this));
 	}
 
-	onMessage(event: Event<Message>) {
+	onMessage(event: EventForEmitter<MineflayerClient, 'message'>) {
 		const bot = this.client.getBot!();
 		const follow = this.client.behaviours.follow!;
 

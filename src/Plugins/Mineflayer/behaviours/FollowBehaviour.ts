@@ -1,12 +1,7 @@
 import { DateTime } from 'luxon';
 import { Entity } from 'prismarine-entity';
 import { Vec3 } from 'vec3';
-import {
-	Event,
-	EventEmitter,
-	EventHandler,
-	IEventEmitter,
-} from '../../../Events';
+import { Event, EventEmitter } from '../../../Events';
 import { PartialDefaults } from '../../../util/PartialDefaults';
 import shallowMerge from '../../../util/shallowMerge';
 import MineflayerClient from '../ChatServer/MineflayerClient';
@@ -48,7 +43,6 @@ interface FollowBehaviourEvents {
 }
 
 interface FollowBehaviourDependencies {
-	eventEmitter?: EventEmitter;
 	client: MineflayerClient;
 }
 
@@ -59,22 +53,19 @@ declare global {
 	}
 }
 
-export default class FollowBehaviour
-	implements IEventEmitter<FollowBehaviourEvents> {
+export default class FollowBehaviour extends EventEmitter<
+	FollowBehaviourEvents
+> {
 	private _opts: RequiredFollowOptions;
-	private events: EventEmitter;
 
 	private tickInterval: NodeJS.Timeout | null = null;
 	private _client: MineflayerClient;
 	constructor(
 		options: FollowOptions,
-		{
-			eventEmitter = new EventEmitter(),
-			client,
-		}: FollowBehaviourDependencies
+		{ client }: FollowBehaviourDependencies
 	) {
+		super();
 		this._opts = shallowMerge(defaultOptions, options);
-		this.events = eventEmitter;
 		this._client = client;
 		client.setBehaviour('follow', this);
 	}
@@ -153,14 +144,14 @@ export default class FollowBehaviour
 			if (this._wasClose !== true) {
 				bot.clearControlStates();
 			}
-			this.events.emit(new Event<void>('enteredRadius', void 0));
+			this.emit(new Event('enteredRadius', void 0));
 			this._wasClose = true;
 
 			// bot.lookAt(new Vec3(pos.x, pos.y + target.height, pos.z));
 		} else {
 			// if (this._wasClose !== false) {
 			// }
-			this.events.emit(new Event<void>('exitedRadius', void 0));
+			this.emit(new Event('exitedRadius', void 0));
 
 			this._wasClose = false;
 			let jump = false;
@@ -217,27 +208,5 @@ export default class FollowBehaviour
 			bot.swingArm();
 			this._lastHit = DateTime.utc().valueOf();
 		}
-	}
-	on<TEventName extends keyof FollowBehaviourEvents>(
-		event: TEventName,
-		handler: EventHandler<FollowBehaviourEvents[TEventName]>,
-		key?: any
-	): void {
-		this.events.on(event, handler, key);
-	}
-
-	once<TEventName extends keyof FollowBehaviourEvents>(
-		event: TEventName,
-		handler: EventHandler<FollowBehaviourEvents[TEventName]>,
-		key?: any
-	): void {
-		this.events.once(event, handler, key);
-	}
-
-	off<TEventName extends keyof FollowBehaviourEvents>(
-		event: TEventName,
-		key: any
-	): void {
-		this.events.off(event, key);
 	}
 }
