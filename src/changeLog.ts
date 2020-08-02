@@ -13,8 +13,11 @@ const changeLog: ChangeLog = {
 			'Add basic mineflayer integration for minecraft bots',
 			'Add follow and attack commands for mineflayer bot',
 		],
+	},
+	'0.6.0': {
 		Updated: [
 			'Use singleton logger to avoid passing it in through all constructors',
+			'Strongly type all event emitter events',
 		],
 	},
 	'0.5.0': {

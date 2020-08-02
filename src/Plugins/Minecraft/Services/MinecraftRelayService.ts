@@ -3,7 +3,7 @@ import Message from '../../../ChatServer/Message';
 import TextChannel from '../../../ChatServer/TextChannel';
 import Command from '../../../Command';
 import DashBot from '../../../DashBot';
-import { Event } from '../../../Events';
+import { EventForEmitter } from '../../../Events';
 import Service from '../../../Service';
 import StorageRegister, { PersistentData } from '../../../StorageRegister';
 import Tracery from '../../../tracery/Tracery';
@@ -150,7 +150,7 @@ export default class MinecraftRelayService implements Service {
 	}
 
 	private async onDataLoaded(
-		event: Event<MinecraftRelayServiceState | undefined>
+		event: EventForEmitter<MinecraftRelayService['_store'], 'dataLoaded'>
 	) {
 		const state = event.data;
 		if (state?.relays instanceof Array) {
@@ -219,7 +219,7 @@ export default class MinecraftRelayService implements Service {
 		});
 	}
 
-	private async onMessage(event: Event<Message>) {
+	private async onMessage(event: EventForEmitter<DashBot, 'message'>) {
 		const message = event.data;
 
 		let relay = this.getRelayByServer(message.channel.server.id);

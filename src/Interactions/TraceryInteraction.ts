@@ -1,7 +1,6 @@
 import Interaction from '../ChatServer/Interaction';
-import Message from '../ChatServer/Message';
 import DashBot from '../DashBot';
-import { Event } from '../Events';
+import { EventForEmitter } from '../Events';
 import { AdventurerIntroduction } from '../Grammars/AdventurerIntroduction';
 import Tracery from '../tracery/Tracery';
 
@@ -10,7 +9,7 @@ export default class TraceryInteraction implements Interaction {
 		bot.on('message', this.onMessage.bind(this));
 	}
 
-	onMessage(event: Event<Message>) {
+	onMessage(event: EventForEmitter<DashBot, 'message'>) {
 		const message = event.data;
 		const textContent = message.textContent;
 
