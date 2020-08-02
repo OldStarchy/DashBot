@@ -9,6 +9,14 @@ type ChangeLog = {
 
 const changeLog: ChangeLog = {
 	'0.7.1': {
+		Updated: [
+			'Dashbot now stops doing things when disconnecting from minecraft',
+		],
+		Fixed: [
+			'Fixed some commands relying on mineflayer being available too soon',
+		],
+	},
+	'0.7.1': {
 		Fixed: ['Removed some test code that broke prod'],
 	},
 	'0.7.0': {
