@@ -300,9 +300,7 @@ export default class MineflayerClient
 			this.bot!.version
 		) as MinecraftData.IndexedData;
 
-		this.bot!.once('spawn', () => {
-			this._loggedIn.resolve(this);
-		});
+		this._loggedIn.resolve(this);
 	}
 	private onKicked() {
 		winston.info("I've been kicked");
