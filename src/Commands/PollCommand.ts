@@ -43,7 +43,7 @@ export default class PollCommand extends Command {
 		Emoji.TEN,
 	];
 
-	async run(message: Message, _: string, ...args: string[]) {
+	async run(message: Message, ...args: string[]) {
 		const channel = message.channel;
 		if (!channel.supportsReactions) {
 			await channel.sendText("This chat does't support polls");

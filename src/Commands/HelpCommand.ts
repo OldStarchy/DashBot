@@ -53,13 +53,7 @@ export default class HelpCommand extends Command implements Interaction {
 		this._session = new SessionStore(storage);
 	}
 
-	async run(
-		message: Message | null
-		// name: string,
-		// ...args: string[]
-	): Promise<void> {
-		if (message == null) return;
-
+	async run(message: Message): Promise<void> {
 		const { textContent, channel, author } = message;
 
 		const helpRegex = /^(\!?help)$/;

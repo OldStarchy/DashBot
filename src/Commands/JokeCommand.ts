@@ -13,11 +13,7 @@ export default class JokeCommand extends Command {
 		super();
 	}
 
-	async run(message: Message | null) {
-		if (message === null) {
-			return;
-		}
-
+	async run(message: Message) {
 		const response = await this._jokes.getJoke();
 
 		const reply =

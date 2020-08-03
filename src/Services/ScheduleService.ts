@@ -83,12 +83,8 @@ export default class ScheduleService extends EventEmitter<ScheduleServiceEvents>
 			readonly description =
 				"Sets a one-off reminder.\n!remind <date / time> <message>\nYou can have up to 5 reminders at a time. Once you set one, you can't change it so set them wisely";
 
-			async run(
-				message: Message | null,
-				name: string,
-				...args: string[]
-			) {
-				if (message === null || !message.channel.canSend) return;
+			async run(message: Message, ...args: string[]) {
+				if (!message.channel.canSend) return;
 
 				if (args.length === 0) {
 					await message.channel.sendText('No args');

@@ -38,11 +38,7 @@ export class ImgurCommand extends Command {
 		super();
 	}
 
-	async run(message: Message | null, _: string, ...query: string[]) {
-		if (message === null) {
-			return;
-		}
-
+	async run(message: Message, ...query: string[]) {
 		const channel = message.channel;
 		const searchResults = await this._imgur.search(query.join(' '));
 

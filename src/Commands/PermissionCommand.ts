@@ -29,11 +29,7 @@ export default class PermissionCommand extends Command {
 
 		return undefined;
 	}
-	async run(message: Message | null, _: string, ...args: string[]) {
-		if (message === null) {
-			return;
-		}
-
+	async run(message: Message, ...args: string[]) {
 		if (args.length < 2) return;
 
 		switch (args[0]) {

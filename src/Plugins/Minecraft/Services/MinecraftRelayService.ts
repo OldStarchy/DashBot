@@ -284,13 +284,7 @@ export default class MinecraftRelayService implements Service {
 			readonly description =
 				'Allows you to link a minecraft server with a discord text chat channel.';
 
-			async run(
-				message: Message | null,
-				_command: string,
-				idOrCommand?: string
-			) {
-				if (message === null) return;
-
+			async run(message: Message, idOrCommand?: string) {
 				const { channel } = message;
 
 				if (idOrCommand && !/^(\d+|start|stop)$/.test(idOrCommand)) {

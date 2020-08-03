@@ -6,9 +6,7 @@ export default class VersionCommand extends Command {
 	readonly name = 'version';
 	readonly description = 'Shows the current version... duh';
 
-	async run(message: Message | null) {
-		if (message === null) return;
-
+	async run(message: Message) {
 		message.channel.sendText(getVersion());
 	}
 }

@@ -7,7 +7,7 @@ import MinecraftServer from './Plugins/Minecraft/ChatServer/MinecraftServer';
 import parseArguments from './util/parseArguments';
 
 export interface BeforeRunCommandData {
-	message: Message | null;
+	message: Message;
 	name: string;
 	args: string[];
 }

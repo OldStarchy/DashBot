@@ -31,7 +31,7 @@ export default class PickCommand extends Command {
 	readonly name = 'pick';
 	readonly description = 'Chooses a random answer for you';
 
-	async run(message: Message, _: string, ...args: string[]) {
+	async run(message: Message, ...args: string[]) {
 		if (message === null) {
 			return;
 		}

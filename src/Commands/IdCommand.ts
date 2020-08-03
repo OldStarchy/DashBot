@@ -10,11 +10,7 @@ export default class IdCommand extends Command {
 	constructor(private readonly permissions: Permissions) {
 		super();
 	}
-	async run(message: Message | null) {
-		if (message === null) {
-			return;
-		}
-
+	async run(message: Message) {
 		if (
 			!this.permissions.has(
 				await message.author.getPerson(),
