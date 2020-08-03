@@ -23,7 +23,7 @@ export interface DiscordServerOptions {
 type DiscordServerEvents = ChatServerEvents;
 
 export default class DiscordServer extends EventEmitter<DiscordServerEvents>
-	implements ChatServer<DiscordIdentity, DiscordTextChannel> {
+	implements ChatServer {
 	private _channelCache: Record<string, DiscordTextChannel> = {};
 	private _loggedIn = deferred<this>();
 	private _isLoggedIn = false;

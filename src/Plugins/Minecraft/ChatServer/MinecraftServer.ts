@@ -29,7 +29,7 @@ interface MinecraftServerEvents extends ChatServerEvents {
 	};
 }
 export default class MinecraftServer extends EventEmitter<MinecraftServerEvents>
-	implements ChatServer<MinecraftIdentity, MinecraftTextChannel> {
+	implements ChatServer {
 	private _textChannel: MinecraftTextChannel;
 	private _identityCache: MinecraftIdentityCache;
 

@@ -46,7 +46,7 @@ type MineflayerClientEvents = ChatServerEvents;
 
 export default class MineflayerClient
 	extends EventEmitter<MineflayerClientEvents>
-	implements ChatServer<MineflayerIdentity, MineflayerTextChannel> {
+	implements ChatServer {
 	private _loggedIn: Deferred<this>;
 	private _identityService: IdentityService;
 	private _behaviours: Partial<MineflayerBehaviours>;

@@ -15,20 +15,17 @@ export interface ChatServerEvents {
 	presenceUpdate: PresenceUpdateEventData;
 }
 
-export default interface ChatServer<
-	TIdentity extends Identity = Identity,
-	TTextChannel extends TextChannel = TextChannel
-> extends EventEmitter<ChatServerEvents> {
+export default interface ChatServer extends EventEmitter<ChatServerEvents> {
 	readonly id: string;
-	readonly me: Readonly<TIdentity>;
+	readonly me: Readonly<Identity>;
 	readonly isConnected: boolean;
 	connect(): Promise<void>;
 	disconnect(): Promise<void>;
 	getAudioChannels(): Promise<AudioChannel[]>;
-	getTextChannels(): Promise<TTextChannel[]>;
-	getTextChannel(id: string): Promise<TTextChannel | null>;
-	getPrivateTextChannel(person: TIdentity): Promise<TTextChannel | null>;
-	getIdentityById(id: string): Promise<TIdentity | null>;
+	getTextChannels(): Promise<TextChannel[]>;
+	getTextChannel(id: string): Promise<TextChannel | null>;
+	getPrivateTextChannel(person: Identity): Promise<TextChannel | null>;
+	getIdentityById(id: string): Promise<Identity | null>;
 	getIdentityService(): IdentityService;
 	awaitConnected(): Promise<this>;
 }
