@@ -8,6 +8,12 @@ type ChangeLog = {
 };
 
 const changeLog: ChangeLog = {
+	patch: {
+		Fixed: [
+			"Start responding in Minecraft sooner (aka don't wait for a spawn event)",
+			'Fix a bunch of old commands not implementing Command.run properly',
+		],
+	},
 	'0.7.2': {
 		Updated: [
 			'Dashbot now stops doing things when disconnecting from minecraft',
