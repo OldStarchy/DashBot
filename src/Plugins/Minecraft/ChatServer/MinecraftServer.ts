@@ -52,7 +52,7 @@ export default class MinecraftServer extends EventEmitter<MinecraftServerEvents>
 
 		this._textChannel = new MinecraftTextChannel(this, this._rcon);
 		this._identityCache = new MinecraftIdentityCache(this, storage);
-		this.me = new MinecraftIdentity(this, botName, '');
+		this.me = new MinecraftIdentity(this, botName, '', true);
 
 		this._logReader.on('chatMessage', async event => {
 			const chatMessage = event.data;

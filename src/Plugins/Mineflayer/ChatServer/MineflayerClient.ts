@@ -12,6 +12,7 @@ import { CancellableEvent, EventEmitter } from '../../../Events';
 import MojangApiClient from '../../../MojangApiClient';
 import deferred, { Deferred } from '../../../util/deferred';
 import parseArguments from '../../../util/parseArguments';
+import MinecraftIdentity from '../../Minecraft/ChatServer/MinecraftIdentity';
 import FollowBehaviour from '../behaviours/FollowBehaviour';
 import AttackCommand from '../commands/AttackCommand';
 import DropAllCommand from '../commands/DropAllCommand';
@@ -23,7 +24,6 @@ import blockMarch from '../util/blockMarch';
 import BusyLock from '../util/BusyLock';
 import { deltaYaw } from '../util/deltaYaw';
 import MineflayerBroadcastChannel from './MineflayerBroadcastChannel';
-import MineflayerIdentity from './MineflayerIdentity';
 import MineflayerMessage from './MineflayerMessage';
 import MineflayerTextChannel from './MineflayerTextChannel';
 import MineflayerWhisperChannel from './MineflayerWhisperChannel';
@@ -59,7 +59,7 @@ export default class MineflayerClient
 		return this.options.username;
 	}
 
-	get me(): Readonly<MineflayerIdentity> {
+	get me(): Readonly<MinecraftIdentity> {
 		throw new Error('Method not implemented.');
 	}
 
@@ -418,20 +418,20 @@ export default class MineflayerClient
 		return this.makeWhisperChannel(person.username);
 	}
 
-	private async makeIdentity(username: string): Promise<MineflayerIdentity>;
+	private async makeIdentity(username: string): Promise<MinecraftIdentity>;
 	private async makeIdentity(
 		player: mineflayer.Player
-	): Promise<MineflayerIdentity>;
+	): Promise<MinecraftIdentity>;
 	private async makeIdentity(
 		usernameOrPlayer: mineflayer.Player | string
-	): Promise<MineflayerIdentity> {
+	): Promise<MinecraftIdentity> {
 		const bot = this.bot;
 		if (!bot) throw new Error('Not logged in');
 
 		const mojang = new MojangApiClient();
 
 		if (typeof usernameOrPlayer === 'string')
-			return new MineflayerIdentity(
+			return new MinecraftIdentity(
 				this,
 				usernameOrPlayer,
 				(await mojang.getUuidFromUsername(usernameOrPlayer))?.id ??
@@ -439,7 +439,7 @@ export default class MineflayerClient
 				usernameOrPlayer === bot.username
 			);
 		else {
-			return new MineflayerIdentity(
+			return new MinecraftIdentity(
 				this,
 				usernameOrPlayer.username,
 				(await mojang.getUuidFromUsername(usernameOrPlayer.username))
@@ -448,7 +448,7 @@ export default class MineflayerClient
 			);
 		}
 	}
-	async getIdentityById(id: string): Promise<MineflayerIdentity | null> {
+	async getIdentityById(id: string): Promise<MinecraftIdentity | null> {
 		const bot = this.bot;
 		if (!bot) throw new Error('Not logged in');
 

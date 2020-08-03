@@ -84,7 +84,8 @@ export default class MinecraftIdentityCache extends EventEmitter<{
 	public getById(id: string) {
 		const item = this.internalGetById(id);
 		if (item === undefined) return null;
-		return new MinecraftIdentity(this.server, item.name, item.id);
+		//TODO: Replace this class with better stuff; Also the false at the end here is incorrect
+		return new MinecraftIdentity(this.server, item.name, item.id, false);
 	}
 	private internalGetByName(name: string) {
 		return this._cache.find(item => item.name === name);
@@ -92,6 +93,7 @@ export default class MinecraftIdentityCache extends EventEmitter<{
 	public getByName(name: string) {
 		const item = this.internalGetByName(name);
 		if (item === undefined) return null;
-		return new MinecraftIdentity(this.server, item.name, item.id);
+		//TODO: Replace this class with better stuff; Also the false at the end here is incorrect
+		return new MinecraftIdentity(this.server, item.name, item.id, false);
 	}
 }

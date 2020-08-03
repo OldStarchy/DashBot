@@ -1,12 +1,12 @@
 import Message from '../../../ChatServer/Message';
 import NotSupportedException from '../../../NotSupportedException';
-import MineflayerIdentity from './MineflayerIdentity';
+import MinecraftIdentity from '../../Minecraft/ChatServer/MinecraftIdentity';
 import MineflayerTextChannel from './MineflayerTextChannel';
 
 export default class MineflayerMessage implements Message {
 	constructor(
 		private _channel: MineflayerTextChannel,
-		private _author: MineflayerIdentity,
+		private _author: MinecraftIdentity,
 		private _content: string
 	) {}
 
