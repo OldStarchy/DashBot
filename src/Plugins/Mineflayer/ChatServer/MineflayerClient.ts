@@ -9,10 +9,10 @@ import Identity from '../../../ChatServer/Identity';
 import IdentityService from '../../../ChatServer/IdentityService';
 import { CommandSet } from '../../../Command';
 import { CancellableEvent, EventEmitter } from '../../../Events';
-import MojangApiClient from '../../../MojangApiClient';
 import deferred, { Deferred } from '../../../util/deferred';
 import parseArguments from '../../../util/parseArguments';
 import MinecraftIdentity from '../../Minecraft/ChatServer/MinecraftIdentity';
+import MinecraftIdentityCache from '../../Minecraft/ChatServer/MinecraftIdentityCache';
 import FollowBehaviour from '../behaviours/FollowBehaviour';
 import AttackCommand from '../commands/AttackCommand';
 import DropAllCommand from '../commands/DropAllCommand';
@@ -35,6 +35,7 @@ export interface MineflayerOptions {
 	password?: string;
 
 	identityService: IdentityService;
+	minecraftIdentityCache: MinecraftIdentityCache;
 }
 
 declare global {
@@ -52,6 +53,7 @@ export default class MineflayerClient
 	private _behaviours: Partial<MineflayerBehaviours>;
 	private _busyLock: BusyLock = new BusyLock();
 	private _mcData: MinecraftData.IndexedData | null = null;
+	private _minecraftIdentityCache: MinecraftIdentityCache;
 
 	readonly commands = new CommandSet();
 
@@ -60,7 +62,11 @@ export default class MineflayerClient
 	}
 
 	get me(): Readonly<MinecraftIdentity> {
-		throw new Error('Method not implemented.');
+		if (!this.bot)
+			throw new Error(
+				'No self identity for mineflayer when not logged in'
+			);
+		return this.makeIdentity(this.bot.player)!;
 	}
 
 	get isConnected() {
@@ -78,6 +84,7 @@ export default class MineflayerClient
 	constructor(private options: MineflayerOptions) {
 		super();
 		this._identityService = options.identityService;
+		this._minecraftIdentityCache = options.minecraftIdentityCache;
 		this._loggedIn = deferred<this>();
 
 		this._behaviours = {};
@@ -321,16 +328,18 @@ export default class MineflayerClient
 	) {
 		if (!this._loggedIn) return;
 
-		this.emit(
-			new CancellableEvent(
-				'message',
-				new MineflayerMessage(
-					this.broadcastChannel,
-					(await this.makeIdentity(username))!,
-					message
+		const identity = this.makeIdentity(username);
+		if (identity)
+			this.emit(
+				new CancellableEvent(
+					'message',
+					new MineflayerMessage(
+						this.broadcastChannel,
+						identity,
+						message
+					)
 				)
-			)
-		);
+			);
 	}
 
 	private async onWhisper(
@@ -341,17 +350,19 @@ export default class MineflayerClient
 		// _matches: string[] | null
 	) {
 		if (!this._loggedIn) return;
+		const identity = await this.makeIdentity(username);
 
-		this.emit(
-			new CancellableEvent(
-				'message',
-				new MineflayerMessage(
-					this.makeWhisperChannel(username),
-					(await this.makeIdentity(username))!,
-					message
+		if (identity)
+			this.emit(
+				new CancellableEvent(
+					'message',
+					new MineflayerMessage(
+						this.makeWhisperChannel(username),
+						identity,
+						message
+					)
 				)
-			)
-		);
+			);
 	}
 
 	public getBot() {
@@ -418,46 +429,53 @@ export default class MineflayerClient
 		return this.makeWhisperChannel(person.username);
 	}
 
-	private async makeIdentity(username: string): Promise<MinecraftIdentity>;
-	private async makeIdentity(
-		player: mineflayer.Player
-	): Promise<MinecraftIdentity>;
-	private async makeIdentity(
+	private makeIdentity(username: string): MinecraftIdentity | null;
+	private makeIdentity(player: mineflayer.Player): MinecraftIdentity | null;
+	private makeIdentity(
 		usernameOrPlayer: mineflayer.Player | string
-	): Promise<MinecraftIdentity> {
+	): MinecraftIdentity | null {
 		const bot = this.bot;
 		if (!bot) throw new Error('Not logged in');
 
-		const mojang = new MojangApiClient();
+		let player: mineflayer.Player;
+		if (typeof usernameOrPlayer === 'string') {
+			const username = usernameOrPlayer;
 
-		if (typeof usernameOrPlayer === 'string')
-			return new MinecraftIdentity(
-				this,
-				usernameOrPlayer,
-				(await mojang.getUuidFromUsername(usernameOrPlayer))?.id ??
-					usernameOrPlayer,
-				usernameOrPlayer === bot.username
-			);
-		else {
-			return new MinecraftIdentity(
-				this,
-				usernameOrPlayer.username,
-				(await mojang.getUuidFromUsername(usernameOrPlayer.username))
-					?.id ?? usernameOrPlayer.username,
-				usernameOrPlayer.username === bot.username
-			);
+			player = bot.players[username];
+		} else {
+			player = usernameOrPlayer;
 		}
+
+		if (!player) return null;
+
+		this._minecraftIdentityCache.add(player);
+
+		return new MinecraftIdentity(
+			this,
+			player,
+			player.username === bot.username
+		);
 	}
 	async getIdentityById(id: string): Promise<MinecraftIdentity | null> {
 		const bot = this.bot;
-		if (!bot) throw new Error('Not logged in');
 
-		const player = Object.values(bot.players).find(
-			player => (player as any).uuid === id
-		);
+		let player;
+		//Look for a logged in player first
+		if (bot) {
+			player = Object.values(bot.players).find(
+				player => player.uuid.replace(/-/g, '') === id
+			);
 
-		if (player) {
-			return this.makeIdentity(player);
+			if (player) {
+				const identity = this.makeIdentity(player);
+				if (identity) return identity;
+			}
+		}
+
+		//Otherwise check the cache
+		const cached = this._minecraftIdentityCache.getById(id);
+		if (cached) {
+			return new MinecraftIdentity(this, cached, false);
 		}
 
 		return null;

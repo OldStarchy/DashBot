@@ -2,6 +2,7 @@ import ChatServer from './ChatServer/ChatServer';
 import IdentityService from './ChatServer/IdentityService';
 import DashBot from './DashBot';
 import Permissions from './Permissions';
+import MinecraftIdentityCache from './Plugins/Minecraft/ChatServer/MinecraftIdentityCache';
 import StatisticsTracker from './StatisticsTracker';
 import StorageRegister from './StorageRegister';
 
@@ -24,6 +25,7 @@ export class DashBotContext {
 		public readonly permissions: Permissions,
 		public readonly config: DashBotConfig,
 		public readonly storageDir: string,
-		public readonly packageRoot: string
+		public readonly packageRoot: string,
+		public readonly minecraftIdentityCache: MinecraftIdentityCache //TODO: move to module / dependency injection
 	) {}
 }

@@ -59,5 +59,6 @@ declare global {
 		 * Configuring this allows dashbot to relay messages from a channel in discord to a Minecraft server
 		 */
 		rcon?: MinecraftRconConfig;
+		knownBotUsernames?: string[];
 	}
 }

@@ -46,7 +46,7 @@ export default class AttackCommand extends Command {
 
 		if (newLock && !newLock.cancelled) {
 			const targetIdentity = await channel.server.getIdentityById(
-				(targetPlayer as any).uuid
+				targetPlayer.uuid
 			);
 
 			channel.sendText(`Attacking ${targetIdentity?.tag ?? target}.`);

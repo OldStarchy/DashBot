@@ -21,7 +21,7 @@ export class PersistentData<TData>
 	) {
 		super();
 	}
-	setData(data: TData): void {
+	setData(data: Readonly<TData>): void {
 		this._register.setData(this._name, data);
 	}
 	clearData() {

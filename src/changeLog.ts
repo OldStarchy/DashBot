@@ -4,14 +4,23 @@ type ChangeLog = {
 		Updated?: string[];
 		Removed?: string[];
 		Fixed?: string[];
+		Migrated?: string[];
 	};
 };
 
 const changeLog: ChangeLog = {
-	patch: {
+	minor: {
+		Added: [
+			'Migration section to changelog. Check it for any extra steps involved in updating to this version.',
+		],
 		Fixed: [
 			"Start responding in Minecraft sooner (aka don't wait for a spawn event)",
 			'Fix a bunch of old commands not implementing Command.run properly',
+			'Made sure dashbot wouldn\'t talk to itself in minecraft when connected via both mineflayer and log pump (make sure to set "knownBotUsernames" config)',
+		],
+		Migrated: [
+			`Storage: 'MinecraftIdentityCache' changed. "name" => "username", "id" => "uuid". Id's are now mandatory`,
+			'Storage: All minecraft uuids need to have their dashes removed',
 		],
 	},
 	'0.7.2': {

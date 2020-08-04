@@ -125,12 +125,7 @@ export default class UpdateAnnouncerService implements Service {
 	private async printVersionDetails(
 		channel: TextChannel,
 		newVersion: string,
-		changes: {
-			Added?: string[] | undefined;
-			Updated?: string[] | undefined;
-			Removed?: string[] | undefined;
-			Fixed?: string[] | undefined;
-		}
+		changes: typeof changeLog[string]
 	) {
 		let updates = '';
 

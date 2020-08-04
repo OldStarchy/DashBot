@@ -23,6 +23,7 @@ export default class MineflayerPlugin extends DashBotPlugin {
 				username,
 				password,
 				identityService: context.identityService,
+				minecraftIdentityCache: context.minecraftIdentityCache,
 			};
 
 			return new MineflayerClient(options);

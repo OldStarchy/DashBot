@@ -15,6 +15,7 @@ export default class MinecraftGreetInteraction implements Interaction {
 		event: EventForEmitter<DashBot, 'presenceUpdate'>
 	) {
 		const { identity, joined } = event.data;
+		if (identity.isBot) return;
 
 		if (joined && identity.server instanceof MinecraftServer) {
 			await (await identity.server.getTextChannels())[0].sendText(

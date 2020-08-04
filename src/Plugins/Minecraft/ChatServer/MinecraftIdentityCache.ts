@@ -1,99 +1,115 @@
-import { Event, EventEmitter, EventForEmitter } from '../../../Events';
+import { Event, EventEmitter } from '../../../Events';
 import MojangApiClient from '../../../MojangApiClient';
 import StorageRegister, { PersistentData } from '../../../StorageRegister';
-import MinecraftIdentity from './MinecraftIdentity';
-import MinecraftServer from './MinecraftServer';
 
+export class MinecraftUser {
+	constructor(public uuid: string, public username: string) {}
+}
+
+interface MinecraftUserData {
+	username: string;
+	uuid: string;
+}
+interface MinecraftIdentityCacheDependencies {
+	storage: StorageRegister;
+	mojangApiClient: MojangApiClient;
+}
 export default class MinecraftIdentityCache extends EventEmitter<{
-	identityChanged: Record<'id' | 'name' | 'oldName', string>;
+	identityChanged: Record<'id' | 'username' | 'oldName', string>;
 }> {
-	private _cache: {
-		name: string;
-		id: string;
-	}[] = [];
-	private _store: PersistentData<MinecraftIdentityCache['_cache']>;
-	constructor(private server: MinecraftServer, storage: StorageRegister) {
+	private _store: PersistentData<MinecraftUserData[]>;
+	private _mojangApiClient: MojangApiClient;
+
+	constructor({
+		storage,
+		mojangApiClient,
+	}: MinecraftIdentityCacheDependencies) {
 		super();
-		this._store = storage.createStore('MinecraftIdentityCache');
-		this._store.on('dataLoaded', this.onDataLoaded.bind(this));
+		this._store = storage.createStore('MinecraftIdentityCache', false);
+		this._mojangApiClient = mojangApiClient;
 	}
-	private verifyCacheItem(item: MinecraftIdentityCache['_cache'][number]) {
-		const ton = typeof item.name;
-		const toi = typeof item.id;
-		return (
-			(ton === 'string' && toi === 'string') ||
-			(ton === 'string' && toi === 'undefined') ||
-			(ton === 'undefined' && toi === 'string')
-		);
-	}
-	private onDataLoaded(
-		event: EventForEmitter<MinecraftIdentityCache['_store'], 'dataLoaded'>
-	) {
-		const data = event.data;
-		if (data && typeof data == 'object' && data instanceof Array) {
-			for (const item of data) {
-				if (this.verifyCacheItem(item)) {
-					this.add(item);
-				}
-			}
-		}
-	}
-	private write() {
-		this._store.setData(this._cache);
-	}
-	public add({ name, id }: { name: string; id: string }) {
-		if (id === undefined) {
-			if (this.internalGetByName(name) === undefined) {
-				this._cache.push({ name, id });
-				this.write();
-			}
-			return;
-		}
-		const item = this.internalGetById(id);
+
+	public add({ username, uuid }: MinecraftUserData) {
+		const data = this.getData();
+
+		uuid = uuid.replace(/-/g, '');
+
+		const item = data.find(data => data.uuid === uuid);
 		if (item) {
-			if (item.name !== name) {
+			if (item.username !== username) {
 				this.emit(
 					new Event('identityChanged', {
-						id,
-						name,
-						oldName: item.name,
+						id: uuid,
+						username,
+						oldName: item.username,
 					})
 				);
 			}
-			item.name = name;
-			this.write();
-			return;
+			item.username = username;
+			this.setData(data);
+			return this.userDataToUser(item);
 		}
-		this._cache.push({ name, id });
-		this.write();
-		return;
+
+		this.setData([...data, { username, uuid }]);
+		return this.userDataToUser({ username, uuid });
 	}
 
-	public async addByName(name: string) {
-		if (this.getByName(name) === null) {
-			const mojang = new MojangApiClient();
-			const userData = await mojang.getUuidFromUsername(name);
-			if (userData) {
-				this.add(userData);
-			}
+	private getData() {
+		return this._store.getData(() => []);
+	}
+
+	private setData(data: Readonly<MinecraftUserData[]>) {
+		this._store.setData(data);
+	}
+
+	public async addByName(username: string) {
+		const id = await this.fetchIdentity(username);
+
+		if (!id) return null;
+
+		return this.add(id);
+	}
+
+	public async fetchIdentity(username: string) {
+		if (!this._mojangApiClient) return null;
+
+		const userData = await this._mojangApiClient.getUuidFromUsername(
+			username
+		);
+
+		if (userData) {
+			const { name, id } = userData;
+			return { username: name, uuid: id.replace(/-/g, '') };
 		}
+
+		return null;
 	}
-	private internalGetById(id: string) {
-		return this._cache.find(item => item.id === id);
+
+	private userDataToUser(data: MinecraftUserData) {
+		return new MinecraftUser(data.uuid, data.username);
 	}
+
 	public getById(id: string) {
-		const item = this.internalGetById(id);
-		if (item === undefined) return null;
-		//TODO: Replace this class with better stuff; Also the false at the end here is incorrect
-		return new MinecraftIdentity(this.server, item.name, item.id, false);
+		const data = this.getData();
+
+		const userData = data.find(item => item.uuid === id);
+
+		if (userData) {
+			return this.userDataToUser(userData);
+		}
+
+		return null;
 	}
-	private internalGetByName(name: string) {
-		return this._cache.find(item => item.name === name);
-	}
-	public getByName(name: string) {
-		const item = this.internalGetByName(name);
-		if (item === undefined) return null;
-		//TODO: Replace this class with better stuff; Also the false at the end here is incorrect
-		return new MinecraftIdentity(this.server, item.name, item.id, false);
+
+	public getByUsername(username: string) {
+		const data = this.getData();
+
+		const userData = data.find(item => item.username === username);
+
+		if (userData) {
+			return this.userDataToUser(userData);
+		}
+
+		return null;
 	}
 }

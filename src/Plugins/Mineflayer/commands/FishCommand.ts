@@ -2,7 +2,6 @@ import winston from 'winston';
 import Message from '../../../ChatServer/Message';
 import TextChannel from '../../../ChatServer/TextChannel';
 import Command from '../../../Command';
-import sleep from '../../../util/sleep';
 import MineflayerClient from '../ChatServer/MineflayerClient';
 import { BusyLockKey } from '../util/BusyLock';
 
@@ -70,13 +69,14 @@ export default class FishCommand extends Command {
 			this._lineIsOut = false;
 
 			if (err) {
-				winston.error(err.message, { error: err });
-				bot.chat('Failure.');
-				this.stopFishing();
-				return;
+				this.fishing = false;
+				if (err.message !== 'Fishing cancelled') {
+					winston.error(err.message, { error: err });
+					bot.chat('Failure.');
+					this.stopFishing();
+					return;
+				}
 			}
-
-			await sleep(500);
 
 			// const { player, entity } = await new Promise((s, f) => {
 			// 	bot.once(

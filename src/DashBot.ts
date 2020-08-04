@@ -138,6 +138,7 @@ export default class DashBot extends EventEmitter<DashBotEvents> {
 	}
 
 	async runCommand(message: Message, commandName: string, ...args: string[]) {
+		//TODO: Check that command exists before firing event
 		const event = this.emit(
 			new Event('beforeRunCommand', {
 				message,

@@ -6,11 +6,13 @@ import MinecraftPumpLogClient from '../LogClient/MinecraftPumpLogClient';
 import MinecraftTailLogClient from '../LogClient/MinecraftTailLogClient';
 import RconClient from '../Rcon/RconClient';
 import RconSocket from '../Rcon/RconSocket';
+import MinecraftIdentityCache from './MinecraftIdentityCache';
 import MinecraftServer from './MinecraftServer';
 
 interface MinecraftServerFactoryContext {
 	storage: StorageRegister;
 	identityService: IdentityService;
+	minecraftIdentityCache: MinecraftIdentityCache;
 	config: DashBotConfig;
 	storageDir: string;
 	packageRoot: string;
@@ -21,12 +23,12 @@ export default class MinecraftServerFactory {
 		serverConfig: MinecraftServerConfig,
 		context: MinecraftServerFactoryContext
 	): MinecraftServer {
-		const id = serverConfig.id;
+		const { id, knownBotUsernames } = serverConfig;
 
 		const {
-			storage,
 			identityService,
 			config: { botName },
+			minecraftIdentityCache,
 		} = context;
 
 		const logClient = this.makeLogClient(serverConfig, context);
@@ -40,9 +42,10 @@ export default class MinecraftServerFactory {
 			id: id ?? 'Minecraft',
 			logClient,
 			rcon,
-			storage,
+			minecraftIdentityCache,
 			identityService,
 			botName: botName!,
+			knownBotUsernames: knownBotUsernames ?? [],
 		});
 	}
 

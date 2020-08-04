@@ -8,7 +8,9 @@ import IdentityService from './ChatServer/IdentityService';
 import DashBot from './DashBot';
 import DashBotPlugin, { DashBotContext } from './DashBotPlugin';
 import loadConfig from './loadConfig';
+import MojangApiClient from './MojangApiClient';
 import Permissions from './Permissions';
+import MinecraftIdentityCache from './Plugins/Minecraft/ChatServer/MinecraftIdentityCache';
 import handleCli from './Startup/handleCli';
 import registerAllComponents from './Startup/registerAllComponents';
 import StatisticsTracker from './StatisticsTracker';
@@ -76,6 +78,10 @@ const storage = new StorageRegister(storageFile, true);
 const identityService = new IdentityService(storage);
 const statistics = new StatisticsTracker();
 const permissions = new Permissions(storage);
+const minecraftIdentityCache = new MinecraftIdentityCache({
+	storage,
+	mojangApiClient: new MojangApiClient(),
+});
 
 const context = new DashBotContext(
 	bot,
@@ -85,7 +91,8 @@ const context = new DashBotContext(
 	permissions,
 	config,
 	storageDir,
-	packageRoot
+	packageRoot,
+	minecraftIdentityCache
 );
 
 // TODO: Move to config, allow multiple plugin locations (builtin + custom)

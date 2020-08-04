@@ -1,7 +1,6 @@
 import ChatServer, { ChatServerEvents } from '../../../ChatServer/ChatServer';
 import IdentityService from '../../../ChatServer/IdentityService';
 import { CancellableEvent, EventEmitter } from '../../../Events';
-import StorageRegister from '../../../StorageRegister';
 import MinecraftLogClient from '../LogClient/MinecraftLogClient';
 import DeathMessage from '../LogClient/PlayerDeathMessage';
 import RconClient from '../Rcon/RconClient';
@@ -17,9 +16,10 @@ export interface MinecraftServerOptions {
 	id: string;
 	logClient: MinecraftLogClient;
 	rcon: RconClient | null;
-	storage: StorageRegister;
 	identityService: IdentityService;
 	botName: string;
+	minecraftIdentityCache: MinecraftIdentityCache;
+	knownBotUsernames: string[];
 }
 
 interface MinecraftServerEvents extends ChatServerEvents {
@@ -38,6 +38,7 @@ export default class MinecraftServer extends EventEmitter<MinecraftServerEvents>
 	private _logReader: MinecraftLogClient;
 	private _rcon: RconClient | null;
 	private _identityService: IdentityService;
+	private _knownBotUsernames: string[];
 
 	constructor(options: MinecraftServerOptions) {
 		super();
@@ -46,40 +47,50 @@ export default class MinecraftServer extends EventEmitter<MinecraftServerEvents>
 			logClient: this._logReader,
 			rcon: this._rcon,
 			identityService: this._identityService,
+			minecraftIdentityCache: this._identityCache,
+			knownBotUsernames: this._knownBotUsernames,
 		} = options);
 
-		const { storage, botName } = options;
+		const { botName } = options;
 
 		this._textChannel = new MinecraftTextChannel(this, this._rcon);
-		this._identityCache = new MinecraftIdentityCache(this, storage);
-		this.me = new MinecraftIdentity(this, botName, '', true);
+
+		this.me = new MinecraftIdentity(
+			this,
+			{ username: botName, uuid: 'bot-' + botName },
+			true
+		);
 
 		this._logReader.on('chatMessage', async event => {
 			const chatMessage = event.data;
-			await this._identityCache.addByName(chatMessage.author);
-
-			this.emit(
-				new CancellableEvent(
-					'message',
-					new MinecraftMessage(
-						this._textChannel,
-						this._identityCache.getByName(chatMessage.author)!,
-						chatMessage.message
-					)
-				)
+			const identity = await this.getIdentityFromUsername(
+				chatMessage.author
 			);
+
+			if (identity)
+				this.emit(
+					new CancellableEvent(
+						'message',
+						new MinecraftMessage(
+							this._textChannel,
+							identity,
+							chatMessage.message
+						)
+					)
+				);
 		});
 
 		this._logReader.on('logInOutMessage', async event => {
 			const message = event.data;
-			await this._identityCache.addByName(message.who);
+			const identity = await this.getIdentityFromUsername(message.who);
 
-			this.emit(
-				new CancellableEvent('presenceUpdate', {
-					identity: this._identityCache.getByName(message.who)!,
-					joined: message.event === 'joined',
-				})
-			);
+			if (identity)
+				this.emit(
+					new CancellableEvent('presenceUpdate', {
+						identity,
+						joined: message.event === 'joined',
+					})
+				);
 		});
 
 		this._logReader.on('deathMessage', async event => {
@@ -87,15 +98,28 @@ export default class MinecraftServer extends EventEmitter<MinecraftServerEvents>
 
 			if (!message.player) return; //Intentional game design
 
-			await this._identityCache.addByName(message.player!);
-
-			this.emit(
-				new CancellableEvent('game.death', {
-					message: message,
-					server: this,
-				})
+			const identity = await this._identityCache.addByName(
+				message.player!
 			);
+
+			if (identity)
+				this.emit(
+					new CancellableEvent('game.death', {
+						message: message,
+						server: this,
+					})
+				);
 		});
+	}
+
+	private async getIdentityFromUsername(username: string) {
+		const userData = await this._identityCache.addByName(username);
+		if (!userData) return null;
+		return new MinecraftIdentity(
+			this,
+			userData,
+			this._knownBotUsernames.includes(username)
+		);
 	}
 
 	async getTextChannels() {
@@ -144,7 +168,9 @@ export default class MinecraftServer extends EventEmitter<MinecraftServerEvents>
 	}
 
 	async getIdentityById(id: string) {
-		return this._identityCache.getById(id);
+		const userData = this._identityCache.getById(id);
+		if (userData) return new MinecraftIdentity(this, userData, false);
+		return null;
 	}
 
 	getIdentityService() {
