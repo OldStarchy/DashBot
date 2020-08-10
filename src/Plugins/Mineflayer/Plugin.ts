@@ -15,6 +15,7 @@ export default class MineflayerPlugin extends DashBotPlugin {
 				port,
 				username,
 				password,
+				id = 'mineflayer',
 			} = config as MineflayerConfig;
 
 			const options: MineflayerOptions = {
@@ -23,6 +24,7 @@ export default class MineflayerPlugin extends DashBotPlugin {
 				username,
 				password,
 				identityService: context.identityService,
+				id,
 			};
 
 			return new MineflayerClient(options);

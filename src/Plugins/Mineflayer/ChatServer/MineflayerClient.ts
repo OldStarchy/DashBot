@@ -33,7 +33,9 @@ export interface MineflayerOptions {
 	port: number;
 	username: string;
 	password?: string;
+	debug?: boolean;
 
+	id: string;
 	identityService: IdentityService;
 }
 
@@ -55,9 +57,7 @@ export default class MineflayerClient
 
 	readonly commands = new CommandSet();
 
-	get id() {
-		return this.options.username;
-	}
+	readonly id: string;
 
 	get me(): Readonly<MineflayerIdentity> {
 		throw new Error('Method not implemented.');
@@ -68,6 +68,7 @@ export default class MineflayerClient
 	}
 
 	private bot: mineflayer.Bot | null = null;
+	private _debug: boolean;
 
 	private boundOnLogin = this.onLogin.bind(this);
 	private boundOnKicked = this.onKicked.bind(this);
@@ -79,6 +80,8 @@ export default class MineflayerClient
 		super();
 		this._identityService = options.identityService;
 		this._loggedIn = deferred<this>();
+		this._debug = options.debug ?? false;
+		this.id = options.id;
 
 		this._behaviours = {};
 
@@ -244,6 +247,8 @@ export default class MineflayerClient
 			username: this.options.username,
 			password: this.options.password,
 		});
+		// eslint-disable-next-line @typescript-eslint/no-var-requires
+		require('debug')('minecraft-protocol').enabled = true;
 
 		this.awaitConnected().then(() => {
 			const USERNAME_REGEX = '(?:\\(.+\\)|\\[.+\\]|.)*?(\\w+)';
