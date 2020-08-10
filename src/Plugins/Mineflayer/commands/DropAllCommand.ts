@@ -14,7 +14,7 @@ export default class DropAllCommand extends Command {
 		super();
 	}
 
-	async run(message: Message, ...args: string[]): Promise<void> {
+	async run(message: Message): Promise<void> {
 		const bot = this.client.getBot()!;
 		if (!bot) return;
 
@@ -23,12 +23,6 @@ export default class DropAllCommand extends Command {
 		if (this.client.isBusy(priority)) {
 			channel.sendText("I'm too busy");
 			return;
-		}
-
-		const arg = args.shift();
-
-		if (arg !== 'all') {
-			channel.sendText('Only "drop all" is supported.');
 		}
 
 		const items = bot.inventory.items();
