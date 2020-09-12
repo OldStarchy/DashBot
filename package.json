@@ -27,7 +27,7 @@
     "haiku-random": "^1.0.0",
     "luxon": "^1.24.1",
     "mineflayer": "^2.23.0",
-    "node-fetch": "^2.6.0",
+    "node-fetch": "^2.6.1",
     "tail": "^2.0.3",
     "throttle-debounce": "^2.2.1",
     "typed-emitter": "^1.2.0",
