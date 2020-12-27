@@ -8,7 +8,10 @@ type ChangeLog = {
 };
 
 const changeLog: ChangeLog = {
-	patch: {
+	'0.8.0': {
+		Updated: [
+			'Updated a bunch of dependencies',
+		],
 		Fixed: [
 			"Start responding in Minecraft sooner (aka don't wait for a spawn event)",
 			'Fix a bunch of old commands not implementing Command.run properly',
