@@ -1,10 +1,10 @@
 /**
  * Eg. `this._options = shallowMerge(defaults, options);`
  */
-export default function shallowMerge<A extends {}, B extends {}>(
-	a: A,
-	b: B
-): A & B {
+export default function shallowMerge<
+	A extends Record<string, unknown>,
+	B extends Record<string, unknown>
+>(a: A, b: B): A & B {
 	const r = {};
 
 	for (const key in a) {

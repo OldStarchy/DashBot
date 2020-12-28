@@ -301,18 +301,21 @@ interface Question {
 	question: string;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 interface OpenQuestion extends Question {
 	type: 'open';
 	answerRegex: RegExp;
 	answer: string;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 interface MultipleChoiceQuestion extends Question {
 	type: 'multiple-choice';
 	options: [string, string, string, string];
 	answer: 0 | 1 | 2 | 3;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 interface YesNoQuestion extends Question {
 	type: 'yes-no';
 	answer: boolean;

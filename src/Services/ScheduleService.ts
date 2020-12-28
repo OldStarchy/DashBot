@@ -175,7 +175,7 @@ export default class ScheduleService
 		if (any) this._store.setData({ events });
 	}
 
-	queueEvent<T>(
+	queueEvent(
 		timestamp: number,
 		event: Event<string, unknown>,
 		owner: string

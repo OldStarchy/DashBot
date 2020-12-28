@@ -23,5 +23,5 @@ export default abstract class MineflayerTextChannel implements TextChannel {
 		return false;
 	}
 
-	abstract async sendText(message: string): Promise<void>;
+	abstract sendText(message: string): Promise<void>;
 }

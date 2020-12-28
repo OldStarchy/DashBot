@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 
-export default class Storage<T extends {}> {
+export default class Storage<T extends unknown> {
 	public static rootDir = '.';
 
 	constructor(public readonly file: string, private readonly _def: () => T) {

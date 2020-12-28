@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import selectRandom from '../util/selectRandom';
 import DefaultModifiersEn from './default/modifiers-en';
 
@@ -101,6 +102,7 @@ export default class Tracery<T extends Grammar = Grammar> {
 	}
 }
 
+// eslint-disable-next-line @typescript-eslint/ban-types
 type CompiledDefinition = (() => string) | object;
 class Rule {
 	private readonly _compiledDefinition: CompiledDefinition;
@@ -113,9 +115,7 @@ class Rule {
 		this._compiledDefinition = this.compileDefinition(definition);
 	}
 
-	private compileDefinition(
-		definition: RuleDefinition
-	): (() => string) | object {
+	private compileDefinition(definition: RuleDefinition): CompiledDefinition {
 		switch (typeof definition) {
 			case 'string':
 				const compiledString = this.parse(definition);
@@ -277,7 +277,7 @@ class Rule {
 	private reduceObject(
 		obj: Record<string, unknown>,
 		modifiers: string[]
-	): [string | number | Function, string[]] {
+	): [string | number | (() => unknown), string[]] {
 		if (modifiers.length === 0) {
 			throw new Error('Object could not be reduced to string or number');
 		}
@@ -341,7 +341,7 @@ class Rule {
 	}
 
 	private reduce(
-		definition: string | number | Function | object,
+		definition: string | number | (() => unknown) | object,
 		modifiers: string[]
 	): string {
 		switch (typeof definition) {

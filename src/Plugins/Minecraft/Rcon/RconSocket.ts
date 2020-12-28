@@ -81,7 +81,7 @@ export default class RconSocket {
 	}
 
 	connect() {
-		return new Promise((resolve, reject) => {
+		return new Promise<void>((resolve, reject) => {
 			if (this.hasAuthed)
 				return reject(new RconError('Instance is already authed'));
 
