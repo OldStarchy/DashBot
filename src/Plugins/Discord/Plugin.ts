@@ -5,7 +5,7 @@ import DiscordServerFactory from './ChatServer/DiscordServerFactory';
 export default class DiscordPlugin extends DashBotPlugin {
 	public readonly name = 'Discord Plugin';
 	register(context: DashBotContext) {
-		context.chatServerFactories['discord'] = serverConfig => {
+		context.chatServerFactories['discord'] = (serverConfig) => {
 			return new DiscordServerFactory().make(
 				serverConfig as DiscordServerConfig,
 				context

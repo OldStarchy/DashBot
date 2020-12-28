@@ -26,8 +26,8 @@ export default class Permissions {
 	public isAdmin(person: Person) {
 		const ids = Object.values(person.getIds());
 
-		return ids.some(id =>
-			this.getData().admins.some(admin => admin === id)
+		return ids.some((id) =>
+			this.getData().admins.some((admin) => admin === id)
 		);
 	}
 
@@ -38,7 +38,7 @@ export default class Permissions {
 
 		let changed = false;
 
-		Object.values(ids).forEach(id => {
+		Object.values(ids).forEach((id) => {
 			if (!admins.includes(id)) {
 				admins.push(id);
 				changed = true;
@@ -59,8 +59,8 @@ export default class Permissions {
 
 		let changed = false;
 
-		Object.values(ids).forEach(id => {
-			const index = admins.findIndex(admin => admin === id);
+		Object.values(ids).forEach((id) => {
+			const index = admins.findIndex((admin) => admin === id);
 			if (index >= 0) {
 				admins.splice(index, 1);
 				changed = true;

@@ -14,7 +14,7 @@ export default class LogoutCommand extends Command {
 	}
 
 	async run(message: Message, serverId?: string) {
-		const servers = this.bot.servers.filter(server => server.isConnected);
+		const servers = this.bot.servers.filter((server) => server.isConnected);
 
 		if (servers.length === 1) {
 			await message.channel.sendText(
@@ -28,7 +28,7 @@ export default class LogoutCommand extends Command {
 			server = message.channel.server;
 		} else {
 			server =
-				servers.filter(server => server.id === serverId).shift() ??
+				servers.filter((server) => server.id === serverId).shift() ??
 				null;
 
 			if (!server) {

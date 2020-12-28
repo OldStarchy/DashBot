@@ -28,7 +28,7 @@ export default class IdCommand extends Command {
 			formatTable([
 				['Server ID', 'User ID', 'Role'],
 				'=',
-				...Object.keys(ids).map(id => [
+				...Object.keys(ids).map((id) => [
 					id,
 					ids[id],
 					this.permissions.isAdmin(person) ? 'Admin' : '',

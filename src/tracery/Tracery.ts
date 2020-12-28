@@ -45,7 +45,7 @@ export default class Tracery<T extends Grammar = Grammar> {
 	}
 
 	static escape(str: string) {
-		return str.replace(/([#\[])/g, match => `\\${match}`);
+		return str.replace(/([#\[])/g, (match) => `\\${match}`);
 	}
 
 	generate(entry: keyof T & string): string {
@@ -119,7 +119,7 @@ class Rule {
 		switch (typeof definition) {
 			case 'string':
 				const compiledString = this.parse(definition);
-				return () => compiledString.map(part => part()).join('');
+				return () => compiledString.map((part) => part()).join('');
 			case 'number':
 				const compiledNumber = definition.toString();
 				return () => compiledNumber;
@@ -138,7 +138,7 @@ class Rule {
 			case 'object':
 				if (definition instanceof Array) {
 					const compiledArrayDefinitions = definition.map(
-						subDefinition => this.compileDefinition(subDefinition)
+						(subDefinition) => this.compileDefinition(subDefinition)
 					);
 
 					return () => {

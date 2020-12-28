@@ -21,7 +21,7 @@ export default class StatisticsCommand extends Command {
 
 		const r: (string[] | '-' | '=')[] = [['Name', 'Statistic'], '='];
 
-		stats.forEach(stat => {
+		stats.forEach((stat) => {
 			r.push([stat.name, stat.statistic.toString()]);
 		});
 

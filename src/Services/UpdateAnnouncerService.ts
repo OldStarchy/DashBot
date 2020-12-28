@@ -143,12 +143,12 @@ export default class UpdateAnnouncerService implements Service {
 				'new-version'
 			)
 		);
-		(Object.keys(changes) as (keyof typeof changes)[]).forEach(header => {
+		(Object.keys(changes) as (keyof typeof changes)[]).forEach((header) => {
 			if (changes[header]!.length > 0) {
 				updates +=
 					[
 						header + ':',
-						...changes[header]!.map(change => ' * ' + change),
+						...changes[header]!.map((change) => ' * ' + change),
 					].join('\n') + '\n';
 			}
 		});

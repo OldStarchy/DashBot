@@ -64,7 +64,7 @@ export default class FishCommand extends Command {
 		this.fishing = true;
 		while (this.fishing) {
 			this._lineIsOut = true;
-			const err = await new Promise<Error | undefined>(s => {
+			const err = await new Promise<Error | undefined>((s) => {
 				bot.fish(s);
 			});
 			this._lineIsOut = false;
@@ -103,7 +103,7 @@ export default class FishCommand extends Command {
 		if (!bot) return;
 		const mcData = this.client.getMcData()!;
 		const fishingRod = mcData.itemsByName['fishing_rod'].id;
-		const err = await new Promise<Error | undefined>(s => {
+		const err = await new Promise<Error | undefined>((s) => {
 			(bot as any).equip(fishingRod, 'hand', s);
 		});
 

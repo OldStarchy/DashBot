@@ -18,7 +18,7 @@ export default class StatisticsTracker {
 		const statistics: Statistic[] = [];
 
 		await Promise.all(
-			this._providers.map(async p =>
+			this._providers.map(async (p) =>
 				statistics.push(...(await p.getStatistics()))
 			)
 		);

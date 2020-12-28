@@ -28,12 +28,12 @@ export default class IdentityService {
 			return;
 		}
 
-		this._people = data.map(id => ({ identities: { ...id.identities } }));
+		this._people = data.map((id) => ({ identities: { ...id.identities } }));
 	}
 
 	async getById(serverId: string, id: string) {
 		const person = this._people.find(
-			person => person.identities[serverId] === id
+			(person) => person.identities[serverId] === id
 		);
 
 		const identities: Record<string, Identity> = {};
@@ -41,7 +41,7 @@ export default class IdentityService {
 		if (person) {
 			for (const serverId of Object.keys(person.identities)) {
 				const identity = await this._servers
-					.find(server => server.id == serverId)
+					.find((server) => server.id == serverId)
 					?.getIdentityById(person.identities[serverId]);
 
 				if (identity) {
@@ -52,7 +52,7 @@ export default class IdentityService {
 			return new Person(identities);
 		}
 
-		const server = this._servers.find(server => server.id === serverId);
+		const server = this._servers.find((server) => server.id === serverId);
 
 		if (server) {
 			const identity = await server.getIdentityById(id);
@@ -79,6 +79,6 @@ export default class IdentityService {
 	}
 
 	getServer(id: string) {
-		return this._servers.find(server => server.id === id) || null;
+		return this._servers.find((server) => server.id === id) || null;
 	}
 }

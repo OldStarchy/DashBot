@@ -95,7 +95,7 @@ export default class MineflayerClient
 		this.commands.add(new StopCommand(this));
 		this.commands.add(new StopPleaseCommand(this));
 
-		this.on('message', async e => {
+		this.on('message', async (e) => {
 			const message = e.data;
 			if (message.author.isBot) return;
 			const textContent = message.textContent;
@@ -187,7 +187,7 @@ export default class MineflayerClient
 		blockMarch(
 			myPos.offset(0, 1.26, 0),
 			pos.offset(0, 1.26, 0),
-			blockPos => {
+			(blockPos) => {
 				const block = bot.blockAt(blockPos);
 				if (block && block.boundingBox !== 'empty') {
 					blocked = true;
@@ -206,7 +206,7 @@ export default class MineflayerClient
 
 		const hitChance = 1.5 / distance;
 
-		await new Promise<boolean>(s => {
+		await new Promise<boolean>((s) => {
 			bot.lookAt(
 				new Vec3(pos.x, pos.y + target.height, pos.z),
 				false,
@@ -384,8 +384,8 @@ export default class MineflayerClient
 		const players = this.bot.players;
 		const privateChats = Object.keys(players)
 			.sort()
-			.filter(username => username !== this.bot!.username)
-			.map(username => this.makeWhisperChannel(username));
+			.filter((username) => username !== this.bot!.username)
+			.map((username) => this.makeWhisperChannel(username));
 
 		return [this.broadcastChannel, ...privateChats];
 	}
@@ -453,7 +453,7 @@ export default class MineflayerClient
 		if (!bot) throw new Error('Not logged in');
 
 		const player = Object.values(bot.players).find(
-			player => (player as any).uuid === id
+			(player) => (player as any).uuid === id
 		);
 
 		if (player) {

@@ -13,7 +13,9 @@ export default class LoginCommand extends Command {
 	}
 
 	async run(message: Message, serverId?: string) {
-		const servers = this.bot.servers.filter(server => !server.isConnected);
+		const servers = this.bot.servers.filter(
+			(server) => !server.isConnected
+		);
 		if (servers.length === 0) {
 			await message.channel.sendText('No servers to login to.');
 			return;
@@ -29,7 +31,7 @@ export default class LoginCommand extends Command {
 			server = servers[0];
 		} else {
 			server =
-				servers.filter(server => server.id === serverId).shift() ??
+				servers.filter((server) => server.id === serverId).shift() ??
 				null;
 
 			if (!server) {

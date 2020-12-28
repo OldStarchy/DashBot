@@ -51,7 +51,7 @@ const makePotion = (
 				? (items as Items[][])
 				: [items as Items[]]
 			: [[items]]
-		).map(recipe => [Items.NetherWart, ...recipe]),
+		).map((recipe) => [Items.NetherWart, ...recipe]),
 		canExtend,
 		canEnhance,
 	});
@@ -127,9 +127,9 @@ const potionToExplanation = (potion: Potion): RichText => {
 
 const stripRichContent = (content: RichText) =>
 	(content instanceof Array ? content : [content])
-		.map(part => (typeof part === 'string' ? part : part.text))
-		.filter(part => part)
-		.map(part => part!.toString())
+		.map((part) => (typeof part === 'string' ? part : part.text))
+		.filter((part) => part)
+		.map((part) => part!.toString())
 		.join('');
 
 export default class BrewingCommand extends Command {
@@ -149,7 +149,7 @@ export default class BrewingCommand extends Command {
 			const search = args.join(' ');
 
 			//TODO: Fuzzy text search
-			const potion = potions.find(p => p.name === search);
+			const potion = potions.find((p) => p.name === search);
 
 			if (!potion) {
 				await channel.sendText(`No potion named \"${search}\".`);

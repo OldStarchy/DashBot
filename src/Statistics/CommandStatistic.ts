@@ -46,7 +46,7 @@ export default class CommandStatistic implements StatisticProvider {
 
 	async getStatistics() {
 		const data = this.getData();
-		const statistics: Statistic[] = Object.keys(data).map(name => ({
+		const statistics: Statistic[] = Object.keys(data).map((name) => ({
 			name: `"${name}" command invocations`,
 			statistic: data[name].toString(),
 		}));

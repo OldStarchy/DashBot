@@ -54,8 +54,8 @@ export default class MinecraftPumpLogClient extends MinecraftLogClient {
 				const messages = body.split(/[\n\r]+/g);
 
 				messages
-					.filter(line => line !== '')
-					.forEach(line => this.onLineReceived(line));
+					.filter((line) => line !== '')
+					.forEach((line) => this.onLineReceived(line));
 				res.statusCode == 201;
 				res.end();
 			}

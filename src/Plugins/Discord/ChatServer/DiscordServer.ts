@@ -22,7 +22,8 @@ export interface DiscordServerOptions {
 
 type DiscordServerEvents = ChatServerEvents;
 
-export default class DiscordServer extends EventEmitter<DiscordServerEvents>
+export default class DiscordServer
+	extends EventEmitter<DiscordServerEvents>
 	implements ChatServer<DiscordIdentity, DiscordTextChannel> {
 	private _channelCache: Record<string, DiscordTextChannel> = {};
 	private _loggedIn = deferred<this>();
@@ -47,7 +48,7 @@ export default class DiscordServer extends EventEmitter<DiscordServerEvents>
 			winston.info('Logged in to discord');
 		});
 
-		this._discordClient.on('message', message =>
+		this._discordClient.on('message', (message) =>
 			this.emit(
 				new CancellableEvent(
 					'message',
@@ -110,12 +111,12 @@ export default class DiscordServer extends EventEmitter<DiscordServerEvents>
 	async getTextChannels(): Promise<DiscordTextChannel[]> {
 		return this._discordClient.channels.cache
 			.filter(
-				channel =>
+				(channel) =>
 					channel instanceof Discord.TextChannel ||
 					channel instanceof Discord.DMChannel ||
 					channel instanceof Discord.NewsChannel
 			)
-			.map(channel => this.getChannel(channel as TDiscordTextChannel));
+			.map((channel) => this.getChannel(channel as TDiscordTextChannel));
 	}
 
 	async getTextChannel(id: string) {

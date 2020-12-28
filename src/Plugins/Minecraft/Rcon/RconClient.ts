@@ -107,7 +107,9 @@ export default class RconClient {
 		const match = regex.exec(response);
 
 		if (null !== match) {
-			return match.groups!.playerList.split(',').map(name => name.trim());
+			return match
+				.groups!.playerList.split(',')
+				.map((name) => name.trim());
 		}
 
 		return null;

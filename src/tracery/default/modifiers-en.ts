@@ -2,14 +2,14 @@ import { Modifier } from '../Tracery';
 import { Collection, escapeRegExp, isAlphaNum, isVowel } from '../Util';
 
 const DefaultModifiersEn: Collection<Modifier> = {
-	replace: function(s, params) {
+	replace: function (s, params) {
 		//http://stackoverflow.com/questions/1144783/replacing-all-occurrences-of-a-string-in-javascript
 		if (!params || params.length < 2) throw 'Missing regex in modifier';
 
 		return s.replace(new RegExp(escapeRegExp(params[0]), 'g'), params[1]);
 	},
 
-	capitalizeAll: function(s) {
+	capitalizeAll: function (s) {
 		let s2 = '';
 		let capNext = true;
 		for (let i = 0; i < s.length; i++) {
@@ -28,11 +28,11 @@ const DefaultModifiersEn: Collection<Modifier> = {
 		return s2;
 	},
 
-	capitalize: function(s) {
+	capitalize: function (s) {
 		return s.charAt(0).toUpperCase() + s.substring(1);
 	},
 
-	a: function(s) {
+	a: function (s) {
 		if (s.length > 0) {
 			if (s.charAt(0).toLowerCase() === 'u') {
 				if (s.length > 2) {
@@ -48,7 +48,7 @@ const DefaultModifiersEn: Collection<Modifier> = {
 		return 'a ' + s;
 	},
 
-	firstS: function(s) {
+	firstS: function (s) {
 		const s2 = s.split(' ');
 
 		const finished =
@@ -56,7 +56,7 @@ const DefaultModifiersEn: Collection<Modifier> = {
 		return finished;
 	},
 
-	s: function(s) {
+	s: function (s) {
 		switch (s.charAt(s.length - 1)) {
 			case 's':
 				return s + 'es';
@@ -73,7 +73,7 @@ const DefaultModifiersEn: Collection<Modifier> = {
 		}
 	},
 
-	ed: function(s) {
+	ed: function (s) {
 		switch (s.charAt(s.length - 1)) {
 			case 's':
 				return s + 'ed';
@@ -92,7 +92,7 @@ const DefaultModifiersEn: Collection<Modifier> = {
 		}
 	},
 
-	possessive: function(s) {
+	possessive: function (s) {
 		switch (s) {
 			case 'he':
 				return 'his';

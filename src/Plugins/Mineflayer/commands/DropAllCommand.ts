@@ -34,7 +34,7 @@ export default class DropAllCommand extends Command {
 		const items = bot.inventory.items();
 
 		for (const item of items) {
-			const err = await new Promise<Error | undefined>(s =>
+			const err = await new Promise<Error | undefined>((s) =>
 				bot.tossStack(item, s)
 			);
 			if (err) {

@@ -45,7 +45,7 @@ export default class MojangApiClient {
 		const queryString = query
 			? Object.keys(query)
 					.map(
-						key =>
+						(key) =>
 							encodeURIComponent(key) +
 							'=' +
 							encodeURIComponent(query[key])

@@ -45,11 +45,11 @@ export default class DashBot extends EventEmitter<DashBotEvents> {
 
 		// TODO: Make this better
 		chatServer.on('message', this.onMessage.bind(this));
-		chatServer.on('presenceUpdate', e => {
+		chatServer.on('presenceUpdate', (e) => {
 			this.emit(e);
 		});
 		if (chatServer instanceof MinecraftServer)
-			chatServer.on('game.death', e => {
+			chatServer.on('game.death', (e) => {
 				this.emit(e);
 			});
 	}
@@ -58,11 +58,13 @@ export default class DashBot extends EventEmitter<DashBotEvents> {
 		const serversToConnectTo =
 			serverIds === undefined
 				? this.servers
-				: this.servers.filter(server => serverIds.includes(server.id));
+				: this.servers.filter((server) =>
+						serverIds.includes(server.id)
+				  );
 
 		let connections = 0;
 		await Promise.all(
-			serversToConnectTo.map(async server => {
+			serversToConnectTo.map(async (server) => {
 				try {
 					await server.connect();
 					connections++;
@@ -87,7 +89,7 @@ export default class DashBot extends EventEmitter<DashBotEvents> {
 
 	public async disconnect() {
 		await Promise.all(
-			this.servers.map(async server => {
+			this.servers.map(async (server) => {
 				try {
 					await server.disconnect();
 					this._stopTime = Date.now();

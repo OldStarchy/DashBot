@@ -23,7 +23,7 @@ export default class MinecraftTailLogClient extends MinecraftLogClient {
 				follow: true,
 			});
 
-			this._tail.on('line', line => {
+			this._tail.on('line', (line) => {
 				this.onLineReceived(line);
 			});
 		}

@@ -31,9 +31,7 @@ export default class PetCommand extends Command implements StatisticProvider {
 	}
 
 	private static getDateKey() {
-		return DateTime.utc()
-			.setZone('Australia/Adelaide')
-			.toISODate();
+		return DateTime.utc().setZone('Australia/Adelaide').toISODate();
 	}
 
 	async getStatistics() {

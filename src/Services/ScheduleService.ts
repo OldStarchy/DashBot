@@ -45,7 +45,8 @@ interface ScheduleServiceData {
 		owner: string;
 	}[];
 }
-export default class ScheduleService extends EventEmitter<ScheduleServiceEvents>
+export default class ScheduleService
+	extends EventEmitter<ScheduleServiceEvents>
 	implements Service {
 	private _interval: number;
 	private _intervalId: NodeJS.Timeout | null = null;
@@ -144,7 +145,7 @@ export default class ScheduleService extends EventEmitter<ScheduleServiceEvents>
 		dashBot.commands.add(this._remindCommand);
 		this.start();
 
-		this.on('reminder', async e => {
+		this.on('reminder', async (e) => {
 			const { reminder, serverId, channelId } = e.data;
 			const channel = await this._identityService
 				.getServer(serverId)
@@ -182,12 +183,12 @@ export default class ScheduleService extends EventEmitter<ScheduleServiceEvents>
 		const events = this._store.getData()?.events || [];
 
 		if (this._maxTimersPerPerson > 0) {
-			const existing = events.filter(e => e.owner === owner).length;
+			const existing = events.filter((e) => e.owner === owner).length;
 			if (existing > this._maxTimersPerPerson) {
 				return false;
 			}
 		}
-		const index = events.findIndex(e => e.timestamp > timestamp);
+		const index = events.findIndex((e) => e.timestamp > timestamp);
 		if (index === -1) events.push({ timestamp, event, owner });
 		else {
 			events.splice(index, 0, { timestamp, event, owner });

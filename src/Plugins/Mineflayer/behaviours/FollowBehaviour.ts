@@ -53,9 +53,7 @@ declare global {
 	}
 }
 
-export default class FollowBehaviour extends EventEmitter<
-	FollowBehaviourEvents
-> {
+export default class FollowBehaviour extends EventEmitter<FollowBehaviourEvents> {
 	private _opts: RequiredFollowOptions;
 
 	private tickInterval: NodeJS.Timeout | null = null;

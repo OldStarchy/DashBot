@@ -159,7 +159,7 @@ export class QuizGameService implements Interaction {
 		//Check if cancelled with NO_ENTRY
 		const noEntryReactionCount = (
 			await dm.reactions.resolve(Emoji.NO_ENTRY)!.users.fetch()
-		).reduce(a => a++, 0);
+		).reduce((a) => a++, 0);
 
 		if (noEntryReactionCount > 1) {
 			await this.endGame(channel, 'Ok no quiz for you');
@@ -175,25 +175,26 @@ export class QuizGameService implements Interaction {
 				users.push(user);
 				return users;
 			}, [] as User[])
-			.filter(user => !user.bot);
+			.filter((user) => !user.bot);
 
 		gameState.players = (
 			await Promise.all(
 				players.map(
-					async user => await channel.server.getIdentityById(user.id)
+					async (user) =>
+						await channel.server.getIdentityById(user.id)
 				)
 			)
-		).filter(id => id !== null) as Identity[];
+		).filter((id) => id !== null) as Identity[];
 
 		if (gameState.players.length === 0) {
 			return await this.endGame(channel, 'No players!');
 		}
 
 		await channel.sendText(
-			`OK, ${gameState.players.map(p => p.tag).join(', ')}. Lets play!`
+			`OK, ${gameState.players.map((p) => p.tag).join(', ')}. Lets play!`
 		);
 
-		gameState.players.forEach(p => {
+		gameState.players.forEach((p) => {
 			gameState.scores[p.username] = 0;
 		});
 
@@ -259,7 +260,7 @@ export class QuizGameService implements Interaction {
 			formatTable([
 				['Player', 'Score'],
 				'=',
-				...(Object.keys(gameState.scores).map(name => [
+				...(Object.keys(gameState.scores).map((name) => [
 					name,
 					gameState.scores[name],
 				]) as [string, number][])

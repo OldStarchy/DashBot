@@ -15,7 +15,7 @@ import StatisticsTracker from './StatisticsTracker';
 import StorageRegister from './StorageRegister';
 
 function configureWinston(loggingDir: string) {
-	const errorStackTracerFormat = winston.format(info => {
+	const errorStackTracerFormat = winston.format((info) => {
 		if (info.error && info.error instanceof Error) {
 			info.message = `${
 				info.message.length > 0 ? info.message + ' ' : ''
@@ -58,7 +58,7 @@ const storageDir = handleCli(args);
 
 configureWinston(storageDir);
 
-process.on('uncaughtException', e => {
+process.on('uncaughtException', (e) => {
 	winston.error('Uncaught Exception', { error: e });
 });
 
@@ -94,18 +94,18 @@ const pluginsDir = './Plugins';
 const plugins: DashBotPlugin[] = [];
 
 fs.readdirSync(pluginsDir)
-	.filter(file => file !== '.' && file !== '..')
-	.map(file => {
+	.filter((file) => file !== '.' && file !== '..')
+	.map((file) => {
 		const fullPath = path.join('.', pluginsDir, file);
 		if (fs.statSync(fullPath).isDirectory())
 			return path.join(file, 'Plugin.js');
 
 		return file;
 	})
-	.filter(file => file.endsWith('Plugin.js'))
+	.filter((file) => file.endsWith('Plugin.js'))
 	.sort()
-	.map(file => path.join(pluginsDir, file))
-	.forEach(file => {
+	.map((file) => path.join(pluginsDir, file))
+	.forEach((file) => {
 		// try {
 		winston.info(`Loading ${require.resolve('./' + file)}...`);
 		// eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -133,7 +133,7 @@ fs.readdirSync(pluginsDir)
 		// }
 	});
 
-plugins.forEach(plugin => {
+plugins.forEach((plugin) => {
 	winston.info(`Adding plugin "${plugin.name}".`);
 	plugin.register(context);
 });
@@ -192,7 +192,7 @@ const shutdown = async (signal?: string, value?: number) => {
 };
 
 (Object.keys(signals) as ('SIGHUP' | 'SIGINT' | 'SIGTERM')[]).forEach(
-	signal => {
+	(signal) => {
 		process.on(signal, () => {
 			shutdown(signal, signals[signal]);
 		});

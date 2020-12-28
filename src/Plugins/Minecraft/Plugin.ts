@@ -11,7 +11,7 @@ export default class MinecraftPlugin extends DashBotPlugin {
 		new MinecraftGreetInteraction().register(context.bot);
 
 		context.bot.commands.add(new BrewingCommand());
-		context.chatServerFactories['minecraft'] = serverConfig => {
+		context.chatServerFactories['minecraft'] = (serverConfig) => {
 			return new MinecraftServerFactory().make(
 				serverConfig as MinecraftServerConfig,
 				context

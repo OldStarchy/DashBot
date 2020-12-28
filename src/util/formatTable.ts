@@ -1,7 +1,7 @@
 export default function formatTable(rows: (string[] | '-' | '=')[]): string {
 	const widths: number[] = [];
 
-	rows.forEach(row =>
+	rows.forEach((row) =>
 		row instanceof Array
 			? row.forEach((col, index) => {
 					widths[index] = Math.max(widths[index] || 0, col.length);
@@ -12,8 +12,8 @@ export default function formatTable(rows: (string[] | '-' | '=')[]): string {
 	return (
 		'```\n' +
 		[
-			'┌' + widths.map(w => '─'.repeat(w + 2)).join('┬') + '┐',
-			...rows.map(row =>
+			'┌' + widths.map((w) => '─'.repeat(w + 2)).join('┬') + '┐',
+			...rows.map((row) =>
 				row instanceof Array
 					? '│' +
 					  row
@@ -24,10 +24,10 @@ export default function formatTable(rows: (string[] | '-' | '=')[]): string {
 							.join('│') +
 					  '│'
 					: row === '-'
-					? '├' + widths.map(w => '─'.repeat(w + 2)).join('┼') + '┤'
-					: '╞' + widths.map(w => '═'.repeat(w + 2)).join('╪') + '╡'
+					? '├' + widths.map((w) => '─'.repeat(w + 2)).join('┼') + '┤'
+					: '╞' + widths.map((w) => '═'.repeat(w + 2)).join('╪') + '╡'
 			),
-			'└' + widths.map(w => '─'.repeat(w + 2)).join('┴') + '┘',
+			'└' + widths.map((w) => '─'.repeat(w + 2)).join('┴') + '┘',
 		].join('\n') +
 		'\n```'
 	);

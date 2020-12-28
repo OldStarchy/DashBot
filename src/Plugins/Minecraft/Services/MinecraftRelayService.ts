@@ -36,7 +36,7 @@ function randomId() {
 		bits.push(selectRandom([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]));
 	}
 
-	return bits.map(b => b.toString()).join('');
+	return bits.map((b) => b.toString()).join('');
 }
 
 const MinecraftRelayServiceGrammar = {
@@ -108,7 +108,7 @@ export default class MinecraftRelayService implements Service {
 	private getRelayByServer(id: string) {
 		return (
 			this._relays.find(
-				relay =>
+				(relay) =>
 					MinecraftRelayService.isRelayValid(relay) &&
 					relay.minecraftServer?.id === id
 			) || null
@@ -118,7 +118,7 @@ export default class MinecraftRelayService implements Service {
 	private getRelayByChannel(id: string) {
 		return (
 			this._relays.find(
-				relay =>
+				(relay) =>
 					MinecraftRelayService.isRelayValid(relay) &&
 					relay.relayChannel?.id === id
 			) || null
@@ -128,14 +128,14 @@ export default class MinecraftRelayService implements Service {
 	private getRelayById(id: string) {
 		return (
 			this._relays.find(
-				relay =>
+				(relay) =>
 					MinecraftRelayService.isRelayValid(relay) && relay.id === id
 			) || null
 		);
 	}
 
 	private removeRelay(id: string) {
-		const index = this._relays.findIndex(relay => relay.id === id);
+		const index = this._relays.findIndex((relay) => relay.id === id);
 		if (index >= 0) {
 			this._relays.splice(index, 1);
 		}
@@ -209,7 +209,7 @@ export default class MinecraftRelayService implements Service {
 		this._store.setData({
 			relays: this._relays
 				.filter(MinecraftRelayService.isRelayValid)
-				.map(relay => ({
+				.map((relay) => ({
 					id: relay.id,
 					connectStartTime: relay.connectionExpiryTime,
 					minecraftServerId: relay.minecraftServer?.id,

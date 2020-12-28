@@ -77,10 +77,10 @@ export class EventEmitter<TEvents> {
 		const events = EventEmitter.extractEventTypes(event.event);
 
 		events
-			.map(eventName => this.eventHandlers[eventName])
-			.filter(handlers => handlers && handlers.length > 0)
-			.map(handlers => handlers.map(handler => handler.handler))
-			.forEach(handlers => this.internalEmit(event, handlers));
+			.map((eventName) => this.eventHandlers[eventName])
+			.filter((handlers) => handlers && handlers.length > 0)
+			.map((handlers) => handlers.map((handler) => handler.handler))
+			.forEach((handlers) => this.internalEmit(event, handlers));
 
 		return event;
 	}
@@ -109,9 +109,9 @@ export class EventEmitter<TEvents> {
 		const events = EventEmitter.extractEventTypes(event.event);
 
 		const handlerss = events
-			.map(eventName => this.eventHandlers[eventName])
-			.filter(handlers => handlers && handlers.length > 0)
-			.map(handlers => handlers.map(handler => handler.handler));
+			.map((eventName) => this.eventHandlers[eventName])
+			.filter((handlers) => handlers && handlers.length > 0)
+			.map((handlers) => handlers.map((handler) => handler.handler));
 
 		for (const handlers of handlerss) {
 			await this.internalEmitAsync(event, handlers);
@@ -184,7 +184,7 @@ export class EventEmitter<TEvents> {
 
 		let index: number;
 		do {
-			index = this.eventHandlers[event].findIndex(h => h.key === key);
+			index = this.eventHandlers[event].findIndex((h) => h.key === key);
 			if (index >= 0) {
 				this.eventHandlers[event].splice(index, 1);
 			}
@@ -206,7 +206,7 @@ export class EventEmitter<TEvents> {
 	) {
 		this.on(
 			event,
-			e => {
+			(e) => {
 				this.off(event, key);
 				handler(e);
 			},

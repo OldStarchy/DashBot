@@ -28,7 +28,8 @@ interface MinecraftServerEvents extends ChatServerEvents {
 		server: ChatServer;
 	};
 }
-export default class MinecraftServer extends EventEmitter<MinecraftServerEvents>
+export default class MinecraftServer
+	extends EventEmitter<MinecraftServerEvents>
 	implements ChatServer<MinecraftIdentity, MinecraftTextChannel> {
 	private _textChannel: MinecraftTextChannel;
 	private _identityCache: MinecraftIdentityCache;
@@ -54,7 +55,7 @@ export default class MinecraftServer extends EventEmitter<MinecraftServerEvents>
 		this._identityCache = new MinecraftIdentityCache(this, storage);
 		this.me = new MinecraftIdentity(this, botName, '');
 
-		this._logReader.on('chatMessage', async event => {
+		this._logReader.on('chatMessage', async (event) => {
 			const chatMessage = event.data;
 			await this._identityCache.addByName(chatMessage.author);
 
@@ -70,7 +71,7 @@ export default class MinecraftServer extends EventEmitter<MinecraftServerEvents>
 			);
 		});
 
-		this._logReader.on('logInOutMessage', async event => {
+		this._logReader.on('logInOutMessage', async (event) => {
 			const message = event.data;
 			await this._identityCache.addByName(message.who);
 
@@ -82,7 +83,7 @@ export default class MinecraftServer extends EventEmitter<MinecraftServerEvents>
 			);
 		});
 
-		this._logReader.on('deathMessage', async event => {
+		this._logReader.on('deathMessage', async (event) => {
 			const message = event.data;
 
 			if (!message.player) return; //Intentional game design

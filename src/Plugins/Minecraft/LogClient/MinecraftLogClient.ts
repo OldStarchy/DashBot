@@ -10,9 +10,7 @@ export interface MinecraftLogClientEvents {
 	deathMessage: DeathMessage;
 }
 
-export default abstract class MinecraftLogClient extends EventEmitter<
-	MinecraftLogClientEvents
-> {
+export default abstract class MinecraftLogClient extends EventEmitter<MinecraftLogClientEvents> {
 	constructor() {
 		super();
 	}
