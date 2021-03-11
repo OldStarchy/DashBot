@@ -123,14 +123,21 @@ export default class ScheduleService
 				);
 
 				if (success) {
+					const timeDiff = time - Date.now();
+					const lessThanADay =
+						Math.abs(timeDiff) < 1000 * 60 * 60 * 24;
+					const format = lessThanADay ? `'at' t` : `'on' DDDD 'at' t`;
+
 					//TODO: get timezone for person, or fallback to channel/server default
 					await message.channel.sendText(
-						`"${reminder}" at ${DateTime.utc(time)
+						`"${reminder}" ${DateTime.fromMillis(time, {
+							locale: 'utc',
+						})
 							.setZone('Australia/Adelaide')
-							.toLocaleString({
-								locale: 'en-AU',
-							})} (${DateStringParser.getTimeDiffString(
-							time - Date.now()
+							.toFormat(
+								format
+							)} (${DateStringParser.getTimeDiffString(
+							timeDiff
 						)})`
 					);
 				} else {
