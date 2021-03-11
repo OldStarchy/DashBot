@@ -8,7 +8,7 @@ type ChangeLog = {
 };
 
 const changeLog: ChangeLog = {
-	patch: {
+	'0.8.1': {
 		Fixed: ['Fix the "Invalid DateTime" text when setting reminders'],
 	},
 	'0.8.0': {
