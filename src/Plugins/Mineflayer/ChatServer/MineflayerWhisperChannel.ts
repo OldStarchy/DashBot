@@ -30,4 +30,8 @@ export default class MineflayerWhisperChannel extends MineflayerTextChannel {
 	async sendText(message: string): Promise<void> {
 		this._server.getBot()?.whisper(this.targetPlayerName, message);
 	}
+
+	async sendIsTyping(): Promise<void> {
+		return;
+	}
 }

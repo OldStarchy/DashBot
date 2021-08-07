@@ -37,4 +37,8 @@ export default class MinecraftTextChannel implements TextChannel {
 			await this._rcon.broadcast(message, this._server.me.username);
 		}
 	}
+
+	async sendIsTyping() {
+		return;
+	}
 }

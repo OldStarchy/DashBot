@@ -38,6 +38,11 @@ export default class DiscordTextChannel implements TextChannel {
 		return new DiscordMessage(this, discordMessage);
 	}
 
+	async sendIsTyping(isTyping: boolean) {
+		if (isTyping) await this._channel.startTyping();
+		else await this._channel.stopTyping();
+	}
+
 	get supportsReactions() {
 		return true;
 	}
