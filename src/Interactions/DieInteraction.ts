@@ -60,16 +60,20 @@ export default class DieInteraction implements Interaction {
 			const result = Math.floor(Math.random() * size) + 1;
 
 			(async () => {
-				await channel.sendText(
-					`@${author.username}, rolling a D${(
-						size * (positive ? 1 : -1)
-					).toFixed(0)}...`
-				);
+				const resultString = positive
+					? result.toFixed(0)
+					: '-' + result.toFixed(0);
 
-				await sleep(1000);
+				const message = `Rolling a D${(
+					size * (positive ? 1 : -1)
+				).toFixed(0)}...  ${resultString}`;
 
-				if (positive) channel.sendText(result.toFixed(0));
-				else channel.sendText('-' + result.toFixed(0));
+				channel.sendIsTyping(true);
+
+				await sleep(500 + 55 * message.length);
+
+				await channel.sendText(message);
+				await channel.sendIsTyping(false);
 			})();
 
 			return;
