@@ -68,6 +68,7 @@ export default class DateStringParser {
 				hour: hr,
 				minute: i ? Number.parseInt(i) : 0,
 				second: s ? Number.parseInt(s) : 0,
+				millisecond: 0,
 			});
 
 			if (!dateFound) {

@@ -29,12 +29,13 @@ export type ScheduleServiceOptions = PartialDefaults<
 	typeof defaultOptions
 >;
 
+interface ReminderData {
+	reminder: string;
+	serverId: string;
+	channelId: string;
+}
 interface ScheduleServiceEvents {
-	reminder: {
-		reminder: string;
-		serverId: string;
-		channelId: string;
-	};
+	reminder: ReminderData;
 	[eventName: string]: unknown;
 }
 
@@ -45,6 +46,7 @@ interface ScheduleServiceData {
 		owner: string;
 	}[];
 }
+
 export default class ScheduleService
 	extends EventEmitter<ScheduleServiceEvents>
 	implements Service {
@@ -54,6 +56,8 @@ export default class ScheduleService
 	private _identityService: IdentityService;
 	private _maxTimersPerPerson: number;
 
+	private _listRemindersCommand: Command;
+	private _deleteReminderCommand: Command;
 	private _remindCommand: Command;
 
 	constructor(options: ScheduleServiceOptions) {
@@ -79,6 +83,75 @@ export default class ScheduleService
 		// eslint-disable-next-line @typescript-eslint/no-this-alias
 		const service = this;
 
+		this._listRemindersCommand = new (class ListRemindersCommand extends Command {
+			name = 'listreminders';
+			description = 'Lists all the reminders in the current room';
+
+			async run(message: Message): Promise<void> {
+				const channel = message.channel;
+				const server = channel.server;
+
+				const events = service
+					.getEventsForChannel(server.id, channel.id)
+					.filter((event) =>
+						service.isReminderEvent(event.event)
+					) as {
+					timestamp: number;
+					event: Event<string, ReminderData>;
+					owner: string;
+				}[];
+
+				if (events.length === 0) {
+					channel.sendText('No reminders for this channel.');
+					return;
+				}
+
+				let id = 1;
+				for (const event of events) {
+					await channel.sendText(
+						`${id++}: ${service.formatTimestamp(
+							event.timestamp
+						)}: ${event.event.data.reminder}`
+					);
+				}
+			}
+		})();
+
+		this._deleteReminderCommand = new (class ListRemindersCommand extends Command {
+			name = 'deletereminder';
+			description = 'Lists all the reminders in the current room';
+
+			async run(message: Message, indexArg: string): Promise<void> {
+				const channel = message.channel;
+				const server = channel.server;
+
+				const events = service
+					.getEventsForChannel(server.id, channel.id)
+					.filter((event) =>
+						service.isReminderEvent(event.event)
+					) as {
+					timestamp: number;
+					event: Event<string, ReminderData>;
+					owner: string;
+				}[];
+
+				if (events.length === 0) {
+					channel.sendText('No reminders for this channel.');
+					return;
+				}
+
+				const index = parseInt(indexArg) - 1;
+
+				if (index >= events.length || index < 0) {
+					channel.sendText('You are invalid!');
+					return;
+				}
+
+				service.deleteReminder(server.id, channel.id, index);
+				channel.sendText(`oke`);
+			}
+		})();
+
 		this._remindCommand = new (class RemindCommand extends Command {
 			readonly name = 'remind';
 			readonly description =
@@ -102,7 +175,7 @@ export default class ScheduleService
 				time = t;
 				reminder = remainingStr;
 
-				if (time === null) {
+				if (null === time) {
 					await message.channel.sendText("Couldn't parse time");
 					return;
 				}
@@ -123,22 +196,9 @@ export default class ScheduleService
 				);
 
 				if (success) {
-					const timeDiff = time - Date.now();
-					const lessThanADay =
-						Math.abs(timeDiff) < 1000 * 60 * 60 * 24;
-					const format = lessThanADay ? `'at' t` : `'on' DDDD 'at' t`;
-
 					//TODO: get timezone for person, or fallback to channel/server default
 					await message.channel.sendText(
-						`"${reminder}" ${DateTime.fromMillis(time, {
-							locale: 'utc',
-						})
-							.setZone('Australia/Adelaide')
-							.toFormat(
-								format
-							)} (${DateStringParser.getTimeDiffString(
-							timeDiff
-						)})`
+						`"${reminder}" ${service.formatTimestamp(time)})`
 					);
 				} else {
 					await message.channel.sendText(
@@ -148,8 +208,25 @@ export default class ScheduleService
 			}
 		})();
 	}
+
+	formatTimestamp(time: number) {
+		const timeDiff = time - Date.now();
+		const lessThanADay = Math.abs(timeDiff) < 1000 * 60 * 60 * 24;
+		const format = lessThanADay ? `'at' t` : `'on' DDDD 'at' t`;
+
+		return `${DateTime.fromMillis(time, {
+			locale: 'utc',
+		})
+			.setZone('Australia/Adelaide')
+			.toFormat(format)} (${DateStringParser.getTimeDiffString(
+			timeDiff
+		)})`;
+	}
 	register(dashBot: DashBot) {
 		dashBot.commands.add(this._remindCommand);
+		dashBot.commands.add(this._listRemindersCommand);
+		dashBot.commands.add(this._deleteReminderCommand);
+
 		this.start();
 
 		this.on('reminder', async (e) => {
@@ -163,8 +240,41 @@ export default class ScheduleService
 		});
 	}
 
+	getEvents() {
+		return this._store.getData()?.events || [];
+	}
+
+	getEventsForChannel(serverId: string, channelId: string) {
+		const events = this.getEvents();
+
+		return events.filter((event) => {
+			if (this.isReminderEvent(event.event)) {
+				if (
+					event.event.data.serverId == serverId &&
+					event.event.data.channelId == channelId
+				)
+					return true;
+			}
+			return false;
+		});
+	}
+
+	isReminderEvent(
+		event: Event<string, unknown>
+	): event is Event<string, ReminderData> {
+		if (event.data instanceof Object) {
+			if (
+				'reminder' in event.data &&
+				'serverId' in event.data &&
+				'channelId' in event.data
+			)
+				return true;
+		}
+		return false;
+	}
+
 	checkForEvents() {
-		const events = this._store.getData()?.events || [];
+		const events = this.getEvents();
 
 		const now = Date.now();
 
@@ -203,6 +313,31 @@ export default class ScheduleService
 
 		this._store.setData({ events });
 		return true;
+	}
+
+	deleteReminder(serverId: string, channelId: string, index: number) {
+		const events = this.getEvents();
+
+		let i = 0;
+		let id2 = 0;
+		for (const event of events) {
+			if (
+				this.isReminderEvent(event.event) &&
+				event.event.data.channelId === channelId &&
+				event.event.data.serverId === serverId
+			) {
+				if (i === index) {
+					events.splice(id2, 1);
+					break;
+				}
+				i++;
+			}
+
+			id2++;
+		}
+		this._store.setData({
+			events,
+		});
 	}
 
 	start() {
