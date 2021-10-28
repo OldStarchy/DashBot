@@ -84,6 +84,14 @@ export default function registerAllComponents(
 	helpCommand.register(bot);
 	new ABResponseInteraction([
 		[
+			/pizza/i,
+			[
+				'Did you say pizza!!?!? I want pizza!',
+				'@OldStarchy has asked me to inform you that he would like to be involved in pizza.',
+				'I want pizza too.',
+			],
+		],
+		[
 			/^compliment( please)?/i,
 			[
 				'#target.username#, you have beautiful eyes.',
