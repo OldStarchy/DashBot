@@ -1,4 +1,4 @@
-FROM node:14 AS builder
+FROM node:16-alpine3.12 AS builder
 WORKDIR /app
 
 COPY package.json .
@@ -15,7 +15,7 @@ RUN yarn install --production && \
 	yarn build:prod
 
 
-FROM arm32v7/node:14-alpine
+FROM arm32v7/node:16-alpine3.12
 WORKDIR /app
 
 COPY --from=builder /app/dist .
