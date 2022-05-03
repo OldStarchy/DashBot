@@ -18,10 +18,10 @@
 			"request": "launch",
 			"name": "Debug DashBot",
 			"skipFiles": ["<node_internals>/**"],
-			"program": "${workspaceFolder}\\dist\\main.js",
+			"program": "${workspaceFolder}/dist/main.js",
 			"outFiles": ["${workspaceFolder}/**/*.js"],
-			"args": ["--storage", "..\\storage"],
-			"cwd": "${workspaceFolder}\\dist",
+			"args": ["--storage", "../storage"],
+			"cwd": "${workspaceFolder}/dist",
 			"outputCapture": "std"
 		}
 	]
