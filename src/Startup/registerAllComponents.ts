@@ -130,7 +130,7 @@ export default function registerAllComponents(
 			'나는 한국어를 못하지만 내 친구 인 #target.username#는합니다.',
 		],
 		[
-			/^(こんいちは|今日は|おはよう|こんばんは)/i,
+			/^(こんにちは|今日は|おはよう|こんばんは)/i,
 			'おはよう。。。かそれがこんばんわですか?何時かわからない :man_shrugging:',
 		],
 		[/^(만나서 반가워요)/i, ['만나서 반가워요 #target.username#']],
