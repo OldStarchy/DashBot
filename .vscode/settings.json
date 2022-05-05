@@ -32,7 +32,6 @@
 	},
 	"npm.packageManager": "yarn",
 	"eslint.packageManager": "yarn",
-	"prettier.packageManager": "yarn",
 	"typescript.disableAutomaticTypeAcquisition": false,
 	"editor.formatOnSave": true
 }

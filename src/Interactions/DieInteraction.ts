@@ -68,12 +68,11 @@ export default class DieInteraction implements Interaction {
 					size * (positive ? 1 : -1)
 				).toFixed(0)}...  ${resultString}`;
 
-				channel.sendIsTyping(true);
+				channel.sendTyping();
 
 				await sleep(500 + 55 * message.length);
 
 				await channel.sendText(message);
-				await channel.sendIsTyping(false);
 			})();
 
 			return;

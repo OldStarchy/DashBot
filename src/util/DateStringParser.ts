@@ -188,7 +188,8 @@ export default class DateStringParser {
 	}
 
 	private static parseHmsText(str: string) {
-		const regex = /(?<amount>\d+) (?<unit>hour|minute|second)s?(?: (?:and|,))?/g;
+		const regex =
+			/(?<amount>\d+) (?<unit>hour|minute|second)s?(?: (?:and|,))?/g;
 
 		let match = null;
 		const totals: DurationObjectUnits = {};

@@ -38,7 +38,7 @@ export default class MinecraftTextChannel implements TextChannel {
 		}
 	}
 
-	async sendIsTyping() {
+	async sendTyping() {
 		return;
 	}
 }

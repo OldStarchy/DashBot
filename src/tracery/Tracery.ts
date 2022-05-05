@@ -369,7 +369,10 @@ class Rule {
 	}
 }
 
-const textPart = (string: string): (() => string) => (): string => string;
+const textPart =
+	(string: string): (() => string) =>
+	(): string =>
+		string;
 const referencePart = <T extends Grammar>(
 	string: string,
 	tracery: Tracery<T>

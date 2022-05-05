@@ -17,7 +17,9 @@ export default class DiscordTextChannel implements TextChannel {
 		if (this._channel instanceof Discord.DMChannel) {
 			return 'DM with ' + this._channel.recipient.username;
 		} else {
-			return this._channel.name;
+			if ('name' in this._channel) return this._channel.name;
+			//TODO: make this return null?
+			return this._channel.id;
 		}
 	}
 
@@ -38,9 +40,8 @@ export default class DiscordTextChannel implements TextChannel {
 		return new DiscordMessage(this, discordMessage);
 	}
 
-	async sendIsTyping(isTyping: boolean) {
-		if (isTyping) await this._channel.startTyping();
-		else await this._channel.stopTyping();
+	async sendTyping() {
+		await this._channel.sendTyping();
 	}
 
 	get supportsReactions() {

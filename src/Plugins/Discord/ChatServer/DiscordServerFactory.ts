@@ -1,4 +1,4 @@
-import { Client } from 'discord.js';
+import { Client, Intents } from 'discord.js';
 import IdentityService from '../../../ChatServer/IdentityService';
 import DiscordServer from './DiscordServer';
 
@@ -15,7 +15,10 @@ export default class DiscordServerFactory {
 
 		return new DiscordServer({
 			id: serverConfig.id ?? 'Discord',
-			discordClient: new Client(),
+			discordClient: new Client({
+				intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.DIRECT_MESSAGES],
+				partials: ['CHANNEL'],
+			}),
 			botToken: serverConfig.botToken,
 			identityService,
 		});

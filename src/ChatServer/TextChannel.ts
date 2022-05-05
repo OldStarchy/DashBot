@@ -9,5 +9,5 @@ export default interface TextChannel {
 	readonly supportsReactions: boolean;
 	readonly server: ChatServer;
 	sendText(message: string): Promise<Message | void>;
-	sendIsTyping(isTyping: boolean): Promise<void>;
+	sendTyping(): Promise<void>;
 }

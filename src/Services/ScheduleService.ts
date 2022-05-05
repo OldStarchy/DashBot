@@ -49,7 +49,8 @@ interface ScheduleServiceData {
 
 export default class ScheduleService
 	extends EventEmitter<ScheduleServiceEvents>
-	implements Service {
+	implements Service
+{
 	private _interval: number;
 	private _intervalId: NodeJS.Timeout | null = null;
 	private _store: DataStore<ScheduleServiceData>;
@@ -64,12 +65,8 @@ export default class ScheduleService
 		super();
 		const compiledOptions = shallowMerge(defaultOptions, options);
 
-		const {
-			interval,
-			storage,
-			identityService,
-			maxTimersPerPerson,
-		} = compiledOptions;
+		const { interval, storage, identityService, maxTimersPerPerson } =
+			compiledOptions;
 
 		this._interval = interval;
 		this._identityService = identityService;
@@ -83,74 +80,76 @@ export default class ScheduleService
 		// eslint-disable-next-line @typescript-eslint/no-this-alias
 		const service = this;
 
-		this._listRemindersCommand = new (class ListRemindersCommand extends Command {
-			name = 'listreminders';
-			description = 'Lists all the reminders in the current room';
+		this._listRemindersCommand =
+			new (class ListRemindersCommand extends Command {
+				name = 'listreminders';
+				description = 'Lists all the reminders in the current room';
 
-			async run(message: Message): Promise<void> {
-				const channel = message.channel;
-				const server = channel.server;
+				async run(message: Message): Promise<void> {
+					const channel = message.channel;
+					const server = channel.server;
 
-				const events = service
-					.getEventsForChannel(server.id, channel.id)
-					.filter((event) =>
-						service.isReminderEvent(event.event)
-					) as {
-					timestamp: number;
-					event: Event<string, ReminderData>;
-					owner: string;
-				}[];
+					const events = service
+						.getEventsForChannel(server.id, channel.id)
+						.filter((event) =>
+							service.isReminderEvent(event.event)
+						) as {
+						timestamp: number;
+						event: Event<string, ReminderData>;
+						owner: string;
+					}[];
 
-				if (events.length === 0) {
-					channel.sendText('No reminders for this channel.');
-					return;
+					if (events.length === 0) {
+						channel.sendText('No reminders for this channel.');
+						return;
+					}
+
+					let id = 1;
+					for (const event of events) {
+						await channel.sendText(
+							`${id++}: ${service.formatTimestamp(
+								event.timestamp
+							)}: ${event.event.data.reminder}`
+						);
+					}
 				}
+			})();
 
-				let id = 1;
-				for (const event of events) {
-					await channel.sendText(
-						`${id++}: ${service.formatTimestamp(
-							event.timestamp
-						)}: ${event.event.data.reminder}`
-					);
+		this._deleteReminderCommand =
+			new (class ListRemindersCommand extends Command {
+				name = 'deletereminder';
+				description = 'Lists all the reminders in the current room';
+
+				async run(message: Message, indexArg: string): Promise<void> {
+					const channel = message.channel;
+					const server = channel.server;
+
+					const events = service
+						.getEventsForChannel(server.id, channel.id)
+						.filter((event) =>
+							service.isReminderEvent(event.event)
+						) as {
+						timestamp: number;
+						event: Event<string, ReminderData>;
+						owner: string;
+					}[];
+
+					if (events.length === 0) {
+						channel.sendText('No reminders for this channel.');
+						return;
+					}
+
+					const index = parseInt(indexArg) - 1;
+
+					if (index >= events.length || index < 0) {
+						channel.sendText('You are invalid!');
+						return;
+					}
+
+					service.deleteReminder(server.id, channel.id, index);
+					channel.sendText(`oke`);
 				}
-			}
-		})();
-
-		this._deleteReminderCommand = new (class ListRemindersCommand extends Command {
-			name = 'deletereminder';
-			description = 'Lists all the reminders in the current room';
-
-			async run(message: Message, indexArg: string): Promise<void> {
-				const channel = message.channel;
-				const server = channel.server;
-
-				const events = service
-					.getEventsForChannel(server.id, channel.id)
-					.filter((event) =>
-						service.isReminderEvent(event.event)
-					) as {
-					timestamp: number;
-					event: Event<string, ReminderData>;
-					owner: string;
-				}[];
-
-				if (events.length === 0) {
-					channel.sendText('No reminders for this channel.');
-					return;
-				}
-
-				const index = parseInt(indexArg) - 1;
-
-				if (index >= events.length || index < 0) {
-					channel.sendText('You are invalid!');
-					return;
-				}
-
-				service.deleteReminder(server.id, channel.id, index);
-				channel.sendText(`oke`);
-			}
-		})();
+			})();
 
 		this._remindCommand = new (class RemindCommand extends Command {
 			readonly name = 'remind';

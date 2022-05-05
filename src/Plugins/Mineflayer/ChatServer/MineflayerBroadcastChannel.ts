@@ -30,7 +30,7 @@ export default class MineflayerBroadcastChannel extends MineflayerTextChannel {
 		this._server.getBot()?.chat(message);
 	}
 
-	async sendIsTyping() {
+	async sendTyping() {
 		return;
 	}
 }

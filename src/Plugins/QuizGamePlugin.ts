@@ -137,13 +137,17 @@ export class QuizGameService implements Interaction {
 		for (let i = 1; i >= 0; i--) {
 			try {
 				//Wait for an "OK"
-				await dm.awaitReactions(
-					(reaction: MessageReaction) =>
-						[Emoji.OK, Emoji.NO_ENTRY].includes(
-							reaction.emoji.name
-						),
-					{ max: 2, time: 60000, errors: ['time'] }
-				);
+				await dm.awaitReactions({
+					filter: (reaction: MessageReaction) =>
+						reaction.emoji.name
+							? [Emoji.OK, Emoji.NO_ENTRY].includes(
+									reaction.emoji.name
+							  )
+							: false,
+					max: 2,
+					time: 60000,
+					errors: ['time'],
+				});
 				break;
 			} catch {
 				if (i > 0) {
@@ -260,10 +264,12 @@ export class QuizGameService implements Interaction {
 			formatTable([
 				['Player', 'Score'],
 				'=',
-				...(Object.keys(gameState.scores).map((name) => [
-					name,
-					gameState.scores[name],
-				]) as [string, number][])
+				...(
+					Object.keys(gameState.scores).map((name) => [
+						name,
+						gameState.scores[name],
+					]) as [string, number][]
+				)
 					.sort((a, b) => a[1] - b[1])
 					.map(([name, score]) => [name, score.toFixed(0)]),
 			])

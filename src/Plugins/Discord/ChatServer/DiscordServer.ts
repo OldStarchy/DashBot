@@ -24,7 +24,8 @@ type DiscordServerEvents = ChatServerEvents;
 
 export default class DiscordServer
 	extends EventEmitter<DiscordServerEvents>
-	implements ChatServer<DiscordIdentity, DiscordTextChannel> {
+	implements ChatServer<DiscordIdentity, DiscordTextChannel>
+{
 	private _channelCache: Record<string, DiscordTextChannel> = {};
 	private _loggedIn = deferred<this>();
 	private _isLoggedIn = false;
@@ -48,16 +49,18 @@ export default class DiscordServer
 			winston.info('Logged in to discord');
 		});
 
-		this._discordClient.on('message', (message) =>
-			this.emit(
-				new CancellableEvent(
-					'message',
-					new DiscordMessage(
-						this.getChannel(message.channel),
-						message
+		this._discordClient.on(
+			'messageCreate',
+			(message) =>
+				void this.emit(
+					new CancellableEvent(
+						'message',
+						new DiscordMessage(
+							this.getChannel(message.channel),
+							message
+						)
 					)
 				)
-			)
 		);
 	}
 

@@ -25,5 +25,6 @@ export default abstract class MineflayerTextChannel implements TextChannel {
 
 	abstract sendText(message: string): Promise<void>;
 
-	abstract sendIsTyping(isTyping: boolean): Promise<void>;
+	abstract sendTyping(isTyping: boolean): Promise<void>;
+	abstract sendTyping(): Promise<void>;
 }
