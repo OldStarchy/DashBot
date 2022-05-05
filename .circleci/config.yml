@@ -7,9 +7,9 @@ executors:
       - image: circleci/buildpack-deps:stretch
 jobs:
   test-source:
-    description: "ESLint source files"
+    description: 'ESLint source files'
     docker:
-      - image: node:14
+      - image: node:16
     steps:
       - checkout
       - run:
@@ -23,12 +23,13 @@ jobs:
             yarn build
             yarn coverage
   test-docker:
-    description: "lint-dockerfile << parameters.container-image >>"
+    description: 'lint-dockerfile << parameters.container-image >>'
     docker:
       - image: docker:stable
     steps:
       - checkout
-      - setup_remote_docker
+      - setup_remote_docker:
+          version: 19.03.13
       - run:
           name: Lint Dockerfile
           command: |
@@ -37,7 +38,8 @@ jobs:
     executor: docker-publisher
     steps:
       - checkout
-      - setup_remote_docker
+      - setup_remote_docker:
+          version: 19.03.13
       - run:
           name: Build Docker Image
           command: |
@@ -54,7 +56,8 @@ jobs:
     steps:
       - attach_workspace:
           at: /tmp/workspace
-      - setup_remote_docker
+      - setup_remote_docker:
+          version: 19.03.13
       - run:
           name: Load archived Docker image
           command: docker load -i /tmp/workspace/image.tar
