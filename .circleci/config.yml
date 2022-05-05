@@ -70,7 +70,7 @@ jobs:
           name: Deploy
           command: |
             echo "$DEPLOY_HOST_ECDSA" >> ~/.ssh/known_hosts
-            ssh $DEPLOY_HOST './dashbot-restart.sh'
+            ssh -o LogLevel=ERROR $DEPLOY_HOST './dashbot-restart.sh'
 workflows:
   main:
     jobs:
