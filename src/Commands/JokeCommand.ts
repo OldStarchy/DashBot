@@ -41,7 +41,7 @@ export class ICanHazDadJokeClient {
 				['Accept', ' application/json'],
 				[
 					'User-Agent',
-					'DashBot Chat Bot (https://github.com/aNickzz/DashBot)',
+					'DashBot Chat Bot (https://github.com/OldStarchy/DashBot)',
 				],
 			],
 		});

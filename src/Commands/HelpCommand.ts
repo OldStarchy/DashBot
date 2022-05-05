@@ -15,7 +15,7 @@ const HelpCommandGrammar = {
 		'I\'m you\'re friendly neighbourhood chatbot. I can do a couple things like give you a "compliment" or "roll D20". If you want, I can DM you some more info.',
 	],
 	moreInfo: [
-		"You're best off reading my readme file over on github.\nhttps://github.com/aNickzz/DashBot\\#dashbot",
+		"You're best off reading my readme file over on github.\nhttps://github.com/OldStarchy/DashBot\\#dashbot",
 	],
 	'ok-no': ['OK :)', 'No problem'],
 	'ok-yes': ['Will do', 'OK, 1 sec'],
