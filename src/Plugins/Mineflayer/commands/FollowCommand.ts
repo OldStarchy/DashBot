@@ -1,9 +1,10 @@
+import MineflayerPathfinder from 'mineflayer-pathfinder';
 import Message from '../../../ChatServer/Message';
 import Command from '../../../Command';
 import MineflayerClient from '../ChatServer/MineflayerClient';
 import { BusyLockKey } from '../util/BusyLock';
 
-const priority = 10;
+const priority = 5;
 
 export default class FollowCommand extends Command {
 	readonly name = 'follow';
@@ -45,11 +46,21 @@ export default class FollowCommand extends Command {
 
 		if (newLock && !newLock.cancelled) {
 			channel.sendText(`Following ${tag}.`);
-			follow.setTarget(target);
+			this.client
+				.getBot()!
+				.pathfinder.setGoal(
+					new MineflayerPathfinder.goals.GoalFollow(
+						targetPlayer.entity,
+						3
+					),
+					true
+				);
+			// follow.setTarget(target);
 
 			this.followLock = newLock;
 			this.followLock.on('cancelled', () => {
-				follow.setTarget(null);
+				this.client.getBot()?.pathfinder.stop();
+				// follow.setTarget(null);
 				this.followLock = null;
 			});
 		} else {

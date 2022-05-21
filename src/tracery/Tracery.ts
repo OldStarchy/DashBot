@@ -415,6 +415,6 @@ export type RuleDefinition =
 	| object
 	| ((tracery: Tracery<Grammar>, ...args: unknown[]) => RuleDefinition);
 
-export type Grammar = {
-	[ruleName: string]: RuleDefinition;
+export type Grammar<T extends string = string> = {
+	[ruleName in T]: RuleDefinition;
 };

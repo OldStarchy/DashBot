@@ -159,12 +159,11 @@ export default class FollowBehaviour extends EventEmitter<FollowBehaviourEvents>
 
 			bot.lookAt(
 				new Vec3(pos.x, pos.y + target.height, pos.z),
-				false,
-				() => {
-					bot.setControlState('forward', true);
-					if (jump) bot.setControlState('jump', true);
-				}
-			);
+				false
+			).then(() => {
+				bot.setControlState('forward', true);
+				if (jump) bot.setControlState('jump', true);
+			});
 		}
 		// 	let blocked = false;
 		// 	blockMarch(
@@ -203,7 +202,7 @@ export default class FollowBehaviour extends EventEmitter<FollowBehaviourEvents>
 
 		if (this._lastHit + 500 < DateTime.utc().valueOf()) {
 			bot.attack(entity);
-			bot.swingArm();
+			bot.swingArm('right');
 			this._lastHit = DateTime.utc().valueOf();
 		}
 	}

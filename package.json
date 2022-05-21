@@ -26,7 +26,8 @@
     "greenlock-express": "^4.0.3",
     "haiku-random": "^1.0.0",
     "luxon": "^1.25.0",
-    "mineflayer": "^2.39.2",
+    "mineflayer": "^4.3.0",
+    "mineflayer-pathfinder": "^2.1.1",
     "node-fetch": "^2.6.1",
     "tail": "^2.1.0",
     "throttle-debounce": "^3.0.1",
@@ -59,8 +60,5 @@
     "prettier": "^2.6.2",
     "source-map-support": "^0.5.19",
     "ts-node": "^9.1.1"
-  },
-  "resolutions": {
-    "vec3": "0.1.6"
   }
 }

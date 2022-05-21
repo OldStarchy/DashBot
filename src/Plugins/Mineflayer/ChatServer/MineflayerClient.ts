@@ -1,6 +1,7 @@
 import { DateTime } from 'luxon';
 import MinecraftData from 'minecraft-data';
 import mineflayer from 'mineflayer';
+import MineflayerPathfinder from 'mineflayer-pathfinder';
 import { Entity } from 'prismarine-entity';
 import { Vec3 } from 'vec3';
 import winston from 'winston';
@@ -48,7 +49,8 @@ type MineflayerClientEvents = ChatServerEvents;
 
 export default class MineflayerClient
 	extends EventEmitter<MineflayerClientEvents>
-	implements ChatServer<MineflayerIdentity, MineflayerTextChannel> {
+	implements ChatServer<MineflayerIdentity, MineflayerTextChannel>
+{
 	private _loggedIn: Deferred<this>;
 	private _identityService: IdentityService;
 	private _behaviours: Partial<MineflayerBehaviours>;
@@ -209,27 +211,17 @@ export default class MineflayerClient
 
 		const hitChance = 1.5 / distance;
 
-		await new Promise<boolean>((s) => {
-			bot.lookAt(
-				new Vec3(pos.x, pos.y + target.height, pos.z),
-				false,
-				() => {
-					const delta = pos.minus(
-						myPos.offset(0, bot.entity.height, 0)
-					);
-					const yaw = Math.atan2(-delta.x, -delta.z);
+		await bot.lookAt(new Vec3(pos.x, pos.y + target.height, pos.z), false);
 
-					if (Math.abs(deltaYaw(bot.entity.yaw, yaw)) < 0.01) {
-						bot?.swingArm();
-						if (Math.random() < hitChance) {
-							bot?.attack(target);
-							return s(true);
-						}
-					}
-					return s(false);
-				}
-			);
-		});
+		const delta = pos.minus(myPos.offset(0, bot.entity.height, 0));
+		const yaw = Math.atan2(-delta.x, -delta.z);
+
+		if (Math.abs(deltaYaw(bot.entity.yaw, yaw)) < 0.01) {
+			bot?.swingArm('right');
+			if (Math.random() < hitChance) {
+				bot?.attack(target);
+			}
+		}
 	}
 
 	getMcData() {
@@ -245,8 +237,12 @@ export default class MineflayerClient
 			host: this.options.host,
 			port: this.options.port,
 			username: this.options.username,
-			password: this.options.password,
+			// password: this.options.password,
+			auth: 'microsoft',
 		});
+
+		this.bot.loadPlugin(MineflayerPathfinder.pathfinder);
+
 		// eslint-disable-next-line @typescript-eslint/no-var-requires
 		require('debug')('minecraft-protocol').enabled = true;
 
@@ -304,6 +300,17 @@ export default class MineflayerClient
 		this._mcData = require('minecraft-data')(
 			this.bot!.version
 		) as MinecraftData.IndexedData;
+
+		const movements = new MineflayerPathfinder.Movements(
+			this.bot!,
+			this._mcData
+		);
+
+		movements.canDig = false;
+		movements.allow1by1towers = false;
+		movements.allowFreeMotion = true;
+
+		this.bot!.pathfinder.setMovements(movements);
 
 		this._loggedIn.resolve(this);
 	}

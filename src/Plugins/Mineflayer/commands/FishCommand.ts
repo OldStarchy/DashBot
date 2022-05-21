@@ -2,11 +2,18 @@ import winston from 'winston';
 import Message from '../../../ChatServer/Message';
 import TextChannel from '../../../ChatServer/TextChannel';
 import Command from '../../../Command';
-import sleep from '../../../util/sleep';
+import Tracery, { Grammar } from '../../../tracery/Tracery';
 import MineflayerClient from '../ChatServer/MineflayerClient';
 import { BusyLockKey } from '../util/BusyLock';
 
 const priority = 10;
+
+const grammar = {
+	starting: ['Fishing.'],
+	'already-started': ['Already fishing.'],
+	stopping: ['Stopping.'],
+	'stopping-with-reason': ['Stopping because #reason#'],
+} as const;
 
 export default class FishCommand extends Command {
 	readonly name = 'fish';
@@ -23,6 +30,20 @@ export default class FishCommand extends Command {
 
 	constructor(private client: MineflayerClient) {
 		super();
+	}
+
+	async say<TAdditional extends string>(
+		key: keyof (typeof grammar | Grammar<TAdditional>),
+		additionalGrammar?: Grammar<TAdditional>
+	) {
+		if (!this.channel) return;
+
+		const newGrammar = {
+			...grammar,
+			...additionalGrammar,
+		} as Record<typeof key, any>;
+
+		await this.channel.sendText(Tracery.generate(newGrammar, key));
 	}
 
 	async run(message: Message): Promise<void> {
@@ -49,10 +70,7 @@ export default class FishCommand extends Command {
 	}
 
 	async startFishing() {
-		await this.equipFishingRod();
-
-		this.channel!.sendText(`Fishing.`);
-
+		await this.channel?.sendText(Tracery.generate(grammar, 'starting'));
 		// no await
 		this._fish();
 	}
@@ -64,52 +82,62 @@ export default class FishCommand extends Command {
 		this.fishing = true;
 		while (this.fishing) {
 			this._lineIsOut = true;
-			const err = await new Promise<Error | undefined>((s) => {
-				bot.fish(s);
-			});
-			this._lineIsOut = false;
+			try {
+				await this.equipFishingRod();
+				await bot.fish();
+				this._lineIsOut = false;
+			} catch (err: unknown) {
+				this._lineIsOut = false;
 
-			if (err) {
-				winston.error(err.message, { error: err });
-				bot.chat('Failure.');
+				if (!this.fishing) {
+					// stopFishing() was called
+					return;
+				}
+
+				if (err instanceof Error) {
+					winston.error(err.message, { error: err });
+					this.channel?.sendText(
+						Tracery.generate(
+							{
+								...grammar,
+								reason: err.message,
+							},
+							'stopping-with-reason'
+						)
+					);
+				}
+				this.channel?.sendText(Tracery.generate(grammar, 'stopping'));
 				this.stopFishing();
 				return;
 			}
-
-			await sleep(500);
-
-			// const { player, entity } = await new Promise((s, f) => {
-			// 	bot.once(
-			// 		'playerCollect',
-			// 		(player: Entity, entity: Entity) => {
-			// 			s({ player, entity });
-			// 		}
-			// 	);
-			// });
-			// if (entity.kind === 'Drops' && player === bot.entity) {
-			// }
 		}
 	}
 
 	stopFishing() {
 		this.fishing = false;
 		const bot = this.client.getBot()!;
-		if (bot && this._lineIsOut) bot.activateItem();
+		if (bot && this._lineIsOut) {
+			//this causes bot.fish in _fish to throw an error
+			bot.fish();
+		}
 		this._lineIsOut = false;
 	}
 
 	async equipFishingRod() {
 		const bot = this.client.getBot()!;
 		if (!bot) return;
+
+		if (bot.heldItem?.name === 'fishing_rod') return;
+
 		const mcData = this.client.getMcData()!;
 		const fishingRod = mcData.itemsByName['fishing_rod'].id;
-		const err = await new Promise<Error | undefined>((s) => {
-			(bot as any).equip(fishingRod, 'hand', s);
-		});
-
-		if (err) {
-			winston.error(err.message, { error: err });
-			bot.chat('Failure.');
+		try {
+			await bot.equip(fishingRod, 'hand');
+		} catch (err) {
+			if (err instanceof Error) {
+				winston.error(err.message, { error: err });
+			}
+			this.channel?.sendText(Tracery.generate(grammar, 'stopping'));
 			return;
 		}
 	}

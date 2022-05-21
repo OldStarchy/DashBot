@@ -28,11 +28,14 @@ export default class DropAllCommand extends Command {
 		const items = bot.inventory.items();
 
 		for (const item of items) {
-			const err = await new Promise<Error | undefined>((s) =>
-				bot.tossStack(item, s)
-			);
-			if (err) {
-				channel.sendText(err.message);
+			try {
+				await bot.tossStack(item);
+			} catch (err: unknown) {
+				if (err instanceof Error) {
+					channel.sendText(err.message);
+				} else {
+					channel.sendText('Something borked tryna toss a stack');
+				}
 				return;
 			}
 		}
