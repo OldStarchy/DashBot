@@ -102,7 +102,7 @@ export default class NumberGameInteraction implements Interaction {
 
 				if (guess === sessionData.number) {
 					channel.sendText(
-						`You win, you made ${sessionData.guesses} guesses. Well done, you're parents must be proud.`
+						`You win, you made ${sessionData.guesses} guesses. Well done, your parents must be proud.`
 					);
 					session.clearData();
 					return;
